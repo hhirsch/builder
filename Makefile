@@ -1,12 +1,16 @@
 # Go variables
 GO=go
 PKG=main
+PROJECT_PATH := $(PWD)
 
 # Go build flags
 BUILD_FLAGS=-v
 
 # Targets
 all: builder
+
+linkBinary:
+	sudo ln -s $(PROJECT_PATH)/builder /usr/bin/bdev
 
 builder:
 	$(GO) build $(BUILD_FLAGS) -o builder builder.go client.go logger.go interpreter.go registry.go systemd.go environment.go
