@@ -13,9 +13,7 @@ func GetBannerText() string {
 
 func GetHelpText() string {
 	var bannerText string = `
-Builder - server maintenance tool
-
-builder [command]
+Call: builder [command]
 
 help      show this help
 init      initialize project in directory
