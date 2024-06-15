@@ -19,3 +19,9 @@ To read the help page, use the following command:
 ```
 builder help
 ```
+
+## Development
+To make your development binary available in your system as bdev you can use the following target.
+```
+make linkBinary
+```
