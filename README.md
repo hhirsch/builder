@@ -1,9 +1,9 @@
 # Builder
-Write code in a basic dialect to commission GNU/Linux systems
+Write code to commission GNU/Linux systems
 
 ```
-// this is a comment
+// prompt the user to give information about the host
 setupHost myhost
-step Install Net Tools
+step Install Net Tools If Not Installed
 ensurePackage net-tools
 ```
