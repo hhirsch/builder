@@ -20,5 +20,6 @@ func (this *Package) GetDpkgData(data string) string {
 		}
 	}
 
-	return metadata
+	//return metadata
+	return "fixme"
 }
