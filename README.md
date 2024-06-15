@@ -25,3 +25,4 @@ To make your development binary available in your system as bdev you can use the
 ```
 make linkBinary
 ```
+The binary is called bdev so it can be differentiated from your regular builder install.
