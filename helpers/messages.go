@@ -17,6 +17,7 @@ Builder - server maintenance tool
 
 builder [command]
 
+help      show this help
 init      initialize project in directory
 update    run pending migrations scripts
 migration re-run specific migration

@@ -13,3 +13,9 @@ setupHost myhost
 step Install Net Tools If Not Installed
 ensurePackage net-tools
 ```
+
+## Help
+To read the help page, use the following command:
+```
+builder help
+```

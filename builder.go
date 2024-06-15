@@ -32,7 +32,7 @@ func main() {
 		var interpreter Interpreter = *NewInterpreter()
 		interpreter.run(os.Args[2])
 	case "help":
-		logger.Info("Help")
+		logger.Print(helpers.GetHelpText())
 	default:
 		logger.Info("Unrecognized parameter")
 	}
