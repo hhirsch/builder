@@ -1,5 +1,5 @@
 # Builder
-Write code to commission GNU/Linux systems.
+Write code to commission GNU/Linux systems. For example install packages and copy files.
 At the core it is designed to be run on a client system so for your CI pipelines you might
 find other tools more suitable.
 
