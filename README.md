@@ -6,7 +6,8 @@ find other tools more suitable.
 ## Features
 - Domain Specific Language inspired by Basic
 - Command Line Interface
-- Commands to install packages, copy files and take snapshots of the installed packages
+- Install packages, copy files and take snapshots of the installed packages
+- Turn your binary into a service for systemd
 
 ## Example
 ```
