@@ -1,5 +1,7 @@
 # Builder
-Write code to commission GNU/Linux systems
+Write code to commission GNU/Linux systems.
+At the core it is designed to be run on a client system so for your CI pipelines you might
+find other tools more suitable.
 
 ## Features
 - Domain Specific Language inspired by Basic

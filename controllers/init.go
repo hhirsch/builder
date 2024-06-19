@@ -7,7 +7,6 @@ import (
 
 func isInitialized() bool {
 	dirName := ".builder"
-
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
 		return false
 	}
