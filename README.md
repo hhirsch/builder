@@ -10,10 +10,16 @@ find other tools more suitable.
 
 ## Example
 ```
+// tools.bld
 // prompt the user to give information about the host
 setupHost myhost
 step Install Net Tools If Not Installed
 ensurePackage net-tools
+```
+
+Run it with the following command
+```
+builder script tools.bld
 ```
 
 ## Help
