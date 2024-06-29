@@ -9,6 +9,14 @@ find other tools more suitable.
 - Install packages, copy files and take snapshots of the installed packages
 - Turn your binary into a service for systemd
 
+## Planned Features
+- Nginx configuration
+- Wiki install
+- Wordpress install
+- Wordpress backup
+- Change Wordpress hostname
+- MySQL-Dump
+
 ## Example
 ```
 // tools.bld
