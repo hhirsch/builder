@@ -18,13 +18,13 @@ type Interpreter struct {
 	step     string
 }
 
-func NewInterpreter() *Interpreter {
+func NewInterpreter(environment *Environment) *Interpreter {
 	currentUser, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 	path := currentUser.HomeDir + "/.builder"
-	logger := NewLogger()
+	logger := environment.logger
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(path, os.ModePerm)
 		if err != nil {

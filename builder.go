@@ -29,11 +29,12 @@ func main() {
 			return
 		}
 		logger.Info("Builder started")
-		var interpreter Interpreter = *NewInterpreter()
+		var interpreter Interpreter = *NewInterpreter(environment)
 		interpreter.run(os.Args[2])
 	case "help":
 		logger.Print(helpers.GetHelpText())
 	default:
 		logger.Info("Unrecognized parameter")
+		logger.Print(helpers.GetHelpText())
 	}
 }
