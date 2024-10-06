@@ -1,21 +1,21 @@
-package main
+package models
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"os"
-	"errors"
 )
 
 type Registry struct {
-	data map[string]string
+	data     map[string]string
 	fileName string
 }
 
 func NewRegistry(fileName string) *Registry {
-	data:=make(map[string]string)
+	data := make(map[string]string)
 	return &Registry{
-		data: data,
+		data:     data,
 		fileName: fileName,
 	}
 }
@@ -29,7 +29,7 @@ func (this *Registry) GetBool(key string) (bool, error) {
 
 		return true, nil
 	}
-	
+
 	return false, nil
 }
 

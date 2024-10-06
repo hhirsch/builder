@@ -1,4 +1,4 @@
-package main
+package system
 
 import (
 	"github.com/valyala/fasttemplate"
@@ -22,10 +22,10 @@ WantedBy=default.target
 `
 	template := fasttemplate.New(serviceConfig, "{{", "}}")
 	fileContent := template.ExecuteString(map[string]interface{}{
-		"description":  description,
-		"path": path,
-		"userName": userName,
+		"description": description,
+		"path":        path,
+		"userName":    userName,
 	})
-	
+
 	return fileContent
 }

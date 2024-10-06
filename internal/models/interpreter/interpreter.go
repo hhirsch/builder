@@ -1,45 +1,36 @@
-package main
+package interpreter
 
 import (
 	"bufio"
-	"errors"
 	format "fmt"
 	"github.com/charmbracelet/huh"
+	"github.com/hhirsch/builder/internal/helpers"
+	"github.com/hhirsch/builder/internal/models"
+	"github.com/hhirsch/builder/internal/models/interpreter/commands"
 	"log"
 	"os"
-	"os/user"
 	"strings"
 )
 
 type Interpreter struct {
-	client   Client
-	logger   *Logger
-	registry *Registry
-	step     string
+	logger      *helpers.Logger
+	environment *models.Environment
+	registry    *models.Registry
+	step        string
 }
 
-func NewInterpreter(environment *Environment) *Interpreter {
-	currentUser, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
-	path := currentUser.HomeDir + "/.builder"
-	logger := environment.logger
-	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(path, os.ModePerm)
-		if err != nil {
-			logger.Warn(err.Error())
-		}
-	}
-	registry := NewRegistry(path + "/builderGlobal.reg")
+func NewInterpreter(environment *models.Environment) *Interpreter {
+	logger := environment.GetLogger()
+	registry := models.NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
 	registry.Load()
 	return &Interpreter{
-		logger:   logger,
-		registry: registry,
+		logger:      logger,
+		registry:    registry,
+		environment: environment,
 	}
 }
 
-func (this *Interpreter) run(fileName string) {
+func (this *Interpreter) Run(fileName string) {
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
@@ -56,16 +47,10 @@ func (this *Interpreter) run(fileName string) {
 	}
 	file.Close()
 }
-
 func (this *Interpreter) requireConnection() {
-	if this.client == (Client{}) {
+	if this.environment.Client == (models.Client{}) {
 		this.logger.Fatal("Setup a host before using a command that requires a connection.")
 	}
-}
-
-func (this *Interpreter) Step(step string) {
-	this.step = step
-	this.logger.Info(step)
 }
 
 func (this *Interpreter) setupHost(tokens []string) {
@@ -108,7 +93,7 @@ func (this *Interpreter) setupHost(tokens []string) {
 	}
 
 	this.registry.Save()
-	this.client = *NewClient(userName, hostName)
+	this.environment.Client = *models.NewClient(userName, hostName)
 }
 
 func (this *Interpreter) handleLine(input string) {
@@ -122,9 +107,7 @@ func (this *Interpreter) handleLine(input string) {
 		this.setupHost(tokens)
 		return
 	case "step":
-		tokens = tokens[1:]
-		parameters := strings.Join(tokens, " ")
-		this.Step(parameters)
+		commands.Step(this.environment, tokens)
 		return
 	case "ensureService":
 		if len(tokens) < 4 {
@@ -133,36 +116,36 @@ func (this *Interpreter) handleLine(input string) {
 		reducedTokens := tokens[3:]
 		description := strings.Join(reducedTokens, " ")
 		this.logger.Info("Creating service name: " + tokens[1] + "  binary: " + tokens[2] + "  description: " + description)
-		this.client.EnsureService(tokens[1], tokens[2], description)
+		this.environment.Client.EnsureService(tokens[1], tokens[2], description)
 		return
 	}
 	this.requireConnection()
 	switch tokens[0] {
 	case "listPackages":
 		format.Println("list")
-		this.client.ListPackages()
+		this.environment.Client.ListPackages()
 	case "dumpPackages":
 		format.Println("list")
-		this.client.DumpPackages()
+		this.environment.Client.DumpPackages()
 	case "executeAndPrint":
 		tokens = tokens[1:]
 		parameters := strings.Join(tokens, " ")
-		this.client.ExecuteAndPrint(parameters)
+		this.environment.Client.ExecuteAndPrint(parameters)
 	case "ensureCapabilityConnection":
 		if len(tokens) != 2 {
 			this.logger.Fatal("ensureCapabilityConnection needs 1 parameters")
 		}
-		this.client.EnsureCapabilityConnection(tokens[1])
+		this.environment.Client.EnsureCapabilityConnection(tokens[1])
 	case "ensurePackage":
 		tokens = tokens[1:]
 		parameters := strings.Join(tokens, " ")
-		this.client.EnsurePackage(parameters)
+		this.environment.Client.EnsurePackage(parameters)
 	case "ensureExecutable":
 		this.logger.Info("Ensuring target is executable.")
 		if len(tokens) != 2 {
 			this.logger.Fatal("ensureExecutable needs 1 parameter")
 		}
-		this.client.EnsureExecutable(tokens[1])
+		this.environment.Client.EnsureExecutable(tokens[1])
 	case "print":
 		tokens = tokens[1:]
 		parameters := strings.Join(tokens, " ")
@@ -172,12 +155,12 @@ func (this *Interpreter) handleLine(input string) {
 		if len(tokens) != 2 {
 			this.logger.Fatal("setTargetUser needs 1 parameter")
 		}
-		this.client.SetTargetUser(tokens[1])
+		this.environment.Client.SetTargetUser(tokens[1])
 	case "pushFile":
 		if len(tokens) != 3 {
 			this.logger.Fatal("pushFile needs 2 parameters")
 		}
-		this.client.PushFile(tokens[1], tokens[2])
+		this.environment.Client.PushFile(tokens[1], tokens[2])
 	default:
 		format.Println("Invalid command " + tokens[0])
 	}

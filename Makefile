@@ -13,7 +13,7 @@ linkBinary:
 	sudo ln -s $(PROJECT_PATH)/builder /usr/bin/bdev
 
 builder:
-	$(GO) build $(BUILD_FLAGS) -o builder builder.go client.go logger.go interpreter.go registry.go systemd.go environment.go
+	$(GO) build $(BUILD_FLAGS) -o builder builder.go client.go interpreter.go registry.go systemd.go helpers/*.go controllers/*.go
 
 demos: registryDemo interpreterDemo builderUiDemo
 

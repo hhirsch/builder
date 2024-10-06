@@ -1,4 +1,4 @@
-package main
+package system
 
 import "testing"
 
@@ -16,7 +16,7 @@ Restart=always
 WantedBy=default.target
 `
 	systemd := Systemd{}
-	
+
 	result := systemd.GetConfig("User", "/usr/bin/foo", "Test description")
 	if exampleConfig != result {
 		test.Errorf("Config does not match example %s", result)

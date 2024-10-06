@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"context"
@@ -9,6 +9,8 @@ import (
 	scp "github.com/bramvdbogaerde/go-scp"
 	"github.com/bramvdbogaerde/go-scp/auth"
 	"github.com/charmbracelet/log"
+	"github.com/hhirsch/builder/internal/helpers"
+	"github.com/hhirsch/builder/internal/helpers/system"
 	"github.com/melbahja/goph"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
@@ -24,20 +26,20 @@ type Client struct {
 	user          string
 	host          string
 	targetUser    string
-	logger        *Logger
+	logger        *helpers.Logger
 	step          string
 	stepNumber    int
 	commandNumber int
 }
 
-func NewClient(userName string, host string) *Client {
+func NewClient(environment *Environment, userName string, host string) *Client {
 	currentUser, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 	keyPath := currentUser.HomeDir + "/.ssh/id_rsa"
 
-	logger := NewLogger()
+	logger := helpers.NewLogger(environment.GetLogFilePath())
 	client := &Client{
 		user:    userName,
 		host:    host,
@@ -68,10 +70,6 @@ func (this *Client) ensureSnapshotDirectoryExists() {
 			this.logger.Warn(err.Error())
 		}
 	}
-}
-
-func (this *Client) SetupHost(hostKey string) {
-	this.logger.Info(hostKey)
 }
 
 func (this *Client) execute(command string) string {
@@ -129,9 +127,7 @@ func (this *Client) UploadSftp(source string, target string) {
 	}
 }
 
-/**
- * Allows a binary to open ports
-**/
+// Gives a binary file permission to open network ports
 func (this *Client) EnsureCapabilityConnection(path string) {
 	if len(this.targetUser) > 0 && !strings.HasPrefix(path, "/") {
 		this.ExecuteAndPrint("setcap 'cap_net_bind_service=+ep' /home/" + this.targetUser + "/" + path)
@@ -166,7 +162,7 @@ func (this *Client) EnsureService(serviceName string, path string, description s
 }
 
 func (this *Client) EnsureCustomService(serviceName string, userName string, path string, description string) {
-	systemd := Systemd{}
+	systemd := system.Systemd{}
 	config := systemd.GetConfig(userName, path, description)
 
 	hash := md5.New()

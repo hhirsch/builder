@@ -12,7 +12,7 @@ func GetBannerText() string {
 }
 
 func GetHelpText() string {
-	var bannerText string = `
+	var helpText string = `
 Call: builder [command]
 
 help      show this help
@@ -21,5 +21,9 @@ update    run pending migrations scripts
 migration re-run specific migration
 script    run specific script
 `
-	return bannerText
+	return helpText
+}
+
+func GetCommandNameRequiredText() string {
+	return "Please provide a command name as an argument"
 }

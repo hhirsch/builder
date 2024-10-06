@@ -1,9 +1,9 @@
-package main
+package helpers
 
 import (
 	"fmt"
-	"log"
 	charmLog "github.com/charmbracelet/log"
+	"log"
 	"os"
 	"time"
 )
@@ -12,12 +12,12 @@ type Logger struct {
 	file *os.File
 }
 
-func NewLogger() *Logger {
-	file, err := os.OpenFile("builder.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+func NewLogger(fileName string) *Logger {
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		log.Fatalln("Failed to open log file:", err)
+		log.Fatalln("Failed to open log file for writing:", err)
 	}
-	
+
 	return &Logger{
 		file: file,
 	}
@@ -38,7 +38,7 @@ func (this *Logger) Info(string string) {
 }
 
 func (this *Logger) Warn(string string) {
-	this.writeGeneric("WARN", string)	
+	this.writeGeneric("WARN", string)
 	charmLog.Warn(string)
 }
 
