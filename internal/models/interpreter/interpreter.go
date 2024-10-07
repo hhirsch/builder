@@ -93,7 +93,7 @@ func (this *Interpreter) setupHost(tokens []string) {
 	}
 
 	this.registry.Save()
-	this.environment.Client = *models.NewClient(userName, hostName)
+	this.environment.Client = *models.NewClient(this.environment, userName, hostName)
 }
 
 func (this *Interpreter) handleLine(input string) {
