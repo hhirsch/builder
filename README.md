@@ -42,7 +42,7 @@ Run it with the following command
 builder script tools.bld
 ```
 
-This will install net-tools on a Debian system
+This will connect via ssh with key authentification and install net-tools on a remote Debian system
 ## Help
 To read the help page, use the following command:
 ```
