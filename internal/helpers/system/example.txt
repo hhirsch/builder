@@ -1,0 +1,11 @@
+[Unit]
+Description=Test description
+After=network.target
+
+[Service]
+User=User
+ExecStart=/usr/bin/foo
+Restart=always
+
+[Install]
+WantedBy=default.target

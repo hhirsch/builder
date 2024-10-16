@@ -1,25 +1,17 @@
 package system
 
 import (
+	_ "embed"
 	"github.com/valyala/fasttemplate"
 )
+
+//go:embed template.txt
+var serviceConfig string
 
 type Systemd struct {
 }
 
 func (this *Systemd) GetConfig(userName string, path string, description string) string {
-	serviceConfig := `[Unit]
-Description={{description}}
-After=network.target
-
-[Service]
-User={{userName}}
-ExecStart={{path}}
-Restart=always
-
-[Install]
-WantedBy=default.target
-`
 	template := fasttemplate.New(serviceConfig, "{{", "}}")
 	fileContent := template.ExecuteString(map[string]interface{}{
 		"description": description,

@@ -1,0 +1,11 @@
+[Unit]
+Description={{description}}
+After=network.target
+
+[Service]
+User={{userName}}
+ExecStart={{path}}
+Restart=always
+
+[Install]
+WantedBy=default.target

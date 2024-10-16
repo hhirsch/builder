@@ -35,8 +35,8 @@ func (this *StepCommand) Undo() {
 
 func (this *StepCommand) Describe() {
 	this.environment.GetLogger().Info("Prints " + this.description + " on screen and logs it to file.")
-	// explain what the command will do when executed
 }
 
 func (this *StepCommand) Help() {
+	this.environment.GetLogger().Info("Prints description on screen and logs it to file.")
 }

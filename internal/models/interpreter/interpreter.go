@@ -107,7 +107,8 @@ func (this *Interpreter) handleLine(input string) {
 		this.setupHost(tokens)
 		return
 	case "step":
-		commands.Step(this.environment, tokens)
+		var step *commands.StepCommand = commands.NewStep(this.environment, tokens)
+		step.Execute()
 		return
 	case "ensureService":
 		if len(tokens) < 4 {

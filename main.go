@@ -16,14 +16,15 @@ var logger *helpers.Logger = environment.GetLogger()
  **/
 func main() {
 	controller := controllers.NewBuilderController(environment)
-	if controller.ParameterValidationFailed(2, helpers.GetCommandNameRequiredText()) {
+	if len(arguments) < 2 {
+		logger.Info(helpers.GetCommandNameRequiredText())
 		controller.Help()
 		return
 	}
 	commands := map[string]func(){
-		"init":    controller.Init,
-		"update":  controller.Update,
 		"help":    controller.Help,
+		"init":    controller.Init,
+		"script":  controller.Script,
 		"command": controller.Command,
 	}
 
