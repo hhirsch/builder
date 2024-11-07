@@ -12,15 +12,14 @@ find other tools more suitable.
   - Turn binaries into system services
   - Take snapshots of the installed packages
 - Command Line Interface
-- Turn your binary into a service for systemd
+- Self documenting commands
 
 ## Planned Features
-- Migration management
+- Incremental Updates
 - Variables
 - Abstract syntax tree
 - If statements
 - y/n prompt
-- Self constructing help
 - Switch statements
 - Nginx configuration
 - Wiki install

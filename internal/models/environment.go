@@ -14,15 +14,19 @@ type Environment struct {
 	configPath string
 	logger     *helpers.Logger
 	arguments  []string
+	registry   *Registry
 }
 
 func NewEnvironment() *Environment {
-
 	environment := &Environment{
 		arguments: os.Args,
 	}
+	registry := NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
+	registry.Load()
+
 	logger := helpers.NewLogger(environment.GetLogFilePath())
 	environment.SetLogger(logger)
+	environment.SetRegistry(registry)
 	return environment
 }
 
@@ -38,6 +42,10 @@ func (this *Environment) GetProjectCommandsPath() string {
 	return this.GetProjectPath() + "/commands/"
 }
 
+func (this *Environment) GetGlobalRegistryPath() string {
+	return this.GetBuilderHomePath() + "/builderGlobal.reg"
+}
+
 func (this *Environment) GetLogger() *helpers.Logger {
 	if this.logger == nil {
 		_, file, line, ok := runtime.Caller(1)
@@ -51,8 +59,16 @@ func (this *Environment) GetLogger() *helpers.Logger {
 	return this.logger
 }
 
+func (this *Environment) GetRegistry() *Registry {
+	return this.registry
+}
+
 func (this *Environment) SetLogger(logger *helpers.Logger) {
 	this.logger = logger
+}
+
+func (this *Environment) SetRegistry(registry *Registry) {
+	this.registry = registry
 }
 
 func (this *Environment) GetArguments() []string {
