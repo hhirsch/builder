@@ -41,7 +41,8 @@ Run it with the following command
 builder script tools.bld
 ```
 
-This will connect via ssh with key authentification and install net-tools on a remote Debian system
+This will connect via ssh with key authentification and install net-tools on a remote Debian system.
+On the first try it will prompt you for the IP or hostname of myhost.
 ## Help
 To read the help page, use the following command:
 ```

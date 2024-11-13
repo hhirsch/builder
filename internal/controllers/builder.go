@@ -17,6 +17,7 @@ type BuilderController struct {
 	actions      []Action
 	initAction   *InitAction
 	scriptAction *ScriptAction
+	actionsMap   map[string]Action
 }
 
 func NewBuilderController(environment *models.Environment) *BuilderController {
@@ -25,6 +26,10 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 	var actions = []Action{
 		initAction,
 		scriptAction,
+	}
+
+	actionsMap := map[string]Action{
+		"init": NewInitAction(environment),
 	}
 
 	var arguments []string
@@ -40,6 +45,7 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 		model:        models.NewBuilderModel(environment),
 		Arguments:    arguments,
 		actions:      actions,
+		actionsMap:   actionsMap,
 		initAction:   initAction,
 		scriptAction: scriptAction,
 	}
@@ -59,19 +65,30 @@ func (this *BuilderController) HasEnoughParameters(requiredAmountOfParameters in
 }
 
 // Initialize builder in current directory
-func (this *BuilderController) Init() {
+func (this *BuilderController) InitAction() {
 	this.initAction.Execute(this)
 }
 
 // Execute builder code from file
-func (this *BuilderController) Script() {
+func (this *BuilderController) ScriptAction() {
 	this.scriptAction.Execute(this)
 }
 
 // run custom builder command
-func (this *BuilderController) Command() {
+func (this *BuilderController) CommandAction() {
 	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
-		this.Help()
+		this.HelpAction()
+		return
+	}
+	this.logger.Print("executing user defined command")
+	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
+	interpreter.Run("./.builder/commands/" + os.Args[2] + ".bld")
+}
+
+// run custom builder command
+func (this *BuilderController) UpdateAction() {
+	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
+		this.HelpAction()
 		return
 	}
 	this.logger.Print("executing user defined command")
@@ -80,9 +97,9 @@ func (this *BuilderController) Command() {
 }
 
 // show help
-func (this *BuilderController) Help() {
-	if !this.HasEnoughParameters(1) {
-		this.logger.Print("Help needs a command name as argument")
+func (this *BuilderController) HelpAction() {
+	if this.HasEnoughParameters(1) {
+		this.logger.Print("tbd show specific help for " + os.Args[2])
 	}
 	this.logger.Print(helpers.GetBannerText())
 	this.logger.Print("help\t\tShow this help")

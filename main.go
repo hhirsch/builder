@@ -5,6 +5,8 @@ import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"os"
+	"reflect"
+	"strings"
 )
 
 var arguments []string = os.Args
@@ -18,21 +20,19 @@ func main() {
 	controller := controllers.NewBuilderController(environment)
 	if len(arguments) < 2 {
 		logger.Info(helpers.GetCommandNameRequiredText())
-		controller.Help()
+		controller.HelpAction()
 		return
 	}
-	commands := map[string]func(){
-		"help":    controller.Help,
-		"init":    controller.Init,
-		"script":  controller.Script,
-		"command": controller.Command,
-	}
 
-	commandName := os.Args[1]
-	if command, exists := commands[commandName]; exists {
-		command()
+	actionName := strings.ToUpper(os.Args[1][:1]) + strings.ToLower(os.Args[1][1:])
+	interfaceValue := reflect.ValueOf(controller)
+	method := interfaceValue.MethodByName(actionName + "Action")
+
+	if method.IsValid() && method.Kind() == reflect.Func {
+		method.Call(nil)
 	} else {
-		logger.Info("Unrecognized parameter " + commandName)
-		controller.Help()
+		logger.Info("Builder called with unrecognized parameter " + os.Args[1] + ".")
+		controller.HelpAction()
+
 	}
 }

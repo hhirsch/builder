@@ -28,16 +28,20 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"step":      com.NewStepCommand(environment),
 		"print":     com.NewPrintCommand(environment),
 		"setupHost": com.NewSetupHostCommand(environment),
+		"connect":   com.NewConnectCommand(environment),
 	}
 	onlineCommands := map[string]com.Command{
-		"ensurePackage":    com.NewEnsurePackageCommand(environment),
-		"ensureExecutable": com.NewEnsureExecutableCommand(environment),
-		"ensureService":    com.NewEnsureServiceCommand(environment),
-		"listPackages":     com.NewListPackagesCommand(environment),
-		"dumpPackages":     com.NewDumpPackagesCommand(environment),
-		"executeAndPrint":  com.NewExecuteAndPrintCommand(environment),
-		"setTargetUser":    com.NewSetTargetUserCommand(environment),
-		"pushFile":         com.NewPushFileCommand(environment),
+		"systemInfo":          com.NewSystemInfoCommand(environment),
+		"ensurePackage":       com.NewEnsurePackageCommand(environment),
+		"ensureExecutable":    com.NewEnsureExecutableCommand(environment),
+		"ensureService":       com.NewEnsureServiceCommand(environment),
+		"listPackages":        com.NewListPackagesCommand(environment),
+		"dumpPackages":        com.NewDumpPackagesCommand(environment),
+		"executeAndPrint":     com.NewExecuteAndPrintCommand(environment),
+		"setTargetUser":       com.NewSetTargetUserCommand(environment),
+		"pushFile":            com.NewPushFileCommand(environment),
+		"saveDatabase":        com.NewPushFileCommand(environment), //host, database, localFileName
+		"showOperatingSystem": com.NewPushFileCommand(environment), //host, database, localFileName
 	}
 	return &Interpreter{
 		logger:         logger,
@@ -89,5 +93,8 @@ func (this *Interpreter) handleLine(input string) {
 	} else {
 		format.Println("Invalid command " + tokens[0])
 	}
+}
 
+func (this *Interpreter) GetReferencePage() string {
+	return ""
 }
