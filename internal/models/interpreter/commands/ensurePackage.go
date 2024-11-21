@@ -6,6 +6,7 @@ import (
 )
 
 type EnsurePackageCommand struct {
+	BaseCommand
 	environment *models.Environment
 	description string
 }
@@ -13,6 +14,7 @@ type EnsurePackageCommand struct {
 func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageCommand {
 	controller := &EnsurePackageCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

@@ -33,6 +33,5 @@ func main() {
 	} else {
 		logger.Info("Builder called with unrecognized parameter " + os.Args[1] + ".")
 		controller.HelpAction()
-
 	}
 }

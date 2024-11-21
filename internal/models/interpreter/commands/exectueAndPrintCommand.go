@@ -8,11 +8,13 @@ import (
 type ExecuteAndPrintCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewExecuteAndPrintCommand(environment *models.Environment) *ExecuteAndPrintCommand {
 	controller := &ExecuteAndPrintCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

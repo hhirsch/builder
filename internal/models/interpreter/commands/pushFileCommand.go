@@ -7,18 +7,20 @@ import (
 type PushFileCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewPushFileCommand(environment *models.Environment) *PushFileCommand {
 	controller := &PushFileCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }
 
 func (this *PushFileCommand) Execute(tokens []string) {
 	if len(tokens) != 3 {
-		this.environment.GetLogger().Fatal("pushFile needs 2 parameters")
+		this.environment.GetLogger().Fatal("pushFile needs 2 parameters.")
 	}
 	this.environment.Client.PushFile(tokens[1], tokens[2])
 
@@ -29,7 +31,7 @@ func (this *PushFileCommand) Undo() {
 }
 
 func (this *PushFileCommand) GetDescription(tokens []string) string {
-	return "Ensure a binary is allowed to open ports."
+	return "Push a file to the server."
 }
 
 func (this *PushFileCommand) GetHelp() string {

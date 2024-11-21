@@ -13,7 +13,6 @@ import (
 	"github.com/hhirsch/builder/internal/helpers/system"
 	"github.com/melbahja/goph"
 	"golang.org/x/crypto/ssh"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"strings"
@@ -34,28 +33,30 @@ type Client struct {
 
 func NewClient(environment *Environment, userName string, host string) *Client {
 	currentUser, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
 	keyPath := currentUser.HomeDir + "/.ssh/id_rsa"
 
-	logger := helpers.NewLogger(environment.GetLogFilePath())
+	logger := environment.GetLogger()
 	client := &Client{
 		user:    userName,
 		host:    host,
 		logger:  logger,
 		keyPath: keyPath,
 	}
+
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	client.ensureSnapshotDirectoryExists()
 
 	auth, err := goph.Key(client.keyPath, "")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	sshClient, err := goph.New(userName, host, auth)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
 	client.sshClient = *sshClient
@@ -72,7 +73,7 @@ func (this *Client) ensureSnapshotDirectoryExists() {
 	}
 }
 
-func (this *Client) execute(command string) string {
+func (this *Client) Execute(command string) string {
 	out, error := this.sshClient.Run(command)
 
 	if error != nil {
@@ -83,7 +84,7 @@ func (this *Client) execute(command string) string {
 
 func (this *Client) ExecuteAndPrint(command string) {
 	log.Info("Executing " + command)
-	fmt.Println(this.execute(command))
+	fmt.Println(this.Execute(command))
 }
 
 func (this *Client) EnsurePath(path string) {
@@ -91,15 +92,15 @@ func (this *Client) EnsurePath(path string) {
 	if error != nil {
 		this.logger.Warn(error.Error())
 		if len(this.targetUser) > 0 {
-			this.execute("sudo -u " + this.targetUser + " mkdir -p " + path)
+			this.Execute("sudo -u " + this.targetUser + " mkdir -p " + path)
 		} else {
-			this.execute("mkdir -p " + path)
+			this.Execute("mkdir -p " + path)
 		}
 	}
 }
 
 func (this *Client) PushFile(source string, target string) {
-	log.Info("Source for the upload: " + source)
+	this.logger.Info("Source for the upload: " + source)
 	var adaptedTarget = target
 	if len(this.targetUser) > 0 && !strings.HasPrefix(target, "/") {
 		adaptedTarget = "/home/" + this.targetUser + "/" + target
@@ -112,9 +113,9 @@ func (this *Client) PushFile(source string, target string) {
 
 	path := adaptedTarget[:lastIndex]
 	this.EnsurePath(path)
-	log.Info("Uploading file from: " + source + " to: " + adaptedTarget)
+	this.logger.Info("Uploading file from: " + source + " to: " + adaptedTarget)
 	this.Upload(source, adaptedTarget)
-	log.Info("File Uploaded")
+	this.logger.Info("File Uploaded")
 	if len(this.targetUser) > 0 {
 		this.SetFileOwner(adaptedTarget, this.targetUser)
 	}
@@ -170,7 +171,7 @@ func (this *Client) EnsureCustomService(serviceName string, userName string, pat
 	hashSum := hash.Sum(nil)
 	tempFilePath := "/tmp/builder-" + hex.EncodeToString(hashSum)
 
-	err := ioutil.WriteFile(tempFilePath, []byte(config), 0644)
+	err := os.WriteFile(tempFilePath, []byte(config), 0644)
 	if err != nil {
 		log.Fatalf("Error writing file: %v", err)
 		return
@@ -195,7 +196,7 @@ func (this *Client) SetTargetUser(userName string) {
 
 func (this *Client) SetFileOwner(path string, userName string) {
 	this.logger.Info("Ensure file " + path + " belongs to user " + userName + ".")
-	result := this.execute("chown -R " + userName + ":" + userName + " " + path)
+	result := this.Execute("chown -R " + userName + ":" + userName + " " + path)
 	if len(result) == 0 {
 		this.logger.Info("Success")
 	} else {
@@ -206,17 +207,17 @@ func (this *Client) SetFileOwner(path string, userName string) {
 func (this *Client) EnsureExecutable(path string) {
 	this.logger.Info("Ensure file is Executable ")
 	if len(this.targetUser) > 0 && !strings.HasPrefix(path, "/") {
-		this.execute("chmod +x " + "/home/" + this.targetUser + "/" + path)
+		this.Execute("chmod +x " + "/home/" + this.targetUser + "/" + path)
 		this.logger.Info("Path: " + "/home/" + this.targetUser + "/" + path)
 		return
 	}
-	this.execute("chmod +x " + path)
+	this.Execute("chmod +x " + path)
 	this.logger.Info("Path: " + path)
 }
 
 func (this *Client) ensureUserExists(userName string) {
 	this.logger.Info("Checking for user " + userName)
-	result := this.execute("getent passwd " + userName)
+	result := this.Execute("getent passwd " + userName)
 	if len(result) == 0 {
 		this.createUser(userName)
 	} else {
@@ -226,7 +227,7 @@ func (this *Client) ensureUserExists(userName string) {
 
 func (this *Client) createUser(userName string) {
 	this.logger.Info("User " + userName + " does not exist.")
-	result := this.execute("useradd -m " + userName)
+	result := this.Execute("useradd -m " + userName)
 	if len(result) == 0 {
 		this.logger.Info("User " + userName + " created successfully.")
 	} else {
@@ -248,9 +249,9 @@ func (this *Client) DumpPackages() {
 	currentTime := time.Now()
 	fileName := "snapshots/" + currentTime.Format("02-01-2006_15-04-05") + ".dmp" // File name format: DD-MM-YYYY_HH-MM-SS
 
-	err := ioutil.WriteFile(fileName, []byte(this.execute("dpkg --get-selections")), 0644)
+	err := os.WriteFile(fileName, []byte(this.Execute("dpkg --get-selections")), 0644)
 	if err != nil {
-		log.Fatalf("Error writing file: %v", err)
+		this.logger.Fatal(fmt.Printf("Error writing file: %v", err))
 	}
 
 	this.logger.Info("File " + fileName + " created and string written successfully!\n")

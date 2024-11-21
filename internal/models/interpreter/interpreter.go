@@ -6,18 +6,18 @@ import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	com "github.com/hhirsch/builder/internal/models/interpreter/commands"
-	"log"
 	"os"
 	"strings"
 )
 
 type Interpreter struct {
-	logger         *helpers.Logger
-	environment    *models.Environment
-	registry       *models.Registry
-	step           string
-	commands       map[string]com.Command
-	onlineCommands map[string]com.Command
+	logger            *helpers.Logger
+	environment       *models.Environment
+	registry          *models.Registry
+	step              string
+	commands          map[string]com.Command
+	onlineCommands    map[string]com.Command
+	testRequirenments bool
 }
 
 func NewInterpreter(environment *models.Environment) *Interpreter {
@@ -44,18 +44,33 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"showOperatingSystem": com.NewPushFileCommand(environment), //host, database, localFileName
 	}
 	return &Interpreter{
-		logger:         logger,
-		registry:       registry,
-		environment:    environment,
-		commands:       commands,
-		onlineCommands: onlineCommands,
+		logger:            logger,
+		registry:          registry,
+		environment:       environment,
+		commands:          commands,
+		onlineCommands:    onlineCommands,
+		testRequirenments: false,
 	}
+}
+
+func (this *Interpreter) TestAndRun(fileName string) {
+	this.logger.Info("Testing requirements of file " + fileName)
+	this.Test(fileName)
+	this.logger.Info("All requirements passed for file " + fileName)
+	this.logger.Info("Executing file " + fileName)
+	this.Run(fileName)
+}
+
+func (this *Interpreter) Test(fileName string) {
+	this.testRequirenments = true
+	this.Run(fileName)
+	this.testRequirenments = false
 }
 
 func (this *Interpreter) Run(fileName string) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		log.Fatal(err)
+		this.logger.Fatal(err.Error())
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -65,7 +80,7 @@ func (this *Interpreter) Run(fileName string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		format.Println("Error scanning file:", err)
+		this.logger.Fatal(format.Printf("Error scanning file: %s", err.Error()))
 	}
 	file.Close()
 }
@@ -89,9 +104,18 @@ func (this *Interpreter) handleLine(input string) {
 	this.requireConnection()
 
 	if command, exists := this.onlineCommands[tokens[0]]; exists {
-		command.Execute(tokens)
+		if this.testRequirenments {
+			this.logger.Debug("Testing requirements for " + tokens[0])
+			if command.TestRequirements() {
+				this.logger.Debug("Passed requirenments for " + tokens[0])
+			} else {
+				this.logger.Error("Failed requirenments for " + tokens[0])
+			}
+		} else {
+			command.Execute(tokens)
+		}
 	} else {
-		format.Println("Invalid command " + tokens[0])
+		this.logger.Error("Invalid command " + tokens[0])
 	}
 }
 

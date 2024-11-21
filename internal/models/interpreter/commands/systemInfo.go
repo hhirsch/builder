@@ -5,6 +5,7 @@ import (
 )
 
 type SystemInfoCommand struct {
+	BaseCommand
 	environment *models.Environment
 	text        string
 }
@@ -12,13 +13,17 @@ type SystemInfoCommand struct {
 func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {
 	controller := &SystemInfoCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }
 
+func (this *SystemInfoCommand) TestRequirements() bool {
+	return this.FindBinary("lsb_release")
+}
+
 func (this *SystemInfoCommand) Execute(tokens []string) {
-	this.environment.Client.ExecuteAndPrint("lsb_release -a")
-	return
+	this.environment.GetLogger().Info("System Info Command", "System is "+this.TrimResponseString(this.environment.Client.Execute("lsb_release -ds")))
 }
 
 func (this *SystemInfoCommand) Undo() {

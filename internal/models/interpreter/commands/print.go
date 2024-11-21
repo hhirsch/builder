@@ -9,13 +9,19 @@ import (
 type PrintCommand struct {
 	environment *models.Environment
 	text        string
+	BaseCommand
 }
 
 func NewPrintCommand(environment *models.Environment) *PrintCommand {
 	controller := &PrintCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
+}
+
+func (this *PrintCommand) TestRequirement() bool {
+	return true
 }
 
 func (this *PrintCommand) Execute(tokens []string) {

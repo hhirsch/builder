@@ -8,11 +8,13 @@ import (
 type DumpPackagesCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewDumpPackagesCommand(environment *models.Environment) *DumpPackagesCommand {
 	controller := &DumpPackagesCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

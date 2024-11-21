@@ -8,11 +8,13 @@ import (
 type StepCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewStepCommand(environment *models.Environment) *StepCommand {
 	controller := &StepCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

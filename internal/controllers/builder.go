@@ -10,22 +10,25 @@ import (
 
 // controller for the builder command line
 type BuilderController struct {
-	environment  *models.Environment
-	logger       *helpers.Logger
-	Arguments    []string
-	model        *models.BuilderModel
-	actions      []Action
-	initAction   *InitAction
-	scriptAction *ScriptAction
-	actionsMap   map[string]Action
+	environment   *models.Environment
+	logger        *helpers.Logger
+	Arguments     []string
+	model         *models.BuilderModel
+	actions       []Action
+	initAction    *InitAction
+	scriptAction  *ScriptAction
+	commandAction *CommandAction
+	actionsMap    map[string]Action
 }
 
 func NewBuilderController(environment *models.Environment) *BuilderController {
 	var initAction = NewInitAction(environment)
 	var scriptAction = NewScriptAction(environment)
+	var commandAction = NewCommandAction(environment)
 	var actions = []Action{
 		initAction,
 		scriptAction,
+		commandAction,
 	}
 
 	actionsMap := map[string]Action{
@@ -40,14 +43,15 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 	}
 
 	controller := &BuilderController{
-		environment:  environment,
-		logger:       environment.GetLogger(),
-		model:        models.NewBuilderModel(environment),
-		Arguments:    arguments,
-		actions:      actions,
-		actionsMap:   actionsMap,
-		initAction:   initAction,
-		scriptAction: scriptAction,
+		environment:   environment,
+		logger:        environment.GetLogger(),
+		model:         models.NewBuilderModel(environment),
+		Arguments:     arguments,
+		actions:       actions,
+		actionsMap:    actionsMap,
+		initAction:    initAction,
+		scriptAction:  scriptAction,
+		commandAction: commandAction,
 	}
 
 	return controller
@@ -76,13 +80,7 @@ func (this *BuilderController) ScriptAction() {
 
 // run custom builder command
 func (this *BuilderController) CommandAction() {
-	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
-		this.HelpAction()
-		return
-	}
-	this.logger.Print("executing user defined command")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run("./.builder/commands/" + os.Args[2] + ".bld")
+	this.commandAction.Execute(this)
 }
 
 // run custom builder command

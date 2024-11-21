@@ -9,12 +9,14 @@ type ConnectCommand struct {
 	environment *models.Environment
 	description string
 	logger      *helpers.Logger
+	BaseCommand
 }
 
 func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 	controller := &ConnectCommand{
 		environment: environment,
 		logger:      environment.GetLogger(),
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }
@@ -24,6 +26,7 @@ func (this *ConnectCommand) Execute(tokens []string) {
 		this.logger.Fatal("connect needs 1 parameter")
 	}
 	this.environment.Client = *models.NewClient(this.environment, "root", tokens[1])
+	this.logger.Info("Connected to " + tokens[1])
 }
 
 func (this *ConnectCommand) Undo() {

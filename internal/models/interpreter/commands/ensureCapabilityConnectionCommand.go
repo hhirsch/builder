@@ -7,13 +7,19 @@ import (
 type EnsureCapabilityConnectionCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewEnsureCapabilityConnectionCommand(environment *models.Environment) *EnsureCapabilityConnectionCommand {
 	controller := &EnsureCapabilityConnectionCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
+}
+
+func (this *EnsureCapabilityConnectionCommand) TestRequirement() bool {
+	return true
 }
 
 func (this *EnsureCapabilityConnectionCommand) Execute(tokens []string) {

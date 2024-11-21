@@ -29,7 +29,7 @@ func (this *ScriptAction) Execute(controller *BuilderController) {
 	}
 	this.logger.Info("Builder started")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run(controller.Arguments[0])
+	interpreter.TestAndRun(controller.Arguments[0])
 }
 
 func (this *ScriptAction) GetName() string {

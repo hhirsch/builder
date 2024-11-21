@@ -10,12 +10,14 @@ type SetupHostCommand struct {
 	environment *models.Environment
 	description string
 	logger      *helpers.Logger
+	BaseCommand
 }
 
 func NewSetupHostCommand(environment *models.Environment) *SetupHostCommand {
 	controller := &SetupHostCommand{
 		environment: environment,
 		logger:      environment.GetLogger(),
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

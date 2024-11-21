@@ -8,11 +8,13 @@ import (
 type ListPackagesCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewListPackagesCommand(environment *models.Environment) *ListPackagesCommand {
 	controller := &ListPackagesCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }

@@ -7,11 +7,13 @@ import (
 type EnsureExecutableCommand struct {
 	environment *models.Environment
 	description string
+	BaseCommand
 }
 
 func NewEnsureExecutableCommand(environment *models.Environment) *EnsureExecutableCommand {
 	controller := &EnsureExecutableCommand{
 		environment: environment,
+		BaseCommand: BaseCommand{environment: environment},
 	}
 	return controller
 }
