@@ -21,5 +21,5 @@ func GetHelpText() string {
 }
 
 func GetCommandNameRequiredText() string {
-	return "Please provide a command name as an argument"
+	return "Please provide a command name as an argument."
 }

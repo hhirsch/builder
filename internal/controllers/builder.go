@@ -32,7 +32,9 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 	}
 
 	actionsMap := map[string]Action{
-		"init": NewInitAction(environment),
+		"init":    initAction,
+		"script":  scriptAction,
+		"command": commandAction,
 	}
 
 	var arguments []string
@@ -56,12 +58,29 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 
 	return controller
 }
+func (this *BuilderController) ExecuteAction() {
+	this.Arguments = []string{}
+	if len(this.environment.GetArguments()) < 2 {
+		this.logger.Info("Please provide a command name as an argument.")
+		this.HelpAction()
+		return
+	}
+
+	this.Arguments = this.environment.GetArguments()[2:]
+
+	if action, exists := this.actionsMap[this.environment.GetArguments()[1]]; exists {
+		action.Execute(this)
+	} else {
+		this.logger.Info("Builder called with unrecognized parameter " + this.environment.GetArguments()[1] + ".")
+		this.HelpAction()
+	}
+}
 
 func (this *BuilderController) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
 	if !this.HasEnoughParameters(requiredAmountOfParameters) {
 		this.logger.Fatal(errorMessage)
 	}
-	return !this.HasEnoughParameters(requiredAmountOfParameters)
+	return false
 }
 
 func (this *BuilderController) HasEnoughParameters(requiredAmountOfParameters int) bool {
@@ -78,12 +97,10 @@ func (this *BuilderController) ScriptAction() {
 	this.scriptAction.Execute(this)
 }
 
-// run custom builder command
 func (this *BuilderController) CommandAction() {
 	this.commandAction.Execute(this)
 }
 
-// run custom builder command
 func (this *BuilderController) UpdateAction() {
 	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
 		this.HelpAction()
@@ -100,7 +117,7 @@ func (this *BuilderController) HelpAction() {
 		this.logger.Print("tbd show specific help for " + os.Args[2])
 	}
 	this.logger.Print(helpers.GetBannerText())
-	this.logger.Print("help\t\tShow this help")
+	this.logger.Print("help\t\tShow this help. Call help with an action name as parameter \n\t\tto get more details on the action.")
 	for _, action := range this.actions {
 		this.logger.Print(fmt.Sprintf("%s\t\t%+v", action.GetName(), action.GetHelp()))
 	}

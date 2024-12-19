@@ -16,7 +16,6 @@ import (
 	"os"
 	"os/user"
 	"strings"
-	"time"
 )
 
 type Client struct {
@@ -242,19 +241,6 @@ func (this *Client) EnsurePackage(packageName string) {
 	this.logger.Info("Installing " + packageName)
 	this.ExecuteAndPrint("apt-get update")
 	this.ExecuteAndPrint("apt-get install " + packageName)
-}
-
-func (this *Client) DumpPackages() {
-	this.logger.Info("Dumping Packages")
-	currentTime := time.Now()
-	fileName := "snapshots/" + currentTime.Format("02-01-2006_15-04-05") + ".dmp" // File name format: DD-MM-YYYY_HH-MM-SS
-
-	err := os.WriteFile(fileName, []byte(this.Execute("dpkg --get-selections")), 0644)
-	if err != nil {
-		this.logger.Fatal(fmt.Printf("Error writing file: %v", err))
-	}
-
-	this.logger.Info("File " + fileName + " created and string written successfully!\n")
 }
 
 func (this *Client) ListPackages() {

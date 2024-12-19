@@ -31,17 +31,17 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"connect":   com.NewConnectCommand(environment),
 	}
 	onlineCommands := map[string]com.Command{
-		"systemInfo":          com.NewSystemInfoCommand(environment),
-		"ensurePackage":       com.NewEnsurePackageCommand(environment),
-		"ensureExecutable":    com.NewEnsureExecutableCommand(environment),
-		"ensureService":       com.NewEnsureServiceCommand(environment),
-		"listPackages":        com.NewListPackagesCommand(environment),
-		"dumpPackages":        com.NewDumpPackagesCommand(environment),
-		"executeAndPrint":     com.NewExecuteAndPrintCommand(environment),
-		"setTargetUser":       com.NewSetTargetUserCommand(environment),
-		"pushFile":            com.NewPushFileCommand(environment),
-		"saveDatabase":        com.NewPushFileCommand(environment), //host, database, localFileName
-		"showOperatingSystem": com.NewPushFileCommand(environment), //host, database, localFileName
+		"systemInfo":       com.NewSystemInfoCommand(environment),
+		"ensurePackage":    com.NewEnsurePackageCommand(environment),
+		"ensureExecutable": com.NewEnsureExecutableCommand(environment),
+		"ensureService":    com.NewEnsureServiceCommand(environment),
+		"listPackages":     com.NewListPackagesCommand(environment),
+		"dumpPackages":     com.NewDumpPackagesCommand(environment),
+		"executeAndPrint":  com.NewExecuteAndPrintCommand(environment),
+		"setTargetUser":    com.NewSetTargetUserCommand(environment),
+		"pushFile":         com.NewPushFileCommand(environment),
+		"saveDatabase":     com.NewPushFileCommand(environment),      //host, database, localFileName
+		"listDatabases":    com.NewListDatabasesCommand(environment), //host, database, localFileName
 	}
 	return &Interpreter{
 		logger:            logger,
