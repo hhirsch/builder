@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/hhirsch/builder/internal/models/interpreter"
@@ -15,33 +14,36 @@ type BuilderController struct {
 	Arguments     []string
 	model         *models.BuilderModel
 	actions       []Action
+	actionsMap    map[string]Action
 	initAction    *InitAction
 	scriptAction  *ScriptAction
 	commandAction *CommandAction
-	actionsMap    map[string]Action
+	helpAction    *HelpAction
 }
 
 func NewBuilderController(environment *models.Environment) *BuilderController {
 	var initAction = NewInitAction(environment)
 	var scriptAction = NewScriptAction(environment)
 	var commandAction = NewCommandAction(environment)
+	var helpAction = NewHelpAction(environment)
 	var actions = []Action{
 		initAction,
 		scriptAction,
 		commandAction,
+		helpAction,
 	}
 
 	actionsMap := map[string]Action{
-		"init":    initAction,
-		"script":  scriptAction,
-		"command": commandAction,
+		initAction.GetName():    initAction,
+		scriptAction.GetName():  scriptAction,
+		commandAction.GetName(): commandAction,
+		helpAction.GetName():    helpAction,
 	}
 
 	var arguments []string
+	arguments = []string{}
 	if len(environment.GetArguments()) > 2 {
 		arguments = environment.GetArguments()[2:]
-	} else {
-		arguments = []string{}
 	}
 
 	controller := &BuilderController{
@@ -54,26 +56,33 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 		initAction:    initAction,
 		scriptAction:  scriptAction,
 		commandAction: commandAction,
+		helpAction:    helpAction,
 	}
 
 	return controller
 }
+
+func (this *BuilderController) GetActionsMap() map[string]Action {
+	return this.actionsMap
+}
+
+func (this *BuilderController) GetActions() []Action {
+	return this.actions
+}
+
 func (this *BuilderController) ExecuteAction() {
-	this.Arguments = []string{}
-	if len(this.environment.GetArguments()) < 2 {
+	if len(this.Arguments) < 1 {
 		this.logger.Info("Please provide a command name as an argument.")
 		this.HelpAction()
 		return
 	}
 
-	this.Arguments = this.environment.GetArguments()[2:]
-
 	if action, exists := this.actionsMap[this.environment.GetArguments()[1]]; exists {
 		action.Execute(this)
-	} else {
-		this.logger.Info("Builder called with unrecognized parameter " + this.environment.GetArguments()[1] + ".")
-		this.HelpAction()
+		return
 	}
+	this.logger.Info("Builder called with unrecognized parameter " + this.Arguments[0] + ".")
+	this.HelpAction()
 }
 
 func (this *BuilderController) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
@@ -85,20 +94,6 @@ func (this *BuilderController) ParameterValidationFailed(requiredAmountOfParamet
 
 func (this *BuilderController) HasEnoughParameters(requiredAmountOfParameters int) bool {
 	return len(this.Arguments) >= requiredAmountOfParameters
-}
-
-// Initialize builder in current directory
-func (this *BuilderController) InitAction() {
-	this.initAction.Execute(this)
-}
-
-// Execute builder code from file
-func (this *BuilderController) ScriptAction() {
-	this.scriptAction.Execute(this)
-}
-
-func (this *BuilderController) CommandAction() {
-	this.commandAction.Execute(this)
 }
 
 func (this *BuilderController) UpdateAction() {
@@ -113,12 +108,5 @@ func (this *BuilderController) UpdateAction() {
 
 // show help
 func (this *BuilderController) HelpAction() {
-	if this.HasEnoughParameters(1) {
-		this.logger.Print("tbd show specific help for " + os.Args[2])
-	}
-	this.logger.Print(helpers.GetBannerText())
-	this.logger.Print("help\t\tShow this help. Call help with an action name as parameter \n\t\tto get more details on the action.")
-	for _, action := range this.actions {
-		this.logger.Print(fmt.Sprintf("%s\t\t%+v", action.GetName(), action.GetHelp()))
-	}
+	this.helpAction.Execute(this)
 }
