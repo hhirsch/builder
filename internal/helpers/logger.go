@@ -5,7 +5,6 @@ import (
 	charmLog "github.com/charmbracelet/log"
 	"log"
 	"os"
-	//	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
@@ -95,8 +94,16 @@ func (this *Logger) Debug(message interface{}, data ...interface{}) {
 	this.genericLog(this.getCallerName(), "DEBUG", message, data)
 }
 
+func (this *Logger) Debugf(message string, data ...interface{}) {
+	this.Debug(fmt.Sprintf(message, data...))
+}
+
 func (this *Logger) Info(message interface{}, data ...interface{}) {
 	this.genericLog(this.getCallerName(), "INFO", message, data)
+}
+
+func (this *Logger) Infof(message string, data ...interface{}) {
+	this.Info(fmt.Sprintf(message, data...))
 }
 
 func (this *Logger) Warn(message interface{}, data ...interface{}) {
@@ -109,6 +116,10 @@ func (this *Logger) Error(message interface{}, data ...interface{}) {
 
 func (this *Logger) Fatal(message interface{}, data ...interface{}) {
 	this.genericLog(this.getCallerName(), "FATAL", message, data)
+}
+
+func (this *Logger) Fatalf(message string, data ...interface{}) {
+	this.Fatal(fmt.Sprintf(message, data...))
 }
 
 func (this *Logger) writeLog(string string) {

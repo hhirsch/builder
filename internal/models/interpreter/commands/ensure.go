@@ -11,11 +11,10 @@ type EnsureExecutableCommand struct {
 }
 
 func NewEnsureExecutableCommand(environment *models.Environment) *EnsureExecutableCommand {
-	controller := &EnsureExecutableCommand{
+	return &EnsureExecutableCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment},
 	}
-	return controller
 }
 
 func (this *EnsureExecutableCommand) Execute(tokens []string) {

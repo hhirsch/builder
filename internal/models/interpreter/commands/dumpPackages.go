@@ -14,11 +14,10 @@ type DumpPackagesCommand struct {
 }
 
 func NewDumpPackagesCommand(environment *models.Environment) *DumpPackagesCommand {
-	controller := &DumpPackagesCommand{
+	return &DumpPackagesCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment},
 	}
-	return controller
 }
 
 func (this *DumpPackagesCommand) Execute(tokens []string) {

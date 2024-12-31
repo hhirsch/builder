@@ -1,7 +1,7 @@
 package controllers
 
 type Action interface {
-	Execute(controller *BuilderController)
+	Execute()
 	GetName() string
 	GetDescription() string
 	GetHelp() string

@@ -11,11 +11,10 @@ type SystemInfoCommand struct {
 }
 
 func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {
-	controller := &SystemInfoCommand{
+	return &SystemInfoCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: *NewBaseCommand(environment),
 	}
-	return controller
 }
 
 func (this *SystemInfoCommand) TestRequirements() bool {

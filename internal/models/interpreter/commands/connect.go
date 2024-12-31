@@ -16,15 +16,13 @@ func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 	controller := &ConnectCommand{
 		environment: environment,
 		logger:      environment.GetLogger(),
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: *NewBaseCommand(environment),
 	}
 	return controller
 }
 
 func (this *ConnectCommand) Execute(tokens []string) {
-	if len(tokens) != 2 {
-		this.logger.Fatal("connect needs 1 parameter")
-	}
+	this.requireParameterAmount(tokens, 1)
 	this.environment.Client = *models.NewClient(this.environment, "root", tokens[1])
 	this.logger.Info("Connected to " + tokens[1])
 }

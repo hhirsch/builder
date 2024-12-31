@@ -10,26 +10,29 @@ type ScriptAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
 	model       *models.BuilderModel
+	controller  *BuilderController
+	BaseAction
 }
 
-func NewScriptAction(environment *models.Environment) *ScriptAction {
+func NewScriptAction(controller *BuilderController) *ScriptAction {
 
-	scriptAction := &ScriptAction{
-		environment: environment,
-		logger:      environment.GetLogger(),
-		model:       models.NewBuilderModel(environment),
+	return &ScriptAction{
+		BaseAction:  BaseAction{controller: controller},
+		environment: controller.GetEnvironment(),
+		logger:      controller.GetEnvironment().GetLogger(),
+		model:       models.NewBuilderModel(controller.GetEnvironment()),
+		controller:  controller,
 	}
 
-	return scriptAction
 }
 
-func (this *ScriptAction) Execute(controller *BuilderController) {
-	if controller.ParameterValidationFailed(1, "script needs a file name as argument") {
+func (this *ScriptAction) Execute() {
+	if this.ParameterValidationFailed(1, "script needs a file name as argument") {
 		return
 	}
 	this.logger.Info("Builder started")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.TestAndRun(controller.Arguments[0])
+	interpreter.TestAndRun(this.controller.Arguments[0])
 }
 
 func (this *ScriptAction) GetName() string {

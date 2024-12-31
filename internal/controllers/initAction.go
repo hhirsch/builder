@@ -11,18 +11,18 @@ type InitAction struct {
 	model       *models.BuilderModel
 }
 
-func NewInitAction(environment *models.Environment) *InitAction {
+func NewInitAction(controller *BuilderController) *InitAction {
 
 	initAction := &InitAction{
-		environment: environment,
-		logger:      environment.GetLogger(),
-		model:       models.NewBuilderModel(environment),
+		environment: controller.GetEnvironment(),
+		logger:      controller.GetEnvironment().GetLogger(),
+		model:       models.NewBuilderModel(controller.GetEnvironment()),
 	}
 
 	return initAction
 }
 
-func (this *InitAction) Execute(controller *BuilderController) {
+func (this *InitAction) Execute() {
 	if this.model.IsInitialized() {
 		this.logger.Info("Already initialized, nothing to do.")
 	}

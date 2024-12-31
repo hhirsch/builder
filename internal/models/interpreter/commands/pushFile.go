@@ -11,11 +11,10 @@ type PushFileCommand struct {
 }
 
 func NewPushFileCommand(environment *models.Environment) *PushFileCommand {
-	controller := &PushFileCommand{
+	return &PushFileCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment},
 	}
-	return controller
 }
 
 func (this *PushFileCommand) Execute(tokens []string) {

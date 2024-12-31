@@ -8,6 +8,7 @@ type ListDatabasesCommand struct {
 	environment *models.Environment
 	description string
 	BaseCommand
+	SqlCommand
 }
 
 func NewListDatabasesCommand(environment *models.Environment) *ListDatabasesCommand {

@@ -12,27 +12,29 @@ type ExecuteAndPrintCommand struct {
 }
 
 func NewExecuteAndPrintCommand(environment *models.Environment) *ExecuteAndPrintCommand {
-	controller := &ExecuteAndPrintCommand{
+	return &ExecuteAndPrintCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment},
 	}
-	return controller
+}
+
+func (this *ExecuteAndPrintCommand) getCommandFromTokens(tokens []string) string {
+	tokens = tokens[1:]
+	return strings.Join(tokens, " ")
 }
 
 func (this *ExecuteAndPrintCommand) Execute(tokens []string) {
-	tokens = tokens[1:]
-	parameters := strings.Join(tokens, " ")
-	this.environment.Client.ExecuteAndPrint(parameters)
+	this.environment.Client.ExecuteAndPrint(this.getCommandFromTokens(tokens))
 }
 
 func (this *ExecuteAndPrintCommand) Undo() {
-	this.environment.GetLogger().Info("Undoing execute and print.")
+	this.environment.GetLogger().Info("Undo unavailable for execute and print.")
 }
 
 func (this *ExecuteAndPrintCommand) GetDescription(tokens []string) string {
-	return "make sure a binary is executable"
+	return "Execute " + this.getCommandFromTokens(tokens) + " and print the output."
 }
 
 func (this *ExecuteAndPrintCommand) GetHelp() string {
-	return "[binaryPath <string>]\tEnsure a binary is executable."
+	return "[command <string>]\tExecute a command and print the output."
 }

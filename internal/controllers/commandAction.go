@@ -9,26 +9,25 @@ import (
 type CommandAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
+	BaseAction
 }
 
-func NewCommandAction(environment *models.Environment) *CommandAction {
+func NewCommandAction(controller *BuilderController) *CommandAction {
 
-	initAction := &CommandAction{
-		environment: environment,
-		logger:      environment.GetLogger(),
+	return &CommandAction{
+		environment: controller.GetEnvironment(),
+		logger:      controller.GetEnvironment().GetLogger(),
 	}
-
-	return initAction
 }
 
-func (this *CommandAction) Execute(controller *BuilderController) {
-	if controller.ParameterValidationFailed(1, "command needs a command name as argument") {
-		controller.HelpAction()
+func (this *CommandAction) Execute() {
+	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
+		this.controller.ShowHelp()
 		return
 	}
 	this.logger.Info("Executing user defined command.")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.TestAndRun(this.environment.GetProjectCommandsPath() + controller.Arguments[0] + ".bld")
+	interpreter.TestAndRun(this.environment.GetProjectCommandsPath() + this.controller.Arguments[0] + ".bld")
 }
 
 func (this *CommandAction) GetName() string {
@@ -36,9 +35,9 @@ func (this *CommandAction) GetName() string {
 }
 
 func (this *CommandAction) GetDescription() string {
-	return "execute command"
+	return "Execute command"
 }
 
 func (this *CommandAction) GetHelp() string {
-	return "execute command"
+	return "Execute command."
 }
