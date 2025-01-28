@@ -13,7 +13,9 @@ type SystemInfoCommand struct {
 func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {
 	return &SystemInfoCommand{
 		environment: environment,
-		BaseCommand: *NewBaseCommand(environment),
+		BaseCommand: BaseCommand{environment: environment,
+			logger: environment.GetLogger(),
+		},
 	}
 }
 
@@ -21,8 +23,9 @@ func (this *SystemInfoCommand) TestRequirements() bool {
 	return this.FindBinary("lsb_release")
 }
 
-func (this *SystemInfoCommand) Execute(tokens []string) {
-	this.environment.GetLogger().Info("System Info Command", "System is "+this.TrimResponseString(this.environment.Client.Execute("lsb_release -ds")))
+func (this *SystemInfoCommand) Execute(tokens []string) string {
+	this.environment.GetLogger().Infof("System is %s.", this.TrimResponseString(this.environment.Client.Execute("lsb_release -ds")))
+	return ""
 }
 
 func (this *SystemInfoCommand) Undo() {

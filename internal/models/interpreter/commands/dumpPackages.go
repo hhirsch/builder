@@ -20,7 +20,7 @@ func NewDumpPackagesCommand(environment *models.Environment) *DumpPackagesComman
 	}
 }
 
-func (this *DumpPackagesCommand) Execute(tokens []string) {
+func (this *DumpPackagesCommand) Execute(tokens []string) string {
 	this.environment.GetLogger().Info("Dumping Packages")
 	currentTime := time.Now()
 	fileName := "snapshots/" + currentTime.Format("02-01-2006_15-04-05") + ".dmp" // File name format: DD-MM-YYYY_HH-MM-SS
@@ -31,6 +31,7 @@ func (this *DumpPackagesCommand) Execute(tokens []string) {
 	}
 
 	this.environment.GetLogger().Info("File " + fileName + " created and string written successfully!\n")
+	return ""
 }
 
 func (this *DumpPackagesCommand) Undo() {

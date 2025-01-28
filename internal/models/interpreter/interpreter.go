@@ -11,19 +11,22 @@ import (
 )
 
 type Interpreter struct {
-	logger            *helpers.Logger
-	environment       *models.Environment
-	registry          *models.Registry
-	step              string
-	commands          map[string]com.Command
-	onlineCommands    map[string]com.Command
-	testRequirenments bool
+	logger              *helpers.Logger
+	environment         *models.Environment
+	registry            *models.Registry
+	step                string
+	commands            map[string]com.Command
+	onlineCommands      map[string]com.Command
+	variables           map[string]string
+	testRequirenments   bool
+	checkedRequirements []string
 }
 
 func NewInterpreter(environment *models.Environment) *Interpreter {
 	logger := environment.GetLogger()
 	registry := models.NewRegistry(environment.GetGlobalRegistryPath())
 	registry.Load()
+	variables := map[string]string{}
 	commands := map[string]com.Command{
 		"step":      com.NewStepCommand(environment),
 		"print":     com.NewPrintCommand(environment),
@@ -31,6 +34,7 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"connect":   com.NewConnectCommand(environment),
 	}
 	onlineCommands := map[string]com.Command{
+		"listFiles":        com.NewListFilesCommand(environment),
 		"systemInfo":       com.NewSystemInfoCommand(environment),
 		"ensurePackage":    com.NewEnsurePackageCommand(environment),
 		"ensureExecutable": com.NewEnsureExecutableCommand(environment),
@@ -44,27 +48,13 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"listDatabases":    com.NewListDatabasesCommand(environment), //host, database, localFileName
 	}
 	return &Interpreter{
-		logger:            logger,
-		registry:          registry,
-		environment:       environment,
-		commands:          commands,
-		onlineCommands:    onlineCommands,
-		testRequirenments: false,
+		logger:         logger,
+		registry:       registry,
+		environment:    environment,
+		commands:       commands,
+		variables:      variables,
+		onlineCommands: onlineCommands,
 	}
-}
-
-func (this *Interpreter) TestAndRun(fileName string) {
-	this.logger.Info("Testing requirements of file " + fileName)
-	this.Test(fileName)
-	this.logger.Info("All requirements passed for file " + fileName)
-	this.logger.Info("Executing file " + fileName)
-	this.Run(fileName)
-}
-
-func (this *Interpreter) Test(fileName string) {
-	this.testRequirenments = true
-	this.Run(fileName)
-	this.testRequirenments = false
 }
 
 func (this *Interpreter) Run(fileName string) {
@@ -91,32 +81,61 @@ func (this *Interpreter) requireConnection() {
 	}
 }
 
+func (this *Interpreter) contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+func (this *Interpreter) handleCommandLine(tokens []string) string {
+	var commandName string = tokens[0]
+	var command com.Command
+	if offlineCommand, isOfflineCommand := this.commands[commandName]; isOfflineCommand {
+		command = offlineCommand
+	}
+
+	if onlineCommand, isOnlineCommand := this.onlineCommands[commandName]; isOnlineCommand {
+		this.requireConnection()
+		command = onlineCommand
+	}
+
+	if command == nil {
+		this.logger.Fatalf("Invalid command %s.", commandName)
+	}
+
+	this.logger.Debugf("Testing requirements for %s.", commandName)
+	if this.contains(this.checkedRequirements, commandName) {
+		this.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
+	} else if command.TestRequirements() {
+		this.logger.Debugf("Passed requirements for %s.", commandName)
+		this.checkedRequirements = append(this.checkedRequirements, commandName)
+	} else {
+		this.logger.Fatalf("Failed requirenments for %s.", commandName)
+	}
+
+	return command.Execute(tokens)
+}
+
+func (this *Interpreter) handleVariableLine(tokens []string) {
+	variableName := strings.TrimPrefix(tokens[0], "$")
+	this.variables[variableName] = this.handleCommandLine(tokens[2:])
+}
+
 func (this *Interpreter) handleLine(input string) {
 	tokens := strings.Fields(input)
 	if strings.HasPrefix(tokens[0], "//") {
 		return
 	}
 
-	if command, exists := this.commands[tokens[0]]; exists {
-		command.Execute(tokens)
+	if strings.HasPrefix(tokens[0], "$") && tokens[1] == "=" {
+		this.handleVariableLine(tokens)
 		return
 	}
-	this.requireConnection()
 
-	if command, exists := this.onlineCommands[tokens[0]]; exists {
-		if this.testRequirenments {
-			this.logger.Debug("Testing requirements for " + tokens[0])
-			if command.TestRequirements() {
-				this.logger.Debug("Passed requirenments for " + tokens[0])
-			} else {
-				this.logger.Error("Failed requirenments for " + tokens[0])
-			}
-		} else {
-			command.Execute(tokens)
-		}
-	} else {
-		this.logger.Error("Invalid command " + tokens[0])
-	}
+	this.handleCommandLine(tokens)
 }
 
 func (this *Interpreter) GetReferencePage() string {

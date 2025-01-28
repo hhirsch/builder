@@ -23,10 +23,11 @@ func (this *ListDatabasesCommand) TestRequirements() bool {
 	return this.FindBinary("mysql")
 }
 
-func (this *ListDatabasesCommand) Execute(tokens []string) {
+func (this *ListDatabasesCommand) Execute(tokens []string) string {
 	//	this.environment.GetLogger().Info(this.environment.Client.Execute("pwd"))
 	//this.environment.GetLogger().Info(this.environment.Client.Execute("mysql -u root -e \"SHOW DATABASES;\" --protocol=socket"))
 	this.environment.GetLogger().Info(this.environment.Client.Execute("mysql --socket=/var/run/mysqld/mysqld.sock -u root -e \"SHOW DATABASES;\""))
+	return ""
 }
 
 func (this *ListDatabasesCommand) Undo() {

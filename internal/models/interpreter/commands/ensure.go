@@ -17,12 +17,13 @@ func NewEnsureExecutableCommand(environment *models.Environment) *EnsureExecutab
 	}
 }
 
-func (this *EnsureExecutableCommand) Execute(tokens []string) {
+func (this *EnsureExecutableCommand) Execute(tokens []string) string {
 	this.environment.GetLogger().Info("Ensuring target is executable.")
 	if len(tokens) != 2 {
 		this.environment.GetLogger().Fatal("ensureExecutable needs 1 parameter")
 	}
 	this.environment.Client.EnsureExecutable(tokens[1])
+	return ""
 }
 
 func (this *EnsureExecutableCommand) Undo() {

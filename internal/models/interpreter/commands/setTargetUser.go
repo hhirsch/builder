@@ -18,12 +18,13 @@ func NewSetTargetUserCommand(environment *models.Environment) *SetTargetUserComm
 	return controller
 }
 
-func (this *SetTargetUserCommand) Execute(tokens []string) {
+func (this *SetTargetUserCommand) Execute(tokens []string) string {
 	this.environment.GetLogger().Info("Setting target user.")
 	if len(tokens) != 2 {
 		this.environment.GetLogger().Fatal("setTargetUser needs 1 parameter")
 	}
 	this.environment.Client.SetTargetUser(tokens[1])
+	return ""
 }
 
 func (this *SetTargetUserCommand) Undo() {

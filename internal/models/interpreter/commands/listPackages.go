@@ -19,10 +19,10 @@ func NewListPackagesCommand(environment *models.Environment) *ListPackagesComman
 	return controller
 }
 
-func (this *ListPackagesCommand) Execute(tokens []string) {
+func (this *ListPackagesCommand) Execute(tokens []string) string {
 	format.Println("list")
 	this.environment.Client.ListPackages()
-
+	return ""
 }
 
 func (this *ListPackagesCommand) Undo() {

@@ -24,11 +24,11 @@ func (this *PrintCommand) TestRequirement() bool {
 	return true
 }
 
-func (this *PrintCommand) Execute(tokens []string) {
+func (this *PrintCommand) Execute(tokens []string) string {
 	tokens = tokens[1:]
 	parameters := strings.Join(tokens, " ")
 	format.Println(parameters)
-	return
+	return ""
 }
 
 func (this *PrintCommand) Undo() {

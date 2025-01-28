@@ -22,11 +22,12 @@ func (this *EnsureCapabilityConnectionCommand) TestRequirement() bool {
 	return true
 }
 
-func (this *EnsureCapabilityConnectionCommand) Execute(tokens []string) {
+func (this *EnsureCapabilityConnectionCommand) Execute(tokens []string) string {
 	if len(tokens) != 2 {
 		this.environment.GetLogger().Fatal("ensureCapabilityConnection needs 1 parameters")
 	}
 	this.environment.Client.EnsureCapabilityConnection(tokens[1])
+	return ""
 }
 
 func (this *EnsureCapabilityConnectionCommand) Undo() {

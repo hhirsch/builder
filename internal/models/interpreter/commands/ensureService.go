@@ -23,7 +23,7 @@ func (this *EnsureServiceCommand) TestRequirement() bool {
 	return true
 }
 
-func (this *EnsureServiceCommand) Execute(tokens []string) {
+func (this *EnsureServiceCommand) Execute(tokens []string) string {
 	if len(tokens) < 4 {
 		this.environment.GetLogger().Fatal("ensureService needs 2 parameters and a description string")
 	}
@@ -32,7 +32,7 @@ func (this *EnsureServiceCommand) Execute(tokens []string) {
 	this.environment.GetLogger().Info("Creating service name: " + tokens[1] + "  binary: " + tokens[2] + "  description: " + description)
 	this.environment.Client.EnsureService(tokens[1], tokens[2], description)
 
-	return
+	return ""
 }
 
 func (this *EnsureServiceCommand) Undo() {

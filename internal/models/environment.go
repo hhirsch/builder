@@ -26,8 +26,29 @@ func NewEnvironment() *Environment {
 
 	logger := helpers.NewLogger(environment.GetLogFilePath())
 	environment.SetLogger(logger)
+	encryption, err := NewEncryption(environment)
+	if err != nil {
+		logger.Error("No encryption possible: " + err.Error())
+	} else {
+		logger.Info("Encryption available.")
+		registry.EnableRsa(*encryption)
+		if registry.EncryptionTest() == nil {
+			logger.Info("Encryption test passed.")
+		} else {
+			logger.Fatal("Encryption test failed.")
+		}
+	}
 	environment.SetRegistry(registry)
 	return environment
+}
+
+func (this *Environment) getHomePath() string {
+	currentUser, err := user.Current()
+	if err != nil {
+		this.logger.Fatal(err.Error())
+	}
+
+	return currentUser.HomeDir
 }
 
 func (this *Environment) GetLogFilePath() string {
@@ -44,6 +65,10 @@ func (this *Environment) GetProjectCommandsPath() string {
 
 func (this *Environment) GetGlobalRegistryPath() string {
 	return this.GetBuilderHomePath() + "/builderGlobal.reg"
+}
+
+func (this *Environment) GetKeyPath() string {
+	return this.getHomePath() + "/.ssh/id_rsa"
 }
 
 func (this *Environment) GetLogger() *helpers.Logger {
@@ -76,12 +101,7 @@ func (this *Environment) GetArguments() []string {
 }
 
 func (this *Environment) GetBuilderHomePath() string {
-	currentUser, err := user.Current()
-	path := currentUser.HomeDir + "/" + this.GetProjectPath()
-
-	if err != nil {
-		this.logger.Fatal(err.Error())
-	}
+	path := this.getHomePath() + "/" + this.GetProjectPath()
 
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(path, os.ModePerm)

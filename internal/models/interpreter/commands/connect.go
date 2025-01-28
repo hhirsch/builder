@@ -21,14 +21,11 @@ func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 	return controller
 }
 
-func (this *ConnectCommand) Execute(tokens []string) {
+func (this *ConnectCommand) Execute(tokens []string) string {
 	this.requireParameterAmount(tokens, 1)
 	this.environment.Client = *models.NewClient(this.environment, "root", tokens[1])
 	this.logger.Info("Connected to " + tokens[1])
-}
-
-func (this *ConnectCommand) Undo() {
-	this.environment.GetLogger().Info("Undo not implemented")
+	return "true"
 }
 
 func (this *ConnectCommand) GetDescription(tokens []string) string {

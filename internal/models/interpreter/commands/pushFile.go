@@ -17,12 +17,12 @@ func NewPushFileCommand(environment *models.Environment) *PushFileCommand {
 	}
 }
 
-func (this *PushFileCommand) Execute(tokens []string) {
+func (this *PushFileCommand) Execute(tokens []string) string {
 	if len(tokens) != 3 {
 		this.environment.GetLogger().Fatal("pushFile needs 2 parameters.")
 	}
 	this.environment.Client.PushFile(tokens[1], tokens[2])
-
+	return ""
 }
 
 func (this *PushFileCommand) Undo() {

@@ -19,9 +19,10 @@ func NewStepCommand(environment *models.Environment) *StepCommand {
 	return controller
 }
 
-func (this *StepCommand) Execute(tokens []string) {
+func (this *StepCommand) Execute(tokens []string) string {
 	this.description = strings.Join(tokens, " ")
 	this.environment.GetLogger().Info(this.description)
+	return ""
 }
 
 func (this *StepCommand) Undo() {

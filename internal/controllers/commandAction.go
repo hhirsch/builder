@@ -21,13 +21,14 @@ func NewCommandAction(controller *BuilderController) *CommandAction {
 }
 
 func (this *CommandAction) Execute() {
-	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
+	if this.ParameterValidationFailed(1, "command needs a command name as argument.") {
 		this.controller.ShowHelp()
 		return
 	}
 	this.logger.Info("Executing user defined command.")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.TestAndRun(this.environment.GetProjectCommandsPath() + this.controller.Arguments[0] + ".bld")
+	var commandName string = this.controller.Arguments[0]
+	interpreter.Run(this.environment.GetProjectCommandsPath() + commandName + ".bld")
 }
 
 func (this *CommandAction) GetName() string {

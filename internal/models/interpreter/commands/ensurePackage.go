@@ -19,10 +19,11 @@ func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageComm
 	return controller
 }
 
-func (this *EnsurePackageCommand) Execute(tokens []string) {
+func (this *EnsurePackageCommand) Execute(tokens []string) string {
 	tokens = tokens[1:]
 	parameters := strings.Join(tokens, " ")
 	this.environment.Client.EnsurePackage(parameters)
+	return ""
 }
 
 func (this *EnsurePackageCommand) Undo() {

@@ -23,8 +23,9 @@ func (this *ExecuteAndPrintCommand) getCommandFromTokens(tokens []string) string
 	return strings.Join(tokens, " ")
 }
 
-func (this *ExecuteAndPrintCommand) Execute(tokens []string) {
+func (this *ExecuteAndPrintCommand) Execute(tokens []string) string {
 	this.environment.Client.ExecuteAndPrint(this.getCommandFromTokens(tokens))
+	return ""
 }
 
 func (this *ExecuteAndPrintCommand) Undo() {

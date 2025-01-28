@@ -47,28 +47,44 @@ func (this *Logger) writeFile(level string, message string) {
 	this.writeLog(time.Format("2006/01/02 15:04:05") + " " + level + " " + message + "\n")
 }
 
-func (this *Logger) getCallerName() string {
-	callAdresses := make([]uintptr, 10)
-	callers := runtime.Callers(3, callAdresses)
+func (this *Logger) splitNamespaceFromFunctionName(functionName string) (isolatedNamespaceName string, isolatedFunctionName string) {
+	lastSlash := strings.LastIndex(functionName, "/")
+	if lastSlash == -1 {
+		return "", functionName
+	}
+	lastDot := strings.LastIndex(functionName[lastSlash:], ".")
+	if lastDot == -1 {
+		return functionName[:lastSlash], functionName[lastSlash+1:]
+	}
 
+	return functionName[:lastSlash], functionName[lastSlash+lastDot+1:]
+}
+
+func (this *Logger) getCallerName() (result string) {
+	callAdresses := make([]uintptr, 10)
+	callers := runtime.Callers(4, callAdresses)
+	result = ""
 	if callers == 0 {
-		return ""
+		return
 	}
 
 	function := runtime.FuncForPC(callAdresses[0])
 	if function == nil {
-		return ""
+		return
 	}
 
 	fullName := function.Name()
 	parts := strings.Split(fullName, ".")
 
 	if len(parts) == 0 {
-		return ""
+		return
 	}
 	expression := regexp.MustCompile(`[()*]`)
-	callerType := expression.ReplaceAllString(parts[len(parts)-2], "")
-
+	callerTypeWithNamespace := parts[len(parts)-2]
+	callerType := expression.ReplaceAllString(callerTypeWithNamespace, "")
+	if callerType == callerTypeWithNamespace {
+		_, callerType = this.splitNamespaceFromFunctionName(callerTypeWithNamespace)
+	}
 	return callerType + "->" + parts[len(parts)-1]
 }
 
@@ -112,6 +128,10 @@ func (this *Logger) Warn(message interface{}, data ...interface{}) {
 
 func (this *Logger) Error(message interface{}, data ...interface{}) {
 	this.genericLog(this.getCallerName(), "ERROR", message, data)
+}
+
+func (this *Logger) Errorf(message string, data ...interface{}) {
+	this.Error(fmt.Sprintf(message, data...))
 }
 
 func (this *Logger) Fatal(message interface{}, data ...interface{}) {

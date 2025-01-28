@@ -22,7 +22,7 @@ func NewSetupHostCommand(environment *models.Environment) *SetupHostCommand {
 	return controller
 }
 
-func (this *SetupHostCommand) Execute(tokens []string) {
+func (this *SetupHostCommand) Execute(tokens []string) string {
 	if len(tokens) != 2 {
 		this.logger.Fatal("setupHost needs 1 parameter")
 	}
@@ -63,6 +63,7 @@ func (this *SetupHostCommand) Execute(tokens []string) {
 
 	this.environment.GetRegistry().Save()
 	this.environment.Client = *models.NewClient(this.environment, userName, hostName)
+	return ""
 }
 
 func (this *SetupHostCommand) Undo() {
