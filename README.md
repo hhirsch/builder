@@ -4,29 +4,30 @@ At the core it is designed to be run on a client system so for your CI pipelines
 find other tools more suitable.
 
 ## Features
-- Touring incomplete Domain Specific Language inspired by Basic
-- Commands to 
-  - Install packages
-  - Upload files
-  - Manage users
-  - Turn binaries into system services
-  - Take snapshots of the installed packages
-- Command Line Interface
-- Self documenting commands
+- Touring incomplete Domain Specific Language inspired by Basic.
+- commands to 
+  - install packages
+  - upload files
+  - manage users
+  - turn binaries into system services
+  - take snapshots of the installed packages
+- command line interface
+- self documenting commands
 
 ## Planned Features
-- Incremental Updates
-- Variables
-- Abstract syntax tree
-- If statements
+- incremental Updates
+- variables
+- abstract syntax tree
+- if statements
 - y/n prompt
-- Switch statements
+- switch statements
 - Nginx configuration
 - Wiki install
 - Wordpress install
 - Wordpress backup
-- Change Wordpress hostname
+- change Wordpress hostname
 - MySQL-Dump
+- host aliases json file
 
 ## Example
 tools.bld

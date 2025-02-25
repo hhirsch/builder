@@ -44,8 +44,8 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		"executeAndPrint":  com.NewExecuteAndPrintCommand(environment),
 		"setTargetUser":    com.NewSetTargetUserCommand(environment),
 		"pushFile":         com.NewPushFileCommand(environment),
-		"saveDatabase":     com.NewPushFileCommand(environment),      //host, database, localFileName
-		"listDatabases":    com.NewListDatabasesCommand(environment), //host, database, localFileName
+		"saveDatabase":     com.NewPushFileCommand(environment),
+		"listDatabases":    com.NewListDatabasesCommand(environment),
 	}
 	return &Interpreter{
 		logger:         logger,

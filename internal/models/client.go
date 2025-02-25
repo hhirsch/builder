@@ -62,6 +62,10 @@ func NewClient(environment *Environment, userName string, host string) *Client {
 	return client
 }
 
+func (this *Client) GetHost() (hostName string) {
+	return this.host
+}
+
 func (this *Client) ensureSnapshotDirectoryExists() {
 	path := "snapshots"
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {

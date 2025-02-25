@@ -85,6 +85,9 @@ func (this *Environment) GetLogger() *helpers.Logger {
 }
 
 func (this *Environment) GetRegistry() *Registry {
+	if this.registry == nil {
+		this.logger.Fatal("No registry exists at this point failing disgracefully.")
+	}
 	return this.registry
 }
 

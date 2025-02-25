@@ -6,7 +6,7 @@ import (
 )
 
 // controller for the builder command line
-type BuilderController struct {
+type RegistryController struct {
 	environment   *models.Environment
 	logger        *helpers.Logger
 	Arguments     []string
@@ -20,7 +20,7 @@ type BuilderController struct {
 	createAction  *CreateAction
 }
 
-func NewBuilderController(environment *models.Environment) *BuilderController {
+func NewRegistryController(environment *models.Environment) *BuilderController {
 	controller := &BuilderController{
 		environment: environment,
 		logger:      environment.GetLogger(),
@@ -29,23 +29,15 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 
 	var initAction = NewInitAction(controller)
 	var scriptAction = NewScriptAction(controller)
-	var commandAction = NewCommandAction(controller)
 	var helpAction = NewHelpAction(controller)
-	var createAction = NewCreateAction(controller)
 	var actions = []Action{
-		initAction,
 		scriptAction,
-		commandAction,
 		helpAction,
-		createAction,
 	}
 
 	actionsMap := map[string]Action{
-		initAction.GetName():    initAction,
-		scriptAction.GetName():  scriptAction,
-		commandAction.GetName(): commandAction,
-		helpAction.GetName():    helpAction,
-		createAction.GetName():  createAction,
+		scriptAction.GetName(): initAction,
+		scriptAction.GetName(): scriptAction,
 	}
 
 	var arguments []string
@@ -62,19 +54,19 @@ func NewBuilderController(environment *models.Environment) *BuilderController {
 	return controller
 }
 
-func (this *BuilderController) GetEnvironment() *models.Environment {
+func (this *RegistryController) GetEnvironment() *models.Environment {
 	return this.environment
 }
 
-func (this *BuilderController) GetActionsMap() map[string]Action {
+func (this *RegistryController) GetActionsMap() map[string]Action {
 	return this.actionsMap
 }
 
-func (this *BuilderController) GetActions() []Action {
+func (this *RegistryController) GetActions() []Action {
 	return this.actions
 }
 
-func (this *BuilderController) ExecuteAction() {
+func (this *RegistryController) ExecuteAction() {
 	if len(this.Arguments) < 1 {
 		this.logger.Info("You need to pass a command name as argument.")
 		this.ShowHelp()
@@ -90,6 +82,6 @@ func (this *BuilderController) ExecuteAction() {
 	this.ShowHelp()
 }
 
-func (this *BuilderController) ShowHelp() {
+func (this *RegistryController) ShowHelp() {
 	this.helpAction.Execute()
 }

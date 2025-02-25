@@ -14,7 +14,8 @@ type ListDatabasesCommand struct {
 func NewListDatabasesCommand(environment *models.Environment) *ListDatabasesCommand {
 	controller := &ListDatabasesCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		SqlCommand:  *NewSqlCommand(environment),
+		BaseCommand: *NewBaseCommand(environment),
 	}
 	return controller
 }
@@ -24,9 +25,9 @@ func (this *ListDatabasesCommand) TestRequirements() bool {
 }
 
 func (this *ListDatabasesCommand) Execute(tokens []string) string {
-	//	this.environment.GetLogger().Info(this.environment.Client.Execute("pwd"))
-	//this.environment.GetLogger().Info(this.environment.Client.Execute("mysql -u root -e \"SHOW DATABASES;\" --protocol=socket"))
-	this.environment.GetLogger().Info(this.environment.Client.Execute("mysql --socket=/var/run/mysqld/mysqld.sock -u root -e \"SHOW DATABASES;\""))
+	this.uploadSqlCredentials()
+	this.environment.GetLogger().Info(this.environment.Client.Execute(this.mysql.GetListDatabasesCommand()))
+	this.wipeSqlCredentialsFromServer()
 	return ""
 }
 
@@ -35,9 +36,9 @@ func (this *ListDatabasesCommand) Undo() {
 }
 
 func (this *ListDatabasesCommand) GetDescription(tokens []string) string {
-	return "Ensure a binary is allowed to open ports."
+	return "Lists all databases."
 }
 
 func (this *ListDatabasesCommand) GetHelp() string {
-	return "[source <string>, target <string>]\tPush a file to the server."
+	return "[]\tLists all databases."
 }

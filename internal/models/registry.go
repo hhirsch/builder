@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"strings"
 )
@@ -35,7 +35,7 @@ func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
 	if this.encryption == nil {
 		err = errors.New("Encryption is disabled.")
 	}
-	this.data[key] = value
+	this.data[key], _ = this.encryption.Encrypt(value)
 	return
 }
 
@@ -45,8 +45,8 @@ func (this *Registry) GetEncryptedString(key string) (value string, err error) {
 		err = errors.New("Encryption is disabled.")
 	}
 
-	value, ok := this.data[key]
-	if !ok {
+	value, err = this.encryption.Decrypt(this.data[key])
+	if err == nil {
 		err = errors.New("Value does not exist.")
 	}
 	return
@@ -131,7 +131,7 @@ func (this *Registry) Load() (err error) {
 	}
 	defer file.Close()
 
-	jsonData, err := ioutil.ReadAll(file)
+	jsonData, err := io.ReadAll(file)
 	if err != nil {
 		return
 	}

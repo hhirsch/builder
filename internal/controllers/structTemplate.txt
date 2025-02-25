@@ -1,0 +1,15 @@
+package {{packageName}}
+
+import (
+)
+
+type {{structName}} struct {
+}
+
+func New{{structName}}() *{{structName}} {
+	return &{{structName}}{}
+}
+
+func (this *{{structName}}) PublicFunction() {
+
+}

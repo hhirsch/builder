@@ -27,6 +27,7 @@ func NewBaseCommand(environment *models.Environment) *BaseCommand {
 		result:      "",
 	}
 }
+
 func (this *BaseCommand) GetResult() string {
 	return this.result
 }
