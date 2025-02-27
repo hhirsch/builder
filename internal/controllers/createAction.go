@@ -14,7 +14,7 @@ type CreateAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
 	model       *models.BuilderModel
-	controller  *BuilderController
+	controller  *Controller
 	BaseAction
 	traits.FileSystem
 }
@@ -22,8 +22,7 @@ type CreateAction struct {
 //go:embed structTemplate.txt
 var structTemplate string
 
-func NewCreateAction(controller *BuilderController) *CreateAction {
-
+func NewCreateAction(controller *Controller) *CreateAction {
 	return &CreateAction{
 		BaseAction:  BaseAction{controller: controller},
 		FileSystem:  traits.FileSystem{},

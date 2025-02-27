@@ -10,11 +10,11 @@ type HelpAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
 	model       *models.BuilderModel
-	controller  *BuilderController
+	controller  *Controller
 	BaseAction
 }
 
-func NewHelpAction(controller *BuilderController) *HelpAction {
+func NewHelpAction(controller *Controller) *HelpAction {
 
 	return &HelpAction{
 		BaseAction:  BaseAction{controller: controller},

@@ -13,7 +13,7 @@ type UpdateAction struct {
 	BaseAction
 }
 
-func NewUpdateAction(controller *BuilderController) *UpdateAction {
+func NewUpdateAction(controller *Controller) *UpdateAction {
 
 	return &UpdateAction{
 		environment: controller.GetEnvironment(),
@@ -22,7 +22,7 @@ func NewUpdateAction(controller *BuilderController) *UpdateAction {
 	}
 }
 
-func (this *UpdateAction) Execute(controller *BuilderController) {
+func (this *UpdateAction) Execute(controller *Controller) {
 	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
 		controller.ShowHelp()
 		return

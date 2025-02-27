@@ -92,6 +92,10 @@ func (this *Interpreter) contains(slice []string, str string) bool {
 
 func (this *Interpreter) handleCommandLine(tokens []string) string {
 	var commandName string = tokens[0]
+	if commandName == "connect" || commandName == "setupHost" {
+		//this.checkedRequirements = this.checkedRequirements[:0]
+		this.checkedRequirements = []string{}
+	}
 	var command com.Command
 	if offlineCommand, isOfflineCommand := this.commands[commandName]; isOfflineCommand {
 		command = offlineCommand

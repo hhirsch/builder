@@ -10,11 +10,11 @@ type ScriptAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
 	model       *models.BuilderModel
-	controller  *BuilderController
+	controller  *Controller
 	BaseAction
 }
 
-func NewScriptAction(controller *BuilderController) *ScriptAction {
+func NewScriptAction(controller *Controller) *ScriptAction {
 
 	return &ScriptAction{
 		BaseAction:  BaseAction{controller: controller},

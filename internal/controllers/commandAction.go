@@ -12,7 +12,7 @@ type CommandAction struct {
 	BaseAction
 }
 
-func NewCommandAction(controller *BuilderController) *CommandAction {
+func NewCommandAction(controller *Controller) *CommandAction {
 
 	return &CommandAction{
 		environment: controller.GetEnvironment(),

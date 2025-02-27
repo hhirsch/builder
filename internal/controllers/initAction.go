@@ -11,8 +11,7 @@ type InitAction struct {
 	model       *models.BuilderModel
 }
 
-func NewInitAction(controller *BuilderController) *InitAction {
-
+func NewInitAction(controller *Controller) *InitAction {
 	initAction := &InitAction{
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),

@@ -6,7 +6,7 @@ import (
 
 type BaseAction struct {
 	environment *models.Environment
-	controller  *BuilderController
+	controller  *Controller
 }
 
 func (this *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
@@ -17,5 +17,5 @@ func (this *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int
 }
 
 func (this *BaseAction) HasEnoughParameters(requiredAmountOfParameters int) bool {
-	return len(this.controller.Arguments) >= requiredAmountOfParameters
+	return len(this.controller.GetArguments()) >= requiredAmountOfParameters
 }
