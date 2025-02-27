@@ -3,6 +3,9 @@ Write code to commission GNU/Linux systems.
 At the core it is designed to be run on a client system so for your CI pipelines you might
 find other tools more suitable.
 
+Copyright (C) 2025  Henry Hirsch 
+This program is licensed under the GNU General Public License v3. 
+See <http://www.gnu.org/licenses/gpl-3.0.html> for details.
 ## Features
 - Touring incomplete Domain Specific Language inspired by Basic.
 - commands to 
