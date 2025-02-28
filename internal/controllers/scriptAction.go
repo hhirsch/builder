@@ -17,7 +17,12 @@ type ScriptAction struct {
 func NewScriptAction(controller *Controller) *ScriptAction {
 
 	return &ScriptAction{
-		BaseAction:  BaseAction{controller: controller},
+		BaseAction: BaseAction{
+			controller:  controller,
+			name:        "script",
+			description: "Run the script in <scriptpath>.",
+			help:        "Run a specific script.",
+		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
 		model:       models.NewBuilderModel(controller.GetEnvironment()),
@@ -35,14 +40,6 @@ func (this *ScriptAction) Execute() {
 	interpreter.Run(this.controller.Arguments[0])
 }
 
-func (this *ScriptAction) GetName() string {
-	return "script"
-}
-
 func (this *ScriptAction) GetDescription() string {
 	return "Run the script in <scriptpath>."
-}
-
-func (this *ScriptAction) GetHelp() string {
-	return "Run a specific script."
 }

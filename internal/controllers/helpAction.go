@@ -17,7 +17,11 @@ type HelpAction struct {
 func NewHelpAction(controller *Controller) *HelpAction {
 
 	return &HelpAction{
-		BaseAction:  BaseAction{controller: controller},
+		BaseAction: BaseAction{
+			controller: controller,
+			name:       "help",
+			help:       "Show this help. Call help with an action name as parameter \n\t\tto get more details on the action.",
+		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
 		model:       models.NewBuilderModel(controller.GetEnvironment()),
@@ -38,14 +42,6 @@ func (this *HelpAction) Execute() {
 	}
 }
 
-func (this *HelpAction) GetName() string {
-	return "help"
-}
-
 func (this *HelpAction) GetDescription() string {
 	return "Create builder directories in " + this.environment.GetProjectPath() + "."
-}
-
-func (this *HelpAction) GetHelp() string {
-	return "Show this help. Call help with an action name as parameter \n\t\tto get more details on the action."
 }
