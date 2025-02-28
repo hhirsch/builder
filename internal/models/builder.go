@@ -6,7 +6,6 @@ import (
 	"os"
 )
 
-// controller for the builder command line
 type BuilderModel struct {
 	environment *Environment
 	logger      *helpers.Logger
