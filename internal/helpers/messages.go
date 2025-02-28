@@ -7,17 +7,9 @@ import (
 //go:embed logo.txt
 var bannerText string
 
-//go:embed help.txt
-var helpText string
-
 func GetBannerText() string {
 
 	return bannerText
-}
-
-func GetHelpText() string {
-
-	return helpText
 }
 
 func GetCommandNameRequiredText() string {
