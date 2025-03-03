@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
+	"strings"
 )
 
 type HelpAction struct {
@@ -30,15 +31,24 @@ func NewHelpAction(controller *Controller) *HelpAction {
 
 }
 
+func (this *HelpAction) rightPadString(s string, length int) string {
+	if len(s) >= length {
+		return s
+	}
+	padLength := length - len(s)
+	pad := strings.Repeat(" ", padLength)
+	return s + pad
+}
+
 func (this *HelpAction) Execute() {
 	this.logger.Print(helpers.GetBannerText())
-
-	if len(this.controller.Arguments) > 1 {
+	if !this.HasEnoughParameters(2) {
 		this.logger.Print("Specific help for command " + this.controller.Arguments[0] + ".")
 		return
 	}
+
 	for _, action := range this.controller.GetActions() {
-		this.logger.Print(fmt.Sprintf("%s\t\t%+v", action.GetName(), action.GetHelp()))
+		this.logger.Print(fmt.Sprintf("%s\t%+v", this.rightPadString(action.GetName(), 10), action.GetHelp()))
 	}
 }
 
