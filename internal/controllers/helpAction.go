@@ -42,7 +42,7 @@ func (this *HelpAction) rightPadString(s string, length int) string {
 
 func (this *HelpAction) Execute() {
 	this.logger.Print(helpers.GetBannerText())
-	if !this.HasEnoughParameters(2) {
+	if this.HasEnoughParameters(1) {
 		this.logger.Print("Specific help for command " + this.controller.Arguments[0] + ".")
 		return
 	}
