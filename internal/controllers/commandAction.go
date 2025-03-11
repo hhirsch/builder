@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	_ "embed"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/hhirsch/builder/internal/models/interpreter"
 )
+
+//go:embed scriptAction.md
+var commandMarkdown string
 
 type CommandAction struct {
 	environment *models.Environment
@@ -15,6 +19,13 @@ type CommandAction struct {
 func NewCommandAction(controller *Controller) *CommandAction {
 
 	return &CommandAction{
+		BaseAction: BaseAction{
+			controller:  controller,
+			name:        "command",
+			brief:       "Execute command.",
+			description: "Execute command.",
+			help:        commandMarkdown,
+		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
 	}
@@ -29,16 +40,4 @@ func (this *CommandAction) Execute() {
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
 	var commandName string = this.controller.Arguments[0]
 	interpreter.Run(this.environment.GetProjectCommandsPath() + commandName + ".bld")
-}
-
-func (this *CommandAction) GetName() string {
-	return "command"
-}
-
-func (this *CommandAction) GetDescription() string {
-	return "Execute command"
-}
-
-func (this *CommandAction) GetHelp() string {
-	return "Execute command."
 }

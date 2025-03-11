@@ -5,4 +5,5 @@ type Action interface {
 	GetName() string
 	GetDescription() string
 	GetHelp() string
+	GetBrief() string
 }

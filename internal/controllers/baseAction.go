@@ -8,8 +8,9 @@ type BaseAction struct {
 	environment *models.Environment
 	controller  *Controller
 	name        string
-	description string
-	help        string
+	description string //describes what the program will do if run
+	brief       string //information what the program is for
+	help        string //detailed description of parameters with examples
 }
 
 func (this *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
@@ -29,6 +30,10 @@ func (this *BaseAction) GetName() string {
 
 func (this *BaseAction) GetDescription() string {
 	return this.description
+}
+
+func (this *BaseAction) GetBrief() string {
+	return this.brief
 }
 
 func (this *BaseAction) GetHelp() string {

@@ -71,6 +71,14 @@ func (this *Environment) GetKeyPath() string {
 	return this.getHomePath() + "/.ssh/id_rsa"
 }
 
+func (this *Environment) IsColorEnabled() bool {
+	value := os.Getenv("CLICOLOR")
+	if value == "1" {
+		return true
+	}
+	return false
+}
+
 func (this *Environment) GetLogger() *helpers.Logger {
 	if this.logger == nil {
 		_, file, line, ok := runtime.Caller(1)

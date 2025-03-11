@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
@@ -15,14 +16,20 @@ type HelpAction struct {
 	BaseAction
 }
 
+//go:embed helpAction.md
+var helpMarkdown string
+
 func NewHelpAction(controller *Controller) *HelpAction {
+	baseAction := BaseAction{
+		controller:  controller,
+		name:        "help",
+		description: "Show the help for [parameter].",
+		brief:       "Show this help. Call help with an action name as parameter \n\t\tto get more details on the action.",
+		help:        helpMarkdown,
+	}
 
 	return &HelpAction{
-		BaseAction: BaseAction{
-			controller: controller,
-			name:       "help",
-			help:       "Show this help. Call help with an action name as parameter \n\t\tto get more details on the action.",
-		},
+		BaseAction:  baseAction,
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
 		model:       models.NewBuilderModel(controller.GetEnvironment()),
@@ -31,24 +38,32 @@ func NewHelpAction(controller *Controller) *HelpAction {
 
 }
 
-func (this *HelpAction) rightPadString(s string, length int) string {
-	if len(s) >= length {
-		return s
+func (this *HelpAction) rightPadString(string string, length int) string {
+	if len(string) >= length {
+		return string
 	}
-	padLength := length - len(s)
+	padLength := length - len(string)
 	pad := strings.Repeat(" ", padLength)
-	return s + pad
+	return string + pad
 }
 
 func (this *HelpAction) Execute() {
-	this.logger.Print(helpers.GetBannerText())
+	var markdownRenderer = models.NewMarkdownRenderer()
+
 	if this.HasEnoughParameters(1) {
-		this.logger.Print("Specific help for command " + this.controller.Arguments[0] + ".")
+		var actionName = this.controller.Arguments[0]
+		this.logger.Print(helpers.GetBannerText())
+		if this.environment.IsColorEnabled() {
+			markdownRenderer.EnableColor()
+		}
+		markdownRenderer.Render(this.controller.actionsMap[actionName].GetHelp())
 		return
+	} else {
+		this.logger.Print(helpers.GetBannerText())
 	}
 
 	for _, action := range this.controller.GetActions() {
-		this.logger.Print(fmt.Sprintf("%s\t%+v", this.rightPadString(action.GetName(), 10), action.GetHelp()))
+		this.logger.Print(fmt.Sprintf("  %s\t%+v", this.rightPadString(action.GetName(), 10), action.GetBrief()))
 	}
 }
 

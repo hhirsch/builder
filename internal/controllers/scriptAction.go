@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	_ "embed"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/hhirsch/builder/internal/models/interpreter"
@@ -14,6 +15,9 @@ type ScriptAction struct {
 	BaseAction
 }
 
+//go:embed scriptAction.md
+var scriptMarkdown string
+
 func NewScriptAction(controller *Controller) *ScriptAction {
 
 	return &ScriptAction{
@@ -21,7 +25,8 @@ func NewScriptAction(controller *Controller) *ScriptAction {
 			controller:  controller,
 			name:        "script",
 			description: "Run the script in <scriptpath>.",
-			help:        "Run a specific script.",
+			brief:       "Run a specific script.",
+			help:        scriptMarkdown,
 		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
