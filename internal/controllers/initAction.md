@@ -1,1 +1,3 @@
-* Help for the init action
+# Name
+
+builder init - Initialize Builder in current directory

@@ -44,7 +44,3 @@ func (this *InitAction) Execute() {
 func (this *InitAction) GetDescription() string {
 	return "Create builder directories in " + this.environment.GetProjectPath() + "."
 }
-
-func (this *InitAction) GetHelp() string {
-	return "Initialize builder in the current directory."
-}
