@@ -71,10 +71,7 @@ func (this *Environment) GetKeyPath() string {
 
 func (this *Environment) IsColorEnabled() bool {
 	value := os.Getenv("CLICOLOR")
-	if value == "1" {
-		return true
-	}
-	return false
+	return value == "1"
 }
 
 func (this *Environment) GetLogger() *helpers.Logger {
