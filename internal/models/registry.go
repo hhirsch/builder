@@ -39,17 +39,16 @@ func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
 	return
 }
 
-func (this *Registry) GetEncryptedString(key string) (value string, err error) {
-	value = ""
+func (this *Registry) GetEncryptedString(key string) (string, error) {
 	if this.encryption == nil {
-		err = errors.New("Encryption is disabled.")
+		return "", errors.New("Encryption is disabled.")
 	}
 
-	value, err = this.encryption.Decrypt(this.data[key])
+	value, err := this.encryption.Decrypt(this.data[key])
 	if err == nil {
-		err = errors.New("Value does not exist.")
+		return "", errors.New("Value does not exist.")
 	}
-	return
+	return value, nil
 }
 
 func (this *Registry) GetBool(key string) (value bool, err error) {
