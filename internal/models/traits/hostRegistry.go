@@ -30,11 +30,13 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 	_, err = this.environment.GetRegistry().GetEncryptedString(keyPath)
 	if err != nil {
 		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
-		huh.NewInput().
+		inputField := huh.NewInput().
 			Title("Enter a value for" + key).
-			Value(&value).
-			Run()
-
+			Value(&value)
+		err = inputField.Run()
+		if err != nil {
+			this.environment.GetLogger().Fatalf("Error registering key %s: %s", key, err.Error())
+		}
 		this.environment.GetLogger().Info("Registering " + key)
 		this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
 	}
