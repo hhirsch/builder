@@ -21,10 +21,8 @@ func NewEnvironment() *Environment {
 	environment := &Environment{
 		arguments: os.Args,
 	}
-	registry := NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
-	registry.Load()
-
 	logger := helpers.NewLogger(environment.GetLogFilePath())
+	registry := NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
 	environment.SetLogger(logger)
 	encryption, err := NewEncryption(environment)
 	if err != nil {
@@ -32,12 +30,12 @@ func NewEnvironment() *Environment {
 	} else {
 		logger.Info("Encryption available.")
 		registry.EnableRsa(*encryption)
-		if registry.EncryptionTest() == nil {
-			logger.Info("Encryption test passed.")
-		} else {
-			logger.Fatal("Encryption test failed.")
-		}
 	}
+	err = registry.Load()
+	if err != nil {
+		logger.Fatal("Registry loading failed: " + err.Error())
+	}
+
 	environment.SetRegistry(registry)
 	return environment
 }

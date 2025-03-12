@@ -86,27 +86,6 @@ func (this *Registry) EraseValue(key string) error {
 	return nil
 }
 
-func (this *Registry) EncryptionTest() error {
-	this.Register("encryptionTest", "test")
-	testValue, err := this.GetValue("encryptionTest")
-	if testValue != "test" && err == nil {
-		return errors.New("Regular value retrieval failed.")
-	}
-
-	this.RegisterEncrypted("encryptionTest", "encrypted test")
-	testValueUnencrypted, err := this.GetValue("encryptionTest")
-	if testValueUnencrypted == "encrpyted test" {
-		return errors.New("Unencrypted value retrieved after writing it encrypted.")
-	}
-
-	testValueEncrypted, err := this.GetEncryptedString("encryptionTest")
-	if testValueEncrypted != "encrypted test" {
-		return errors.New("Value was not encrypted.")
-	}
-
-	return nil
-}
-
 func (this *Registry) Save() (err error) {
 	file, err := os.Create(this.fileName)
 	if err != nil {
