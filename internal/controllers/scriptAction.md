@@ -1,11 +1,7 @@
-# Name
-
-builder script - Run a builder script
-
 # Synopsis
-builder script [\<file name\>]
+{{binaryName}} {{actionName}} \<file name\>
 # Description
-With a [\<file name\>] parameter script will execute the script with that file name.
+Execute the script with that \<file name\>.
 # Examples
 ```
 builder script example.bld

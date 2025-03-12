@@ -22,9 +22,19 @@ type CreateAction struct {
 //go:embed structTemplate.txt
 var structTemplate string
 
+//go:embed createAction.md
+var createMarkdown string
+
 func NewCreateAction(controller *Controller) *CreateAction {
+	baseAction := BaseAction{
+		controller:  controller,
+		name:        "create",
+		description: "Create a struct from template.",
+		brief:       "Create a struct from template.",
+		help:        createMarkdown,
+	}
 	return &CreateAction{
-		BaseAction:  BaseAction{controller: controller},
+		BaseAction:  baseAction,
 		FileSystem:  traits.FileSystem{},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
@@ -66,12 +76,4 @@ func (this *CreateAction) Execute() {
 
 func (this *CreateAction) GetName() string {
 	return "create"
-}
-
-func (this *CreateAction) GetDescription() string {
-	return "Create a struct in the project."
-}
-
-func (this *CreateAction) GetHelp() string {
-	return "Create a struct in the project."
 }

@@ -22,7 +22,7 @@ func NewInitAction(controller *Controller) *InitAction {
 			controller:  controller,
 			name:        "init",
 			description: "Initialize builder in the current directory.",
-			brief:       "Initialize builder in the current directory.\n\t\tAdditional information.",
+			brief:       "Initialize builder in the current directory.",
 			help:        initMarkdown,
 		},
 		environment: controller.GetEnvironment(),

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
+	"github.com/valyala/fasttemplate"
 	"strings"
 )
 
@@ -15,6 +16,9 @@ type HelpAction struct {
 	controller  *Controller
 	BaseAction
 }
+
+//go:embed helpHeader.md
+var helpHeader string
 
 //go:embed helpAction.md
 var helpMarkdown string
@@ -56,15 +60,24 @@ func (this *HelpAction) Execute() {
 		if this.environment.IsColorEnabled() {
 			markdownRenderer.EnableColor()
 		}
-		markdownRenderer.Render(this.controller.actionsMap[actionName].GetHelp())
+		action := this.controller.actionsMap[actionName]
+		template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
+		markdownContent := template.ExecuteString(map[string]interface{}{
+			"actionName": actionName,
+			"binaryName": this.environment.GetArguments()[0],
+			"brief":      action.GetBrief(),
+		})
+		markdownRenderer.Render(markdownContent)
 		return
 	} else {
 		this.logger.Print(helpers.GetBannerText())
 	}
 
+	fmt.Printf("  %s <command> [<arguments>]\n\n", this.environment.GetArguments()[0])
 	for _, action := range this.controller.GetActions() {
 		this.logger.Print(fmt.Sprintf("  %s\t%+v", this.rightPadString(action.GetName(), 10), action.GetBrief()))
 	}
+	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
 }
 
 func (this *HelpAction) GetDescription() string {

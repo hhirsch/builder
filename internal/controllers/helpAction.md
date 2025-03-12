@@ -1,13 +1,9 @@
-# Name
-
-builder help - Invoke help for builder commands.
-
 # Synopsis
-builder help [\<command\>]
+{{binaryName}} {{actionName}} [\<command\>]
 # Description
 With a [\<command\>] parameter help will show the specific help for the command.
 # Examples
 ```
-builder help init
+{{binaryName}} {{actionName}} init
 ```
 Show the help for the init command

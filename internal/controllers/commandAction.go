@@ -7,7 +7,7 @@ import (
 	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
-//go:embed scriptAction.md
+//go:embed commandAction.md
 var commandMarkdown string
 
 type CommandAction struct {
