@@ -38,7 +38,10 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 			this.environment.GetLogger().Fatalf("Error registering key %s: %s", key, err.Error())
 		}
 		this.environment.GetLogger().Info("Registering " + key)
-		this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
+		err = this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
+		if err != nil {
+			this.environment.GetLogger().Fatalf("Error registering key %s: %s", key, err.Error())
+		}
 	}
 
 	return value, err
