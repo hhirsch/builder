@@ -10,11 +10,10 @@ import (
 )
 
 type Environment struct {
-	Client     Client
-	configPath string
-	logger     *helpers.Logger
-	arguments  []string
-	registry   *Registry
+	Client    Client
+	logger    *helpers.Logger
+	arguments []string
+	registry  *Registry
 }
 
 func NewEnvironment() *Environment {

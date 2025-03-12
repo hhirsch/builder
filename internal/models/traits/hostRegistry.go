@@ -56,14 +56,16 @@ func (this *HostRegistry) PromptIfMissing(key string) (value string, err error) 
 	_, err = this.environment.GetRegistry().GetValue(keyPath)
 	if err != nil {
 		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
-		huh.NewInput().
+		input := huh.NewInput().
 			Title("Enter a value for" + key).
-			Value(&value).
-			Run()
-
+			Value(&value)
+		err := input.Run()
+		if err != nil {
+			return "", err
+		}
 		this.environment.GetLogger().Info("Registering " + key)
 		this.environment.GetRegistry().Register(keyPath, value)
 	}
 
-	return value, err
+	return value, nil
 }
