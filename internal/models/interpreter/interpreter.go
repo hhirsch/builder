@@ -18,7 +18,6 @@ type Interpreter struct {
 	commands            map[string]com.Command
 	onlineCommands      map[string]com.Command
 	variables           map[string]string
-	testRequirenments   bool
 	checkedRequirements []string
 }
 

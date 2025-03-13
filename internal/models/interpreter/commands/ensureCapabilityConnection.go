@@ -6,7 +6,6 @@ import (
 
 type EnsureCapabilityConnectionCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

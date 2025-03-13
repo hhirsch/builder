@@ -8,7 +8,6 @@ import (
 type EnsurePackageCommand struct {
 	BaseCommand
 	environment *models.Environment
-	description string
 }
 
 func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageCommand {
