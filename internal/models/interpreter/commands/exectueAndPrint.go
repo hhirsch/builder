@@ -7,7 +7,6 @@ import (
 
 type ExecuteAndPrintCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
