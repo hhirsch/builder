@@ -14,18 +14,19 @@ type Interpreter struct {
 	logger              *helpers.Logger
 	environment         *models.Environment
 	registry            *models.Registry
-	step                string
 	commands            map[string]com.Command
 	onlineCommands      map[string]com.Command
 	variables           map[string]string
-	testRequirenments   bool
 	checkedRequirements []string
 }
 
 func NewInterpreter(environment *models.Environment) *Interpreter {
 	logger := environment.GetLogger()
 	registry := models.NewRegistry(environment.GetGlobalRegistryPath())
-	registry.Load()
+	err := registry.Load()
+	if err != nil {
+		logger.Fatalf("Unable to load registry: %s", err.Error())
+	}
 	variables := map[string]string{}
 	commands := map[string]com.Command{
 		"step":      com.NewStepCommand(environment),

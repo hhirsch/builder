@@ -7,7 +7,6 @@ import (
 
 type ConnectCommand struct {
 	environment *models.Environment
-	description string
 	logger      *helpers.Logger
 	BaseCommand
 }

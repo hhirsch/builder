@@ -6,7 +6,6 @@ import (
 
 type ListFilesCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

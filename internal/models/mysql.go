@@ -10,8 +10,6 @@ import (
 var myConfigTemplate string
 
 type MySql struct {
-	data     map[string]string
-	fileName string
 }
 
 func NewMySql() *MySql {

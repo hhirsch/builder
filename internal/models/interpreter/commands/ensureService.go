@@ -7,7 +7,6 @@ import (
 
 type EnsureServiceCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

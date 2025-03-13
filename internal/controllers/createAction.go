@@ -71,7 +71,10 @@ func (this *CreateAction) Execute() {
 		"packageName": packageName,
 		"structName":  structName,
 	})
-	this.WriteStringToFile(this.controller.Arguments[0], fileContent)
+	err := this.WriteStringToFile(this.controller.Arguments[0], fileContent)
+	if err != nil {
+		this.logger.Fatalf("Error writing to file: %s", err.Error())
+	}
 }
 
 func (this *CreateAction) GetName() string {

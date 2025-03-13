@@ -8,7 +8,6 @@ import (
 
 type PrintCommand struct {
 	environment *models.Environment
-	text        string
 	BaseCommand
 }
 

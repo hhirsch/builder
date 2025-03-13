@@ -6,7 +6,6 @@ import (
 
 type ListDatabasesCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 	SqlCommand
 }

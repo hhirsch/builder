@@ -6,7 +6,6 @@ import (
 
 type PushFileCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

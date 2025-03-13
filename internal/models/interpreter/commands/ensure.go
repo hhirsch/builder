@@ -6,7 +6,6 @@ import (
 
 type EnsureExecutableCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

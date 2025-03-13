@@ -7,7 +7,6 @@ import (
 type SystemInfoCommand struct {
 	BaseCommand
 	environment *models.Environment
-	text        string
 }
 
 func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {

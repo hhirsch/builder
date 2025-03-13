@@ -19,15 +19,12 @@ import (
 )
 
 type Client struct {
-	sshClient     goph.Client
-	keyPath       string
-	user          string
-	host          string
-	targetUser    string
-	logger        *helpers.Logger
-	step          string
-	stepNumber    int
-	commandNumber int
+	sshClient  goph.Client
+	keyPath    string
+	user       string
+	host       string
+	targetUser string
+	logger     *helpers.Logger
 }
 
 func NewClient(environment *Environment, userName string, host string) *Client {

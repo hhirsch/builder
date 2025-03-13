@@ -9,7 +9,6 @@ import (
 
 type DumpPackagesCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
