@@ -32,11 +32,13 @@ func (this *SetupHostCommand) Execute(tokens []string) string {
 	if err != nil {
 		this.logger.Info("No user found in registry asking for user input.")
 		userName = "root"
-		huh.NewInput().
+		nameInput := huh.NewInput().
 			Title("Enter user name").
-			Value(&userName).
-			Run()
-
+			Value(&userName)
+		err = nameInput.Run()
+		if err != nil {
+			this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+		}
 		this.logger.Info("Registering " + userPath + " as " + userName)
 		this.environment.GetRegistry().Register(userPath, userName)
 	}
@@ -48,10 +50,13 @@ func (this *SetupHostCommand) Execute(tokens []string) string {
 	hostName, err = this.environment.GetRegistry().GetValue(hostPath)
 	if err != nil {
 		this.logger.Info("No host found in registry asking for user input.")
-		huh.NewInput().
+		hostInput := huh.NewInput().
 			Title("Enter host name or IP").
-			Value(&hostName).
-			Run()
+			Value(&hostName)
+		err = hostInput.Run()
+		if err != nil {
+			this.logger.Fatalf("Error reading input for host name: %s", err.Error())
+		}
 		this.logger.Info("Registering " + hostPath + " as " + hostName)
 		this.environment.GetRegistry().Register(hostPath, hostName)
 	}
@@ -60,7 +65,10 @@ func (this *SetupHostCommand) Execute(tokens []string) string {
 		this.logger.Fatal("Host name must not be empty!")
 	}
 
-	this.environment.GetRegistry().Save()
+	err = this.environment.GetRegistry().Save()
+	if err != nil {
+		this.logger.Fatalf("Error saving registry: %s", err.Error())
+	}
 	this.environment.Client = *models.NewClient(this.environment, userName, hostName)
 	return ""
 }
