@@ -8,7 +8,6 @@ import (
 
 type SetupHostCommand struct {
 	environment *models.Environment
-	description string
 	logger      *helpers.Logger
 	BaseCommand
 }

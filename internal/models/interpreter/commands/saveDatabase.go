@@ -6,7 +6,6 @@ import (
 
 type SaveDatabaseCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 

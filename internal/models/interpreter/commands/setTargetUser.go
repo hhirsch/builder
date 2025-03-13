@@ -7,7 +7,6 @@ import (
 type SetTargetUserCommand struct {
 	BaseCommand
 	environment *models.Environment
-	description string
 }
 
 func NewSetTargetUserCommand(environment *models.Environment) *SetTargetUserCommand {
