@@ -7,7 +7,6 @@ import (
 
 type ListPackagesCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
