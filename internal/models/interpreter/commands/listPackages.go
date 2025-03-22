@@ -13,7 +13,11 @@ type ListPackagesCommand struct {
 func NewListPackagesCommand(environment *models.Environment) *ListPackagesCommand {
 	controller := &ListPackagesCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "listPackages",
+			requiresConnection: true,
+		},
 	}
 	return controller
 }

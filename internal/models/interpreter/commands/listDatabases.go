@@ -14,7 +14,11 @@ func NewListDatabasesCommand(environment *models.Environment) *ListDatabasesComm
 	controller := &ListDatabasesCommand{
 		environment: environment,
 		SqlCommand:  *NewSqlCommand(environment),
-		BaseCommand: *NewBaseCommand(environment),
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "listDatabases",
+			requiresConnection: true,
+		},
 	}
 	return controller
 }

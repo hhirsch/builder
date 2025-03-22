@@ -15,7 +15,11 @@ type DumpPackagesCommand struct {
 func NewDumpPackagesCommand(environment *models.Environment) *DumpPackagesCommand {
 	return &DumpPackagesCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "dumpPackages",
+			requiresConnection: true,
+		},
 	}
 }
 

@@ -12,7 +12,9 @@ type SetTargetUserCommand struct {
 func NewSetTargetUserCommand(environment *models.Environment) *SetTargetUserCommand {
 	controller := &SetTargetUserCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{environment: environment,
+			name: "setTargetUser",
+		},
 	}
 	return controller
 }

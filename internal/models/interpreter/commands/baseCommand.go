@@ -9,12 +9,18 @@ import (
 )
 
 type BaseCommand struct {
-	environment *models.Environment
-	logger      *helpers.Logger
-	commands    []string
-	command     string
-	commandName string
-	result      string
+	environment        *models.Environment
+	logger             *helpers.Logger
+	commands           []string
+	command            string
+	commandName        string
+	result             string
+	name               string
+	description        string //describes what the program will do if run
+	brief              string //information what the program is for
+	help               string //detailed description of parameters with examples
+	parameters         int
+	requiresConnection bool
 }
 
 func NewBaseCommand(environment *models.Environment) *BaseCommand {
@@ -92,10 +98,22 @@ func (this *BaseCommand) Undo() {
 	this.logger.Info("Undo not possible.")
 }
 
-func (this *BaseCommand) GetDescription(tokens []string) string {
-	return "No description for this command."
+func (this *BaseCommand) GetName() string {
+	return this.name
+}
+
+func (this *BaseCommand) GetDescription() string {
+	return this.description
+}
+
+func (this *BaseCommand) GetBrief() string {
+	return this.brief
 }
 
 func (this *BaseCommand) GetHelp() string {
-	return "()\tNo help for this command."
+	return this.help
+}
+
+func (this *BaseCommand) RequiresConnection() bool {
+	return this.requiresConnection
 }

@@ -13,8 +13,11 @@ func NewListFilesCommand(environment *models.Environment) *ListFilesCommand {
 	return &ListFilesCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment,
-			logger:  environment.GetLogger(),
-			command: "ls"},
+			logger:             environment.GetLogger(),
+			command:            "ls",
+			name:               "listFiles",
+			requiresConnection: true,
+		},
 	}
 }
 

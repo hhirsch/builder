@@ -13,7 +13,11 @@ type EnsurePackageCommand struct {
 func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageCommand {
 	controller := &EnsurePackageCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "ensurePackage",
+			requiresConnection: true,
+		},
 	}
 	return controller
 }

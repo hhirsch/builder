@@ -16,7 +16,11 @@ func NewSetupHostCommand(environment *models.Environment) *SetupHostCommand {
 	controller := &SetupHostCommand{
 		environment: environment,
 		logger:      environment.GetLogger(),
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "setupHost",
+			requiresConnection: false,
+		},
 	}
 	return controller
 }

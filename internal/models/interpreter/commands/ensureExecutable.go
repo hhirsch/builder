@@ -12,7 +12,13 @@ type EnsureExecutableCommand struct {
 func NewEnsureExecutableCommand(environment *models.Environment) *EnsureExecutableCommand {
 	return &EnsureExecutableCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "ensureExecutable",
+			description:        "Ensures a binary is executable.",
+			brief:              "[binaryPath <string>]\tEnsure a binary is executable.",
+			requiresConnection: true,
+		},
 	}
 }
 

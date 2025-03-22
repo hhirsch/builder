@@ -14,7 +14,10 @@ type StepCommand struct {
 func NewStepCommand(environment *models.Environment) *StepCommand {
 	controller := &StepCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment: environment,
+			name:        "step",
+		},
 	}
 	return controller
 }

@@ -14,7 +14,10 @@ type PrintCommand struct {
 func NewPrintCommand(environment *models.Environment) *PrintCommand {
 	controller := &PrintCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment: environment,
+			name:        "print",
+		},
 	}
 	return controller
 }

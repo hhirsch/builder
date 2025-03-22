@@ -13,7 +13,11 @@ type ExecuteAndPrintCommand struct {
 func NewExecuteAndPrintCommand(environment *models.Environment) *ExecuteAndPrintCommand {
 	return &ExecuteAndPrintCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "executeAndPrint",
+			requiresConnection: true,
+		},
 	}
 }
 
