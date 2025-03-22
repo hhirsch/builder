@@ -20,6 +20,7 @@ func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 			name:        "connect",
 			description: "Connect to a host. Only supports key auth.",
 			brief:       "[binaryPath <string>]\tEnsure a binary is executable.",
+			parameters:  1,
 		},
 	}
 	return controller
