@@ -53,6 +53,9 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 func (this *HostRegistry) PromptIfMissing(key string) (value string, err error) {
 	var keyPath string
 	keyPath, err = this.getKeyPath(key)
+	if err != nil {
+		return "", err
+	}
 	_, err = this.environment.GetRegistry().GetValue(keyPath)
 	if err != nil {
 		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
