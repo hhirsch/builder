@@ -28,7 +28,10 @@ func (this *ListDatabasesCommand) TestRequirements() bool {
 }
 
 func (this *ListDatabasesCommand) Execute(tokens []string) string {
-	this.uploadSqlCredentials()
+	err := this.uploadSqlCredentials()
+	if err != nil {
+		this.environment.GetLogger().Fatalf("Error uploading SQL credentials: %v", err)
+	}
 	this.environment.GetLogger().Info(this.environment.Client.Execute(this.mysql.GetListDatabasesCommand()))
 	this.wipeSqlCredentialsFromServer()
 	return ""
