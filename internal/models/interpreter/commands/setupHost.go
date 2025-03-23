@@ -20,6 +20,7 @@ func NewSetupHostCommand(environment *models.Environment) *SetupHostCommand {
 			environment:        environment,
 			name:               "setupHost",
 			requiresConnection: false,
+			parameters:         2,
 		},
 	}
 	return controller
