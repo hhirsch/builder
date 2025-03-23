@@ -61,7 +61,7 @@ func (this *FileSystem) WriteStringToFile(path string, content string) (err erro
 }
 
 func (this *FileSystem) GetMapFromJsonFile(path string) (data map[string]string, err error) {
-	var content string = ""
+	var content string
 	content, err = this.getStringFromFile(path)
 	if err != nil {
 		return
