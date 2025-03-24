@@ -46,6 +46,10 @@ func (this *MySql) GetListDatabasesCommand() string {
 	return "mysql -u root -e \"SHOW DATABASES;\""
 }
 
+func (this *MySql) GetListDatabasesQuery() string {
+	return "SHOW DATABASES;"
+}
+
 func (this *MySql) DumpDatabaseCommand(databaseName string, fileName string) string {
 	//return "mysqldump -u username -p database_name > database_dump.sql"
 	//return fmt.Sprintf("mysqldump -u %s -p%s %s > %s", username, password, databaseName, outputFile)

@@ -44,10 +44,10 @@ func (this *SqlCommand) uploadSqlCredentials() (err error) {
 	return
 }
 
-func (this *SqlCommand) executeSqlCommand() {
-	this.environment.Client.Execute(this.mysql.GetListDatabasesCommand())
+func (this *SqlCommand) ExecuteSqlCommand(command string) string {
+	return this.environment.Client.Execute(fmt.Sprintf("mysql -u root -e \"%v;\"", command))
 }
 
 func (this *SqlCommand) wipeSqlCredentialsFromServer() {
-	this.environment.Client.Execute("rm " + this.mysql.GetMyConfigPath())
+	this.environment.Client.Execute(fmt.Sprintf("rm %v", this.mysql.GetMyConfigPath()))
 }

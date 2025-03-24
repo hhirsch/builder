@@ -32,7 +32,7 @@ func (this *ListDatabasesCommand) Execute(tokens []string) string {
 	if err != nil {
 		this.environment.GetLogger().Fatalf("Error uploading SQL credentials: %v", err)
 	}
-	this.environment.GetLogger().Info(this.environment.Client.Execute(this.mysql.GetListDatabasesCommand()))
+	this.environment.GetLogger().Info(this.ExecuteSqlCommand(this.mysql.GetListDatabasesQuery()))
 	this.wipeSqlCredentialsFromServer()
 	return ""
 }
