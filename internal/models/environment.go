@@ -10,21 +10,18 @@ import (
 )
 
 type Environment struct {
-	Client     Client
-	configPath string
-	logger     *helpers.Logger
-	arguments  []string
-	registry   *Registry
+	Client    Client
+	logger    *helpers.Logger
+	arguments []string
+	registry  *Registry
 }
 
 func NewEnvironment() *Environment {
 	environment := &Environment{
 		arguments: os.Args,
 	}
-	registry := NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
-	registry.Load()
-
 	logger := helpers.NewLogger(environment.GetLogFilePath())
+	registry := NewRegistry(environment.GetBuilderHomePath() + "/builderGlobal.reg")
 	environment.SetLogger(logger)
 	encryption, err := NewEncryption(environment)
 	if err != nil {
@@ -32,12 +29,12 @@ func NewEnvironment() *Environment {
 	} else {
 		logger.Info("Encryption available.")
 		registry.EnableRsa(*encryption)
-		if registry.EncryptionTest() == nil {
-			logger.Info("Encryption test passed.")
-		} else {
-			logger.Fatal("Encryption test failed.")
-		}
 	}
+	err = registry.Load()
+	if err != nil {
+		logger.Fatal("Registry loading failed: " + err.Error())
+	}
+
 	environment.SetRegistry(registry)
 	return environment
 }
@@ -73,10 +70,7 @@ func (this *Environment) GetKeyPath() string {
 
 func (this *Environment) IsColorEnabled() bool {
 	value := os.Getenv("CLICOLOR")
-	if value == "1" {
-		return true
-	}
-	return false
+	return value == "1"
 }
 
 func (this *Environment) GetLogger() *helpers.Logger {

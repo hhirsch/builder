@@ -5,8 +5,10 @@ import (
 	format "fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
+	"github.com/hhirsch/builder/internal/models/interpreter/commands"
 	com "github.com/hhirsch/builder/internal/models/interpreter/commands"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -14,40 +16,23 @@ type Interpreter struct {
 	logger              *helpers.Logger
 	environment         *models.Environment
 	registry            *models.Registry
-	step                string
 	commands            map[string]com.Command
 	onlineCommands      map[string]com.Command
 	variables           map[string]string
-	testRequirenments   bool
 	checkedRequirements []string
 }
 
 func NewInterpreter(environment *models.Environment) *Interpreter {
 	logger := environment.GetLogger()
 	registry := models.NewRegistry(environment.GetGlobalRegistryPath())
-	registry.Load()
+	err := registry.Load()
+	if err != nil {
+		logger.Fatalf("Unable to load registry: %s", err.Error())
+	}
 	variables := map[string]string{}
-	commands := map[string]com.Command{
-		"step":      com.NewStepCommand(environment),
-		"print":     com.NewPrintCommand(environment),
-		"setupHost": com.NewSetupHostCommand(environment),
-		"connect":   com.NewConnectCommand(environment),
-	}
-	onlineCommands := map[string]com.Command{
-		"listFiles":        com.NewListFilesCommand(environment),
-		"systemInfo":       com.NewSystemInfoCommand(environment),
-		"ensurePackage":    com.NewEnsurePackageCommand(environment),
-		"ensureExecutable": com.NewEnsureExecutableCommand(environment),
-		"ensureService":    com.NewEnsureServiceCommand(environment),
-		"listPackages":     com.NewListPackagesCommand(environment),
-		"dumpPackages":     com.NewDumpPackagesCommand(environment),
-		"executeAndPrint":  com.NewExecuteAndPrintCommand(environment),
-		"setTargetUser":    com.NewSetTargetUserCommand(environment),
-		"pushFile":         com.NewPushFileCommand(environment),
-		"saveDatabase":     com.NewPushFileCommand(environment),
-		"listDatabases":    com.NewListDatabasesCommand(environment),
-	}
-	return &Interpreter{
+	commands := map[string]com.Command{}
+	onlineCommands := map[string]com.Command{}
+	interpreter := &Interpreter{
 		logger:         logger,
 		registry:       registry,
 		environment:    environment,
@@ -55,6 +40,29 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 		variables:      variables,
 		onlineCommands: onlineCommands,
 	}
+	interpreter.AddCommand(com.NewSetupHostCommand(environment))
+	interpreter.AddCommand(com.NewConnectCommand(environment))
+	interpreter.AddCommand(com.NewStepCommand(environment))
+	interpreter.AddCommand(com.NewPrintCommand(environment))
+	interpreter.AddCommand(com.NewListFilesCommand(environment))
+	interpreter.AddCommand(com.NewSystemInfoCommand(environment))
+	interpreter.AddCommand(com.NewEnsurePackageCommand(environment))
+	interpreter.AddCommand(com.NewEnsureExecutableCommand(environment))
+	interpreter.AddCommand(com.NewEnsureServiceCommand(environment))
+	interpreter.AddCommand(com.NewListPackagesCommand(environment))
+	interpreter.AddCommand(com.NewDumpPackagesCommand(environment))
+	interpreter.AddCommand(com.NewExecuteAndPrintCommand(environment))
+	interpreter.AddCommand(com.NewSetTargetUserCommand(environment))
+	interpreter.AddCommand(com.NewPushFileCommand(environment))
+	interpreter.AddCommand(com.NewListDatabasesCommand(environment))
+	return interpreter
+}
+
+func (this *Interpreter) AddCommand(command commands.Command) {
+	if command.RequiresConnection() {
+		this.onlineCommands[command.GetName()] = command
+	}
+	this.commands[command.GetName()] = command
 }
 
 func (this *Interpreter) Run(fileName string) {
@@ -81,15 +89,6 @@ func (this *Interpreter) requireConnection() {
 	}
 }
 
-func (this *Interpreter) contains(slice []string, str string) bool {
-	for _, s := range slice {
-		if s == str {
-			return true
-		}
-	}
-	return false
-}
-
 func (this *Interpreter) handleCommandLine(tokens []string) string {
 	var commandName string = tokens[0]
 	if commandName == "connect" || commandName == "setupHost" {
@@ -111,7 +110,7 @@ func (this *Interpreter) handleCommandLine(tokens []string) string {
 	}
 
 	this.logger.Debugf("Testing requirements for %s.", commandName)
-	if this.contains(this.checkedRequirements, commandName) {
+	if slices.Contains(this.checkedRequirements, commandName) {
 		this.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
 	} else if command.TestRequirements() {
 		this.logger.Debugf("Passed requirements for %s.", commandName)

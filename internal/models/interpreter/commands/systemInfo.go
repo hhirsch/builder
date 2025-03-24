@@ -7,14 +7,15 @@ import (
 type SystemInfoCommand struct {
 	BaseCommand
 	environment *models.Environment
-	text        string
 }
 
 func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {
 	return &SystemInfoCommand{
 		environment: environment,
 		BaseCommand: BaseCommand{environment: environment,
-			logger: environment.GetLogger(),
+			logger:             environment.GetLogger(),
+			name:               "systemInfo",
+			requiresConnection: true,
 		},
 	}
 }

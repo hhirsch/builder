@@ -7,7 +7,6 @@ import (
 
 type ConnectCommand struct {
 	environment *models.Environment
-	description string
 	logger      *helpers.Logger
 	BaseCommand
 }
@@ -16,7 +15,13 @@ func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 	controller := &ConnectCommand{
 		environment: environment,
 		logger:      environment.GetLogger(),
-		BaseCommand: *NewBaseCommand(environment),
+		BaseCommand: BaseCommand{
+			environment: environment,
+			name:        "connect",
+			description: "Connect to a host. Only supports key auth.",
+			brief:       "[binaryPath <string>]\tEnsure a binary is executable.",
+			parameters:  1,
+		},
 	}
 	return controller
 }

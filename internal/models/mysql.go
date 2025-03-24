@@ -10,8 +10,6 @@ import (
 var myConfigTemplate string
 
 type MySql struct {
-	data     map[string]string
-	fileName string
 }
 
 func NewMySql() *MySql {
@@ -46,6 +44,10 @@ func (this *MySql) EnsureReadOnlyFilePermissionCommand() string {
 
 func (this *MySql) GetListDatabasesCommand() string {
 	return "mysql -u root -e \"SHOW DATABASES;\""
+}
+
+func (this *MySql) GetListDatabasesQuery() string {
+	return "SHOW DATABASES;"
 }
 
 func (this *MySql) DumpDatabaseCommand(databaseName string, fileName string) string {

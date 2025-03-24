@@ -7,14 +7,17 @@ import (
 
 type EnsureServiceCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
 func NewEnsureServiceCommand(environment *models.Environment) *EnsureServiceCommand {
 	controller := &EnsureServiceCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "ensureService",
+			requiresConnection: true,
+		},
 	}
 	return controller
 }

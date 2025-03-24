@@ -7,14 +7,17 @@ import (
 
 type ExecuteAndPrintCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
 func NewExecuteAndPrintCommand(environment *models.Environment) *ExecuteAndPrintCommand {
 	return &ExecuteAndPrintCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "executeAndPrint",
+			requiresConnection: true,
+		},
 	}
 }
 

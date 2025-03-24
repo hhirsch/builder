@@ -39,17 +39,16 @@ func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
 	return
 }
 
-func (this *Registry) GetEncryptedString(key string) (value string, err error) {
-	value = ""
+func (this *Registry) GetEncryptedString(key string) (string, error) {
 	if this.encryption == nil {
-		err = errors.New("Encryption is disabled.")
+		return "", errors.New("Encryption is disabled.")
 	}
 
-	value, err = this.encryption.Decrypt(this.data[key])
+	value, err := this.encryption.Decrypt(this.data[key])
 	if err == nil {
-		err = errors.New("Value does not exist.")
+		return "", errors.New("Value does not exist.")
 	}
-	return
+	return value, nil
 }
 
 func (this *Registry) GetBool(key string) (value bool, err error) {
@@ -84,27 +83,6 @@ func (this *Registry) EraseValue(key string) error {
 		return errors.New("No value to remove.")
 	}
 	delete(this.data, key)
-	return nil
-}
-
-func (this *Registry) EncryptionTest() error {
-	this.Register("encryptionTest", "test")
-	testValue, err := this.GetValue("encryptionTest")
-	if testValue != "test" && err == nil {
-		return errors.New("Regular value retrieval failed.")
-	}
-
-	this.RegisterEncrypted("encryptionTest", "encrypted test")
-	testValueUnencrypted, err := this.GetValue("encryptionTest")
-	if testValueUnencrypted == "encrpyted test" {
-		return errors.New("Unencrypted value retrieved after writing it encrypted.")
-	}
-
-	testValueEncrypted, err := this.GetEncryptedString("encryptionTest")
-	if testValueEncrypted != "encrypted test" {
-		return errors.New("Value was not encrypted.")
-	}
-
 	return nil
 }
 

@@ -51,16 +51,22 @@ func (this *CreateAction) Execute() {
 		return
 	}
 	var structName string
-	huh.NewInput().
+	structNameInput := huh.NewInput().
 		Title("Name the struct").
-		Value(&structName).
-		Run()
+		Value(&structName)
+	err := structNameInput.Run()
+	if err != nil {
+		this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+	}
 
 	var packageName string
-	huh.NewInput().
+	packageNameInput := huh.NewInput().
 		Title("Name the package").
-		Value(&packageName).
-		Run()
+		Value(&packageName)
+	err = packageNameInput.Run()
+	if err != nil {
+		this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+	}
 
 	if !strings.HasSuffix(this.controller.Arguments[0], ".go") {
 		this.logger.Fatal("File ending .go not found in parameter.")
@@ -71,7 +77,10 @@ func (this *CreateAction) Execute() {
 		"packageName": packageName,
 		"structName":  structName,
 	})
-	this.WriteStringToFile(this.controller.Arguments[0], fileContent)
+	err = this.WriteStringToFile(this.controller.Arguments[0], fileContent)
+	if err != nil {
+		this.logger.Fatalf("Error writing to file: %s", err.Error())
+	}
 }
 
 func (this *CreateAction) GetName() string {

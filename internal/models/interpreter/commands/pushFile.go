@@ -6,14 +6,17 @@ import (
 
 type PushFileCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
 func NewPushFileCommand(environment *models.Environment) *PushFileCommand {
 	return &PushFileCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "pushFile",
+			requiresConnection: true,
+		},
 	}
 }
 

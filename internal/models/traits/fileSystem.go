@@ -15,7 +15,7 @@ func NewFileSystem() *FileSystem {
 	return &FileSystem{}
 }
 
-func (this *FileSystem) writeMapToTemporaryFileAsJson(path string, data map[string]string) (filePath string, err error) {
+func (this *FileSystem) WriteMapToTemporaryFileAsJson(path string, data map[string]string) (filePath string, err error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return "", err
@@ -60,13 +60,16 @@ func (this *FileSystem) WriteStringToFile(path string, content string) (err erro
 	return
 }
 
-func (this *FileSystem) getMapFromJsonFile(path string) (data map[string]string, err error) {
+func (this *FileSystem) GetMapFromJsonFile(path string) (data map[string]string, err error) {
 	var content string
 	content, err = this.getStringFromFile(path)
 	if err != nil {
 		return
 	}
 	err = json.Unmarshal([]byte(content), &data)
+	if err != nil {
+		return
+	}
 	return
 }
 

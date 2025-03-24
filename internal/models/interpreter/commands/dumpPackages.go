@@ -9,14 +9,17 @@ import (
 
 type DumpPackagesCommand struct {
 	environment *models.Environment
-	description string
 	BaseCommand
 }
 
 func NewDumpPackagesCommand(environment *models.Environment) *DumpPackagesCommand {
 	return &DumpPackagesCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "dumpPackages",
+			requiresConnection: true,
+		},
 	}
 }
 

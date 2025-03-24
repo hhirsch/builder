@@ -8,13 +8,16 @@ import (
 type EnsurePackageCommand struct {
 	BaseCommand
 	environment *models.Environment
-	description string
 }
 
 func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageCommand {
 	controller := &EnsurePackageCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment:        environment,
+			name:               "ensurePackage",
+			requiresConnection: true,
+		},
 	}
 	return controller
 }

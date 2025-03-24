@@ -8,14 +8,16 @@ import (
 
 type PrintCommand struct {
 	environment *models.Environment
-	text        string
 	BaseCommand
 }
 
 func NewPrintCommand(environment *models.Environment) *PrintCommand {
 	controller := &PrintCommand{
 		environment: environment,
-		BaseCommand: BaseCommand{environment: environment},
+		BaseCommand: BaseCommand{
+			environment: environment,
+			name:        "print",
+		},
 	}
 	return controller
 }

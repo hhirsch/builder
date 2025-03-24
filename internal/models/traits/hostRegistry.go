@@ -14,12 +14,12 @@ func NewHostRegistry(environment *models.Environment) *HostRegistry {
 	return &HostRegistry{environment: environment}
 }
 
-func (this *HostRegistry) getKeyPath(key string) (keyPath string, err error) {
+func (this *HostRegistry) getKeyPath(key string) (string, error) {
 	var hostName = this.environment.Client.GetHost()
 	if hostName == "" {
 		return "", fmt.Errorf("Hostname is empty.")
 	}
-	keyPath = "host." + this.environment.Client.GetHost() + "." + key
+	keyPath := "host." + this.environment.Client.GetHost() + "." + key
 
 	return keyPath, nil
 }
@@ -27,16 +27,24 @@ func (this *HostRegistry) getKeyPath(key string) (keyPath string, err error) {
 func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, err error) {
 	var keyPath string
 	keyPath, err = this.getKeyPath(key)
+	if err != nil {
+		return "", err
+	}
 	_, err = this.environment.GetRegistry().GetEncryptedString(keyPath)
 	if err != nil {
 		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
-		huh.NewInput().
+		inputField := huh.NewInput().
 			Title("Enter a value for" + key).
-			Value(&value).
-			Run()
-
+			Value(&value)
+		err = inputField.Run()
+		if err != nil {
+			return "", err
+		}
 		this.environment.GetLogger().Info("Registering " + key)
-		this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
+		err = this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return value, err
@@ -45,17 +53,22 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 func (this *HostRegistry) PromptIfMissing(key string) (value string, err error) {
 	var keyPath string
 	keyPath, err = this.getKeyPath(key)
+	if err != nil {
+		return "", err
+	}
 	_, err = this.environment.GetRegistry().GetValue(keyPath)
 	if err != nil {
 		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
-		huh.NewInput().
+		input := huh.NewInput().
 			Title("Enter a value for" + key).
-			Value(&value).
-			Run()
-
+			Value(&value)
+		err := input.Run()
+		if err != nil {
+			return "", err
+		}
 		this.environment.GetLogger().Info("Registering " + key)
 		this.environment.GetRegistry().Register(keyPath, value)
 	}
 
-	return value, err
+	return value, nil
 }
