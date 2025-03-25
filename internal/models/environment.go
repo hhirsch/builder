@@ -32,7 +32,7 @@ func NewEnvironment() *Environment {
 	}
 	err = registry.Load()
 	if err != nil {
-		logger.Fatal("Registry loading failed: " + err.Error())
+		logger.Fatalf("Registry loading failed: %v", err.Error())
 	}
 
 	environment.SetRegistry(registry)

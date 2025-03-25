@@ -1,10 +1,14 @@
 package controllers
 
 import (
+	_ "embed"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/hhirsch/builder/internal/models/interpreter"
 )
+
+//go:embed serviceAction.md
+var serviceMarkdown string
 
 type ServiceAction struct {
 	environment *models.Environment
@@ -14,10 +18,6 @@ type ServiceAction struct {
 	BaseAction
 }
 
-/*
- * Eg server list, server add, server alias, server require {serviceName} {serverName}
- * service list, service health, service health {serviceName}, service install {serviceName}
- */
 func NewServiceAction(controller *Controller) *ServiceAction {
 
 	return &ServiceAction{
@@ -25,7 +25,8 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 			controller:  controller,
 			name:        "service",
 			description: "Setup and monitor services.",
-			help:        "Setup and monitor services.",
+			brief:       "Setup and monitor services.",
+			help:        serviceMarkdown,
 		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
@@ -35,11 +36,25 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 
 }
 
-func (this *ServiceAction) Execute() {
-	if this.ParameterValidationFailed(1, "script needs a file name as argument") {
-		return
-	}
+func (this *ServiceAction) install(serviceName string) {
 	this.logger.Info("Builder started")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
 	interpreter.Run(this.controller.Arguments[0])
+}
+func (this *ServiceAction) uninstall(serviceName string) {}
+
+func (this *ServiceAction) Execute() {
+	if this.ParameterValidationFailed(2, "service needs a modifier and service name as an argument") {
+		return
+	}
+	var modifier string = this.controller.Arguments[0]
+	var serviceName string = this.controller.Arguments[1]
+	if modifier == "install" {
+		this.install(serviceName)
+		return
+	}
+	if modifier == "uninstall" {
+		this.uninstall(serviceName)
+		return
+	}
 }
