@@ -42,7 +42,10 @@ func (this *ScriptAction) Execute() {
 	}
 	this.logger.Info("Builder started")
 	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run(this.controller.Arguments[0])
+	err := interpreter.Run(this.controller.Arguments[0])
+	if err != nil {
+		this.logger.Errorf("Interpreter failed: %v", err)
+	}
 }
 
 func (this *ScriptAction) GetDescription() string {

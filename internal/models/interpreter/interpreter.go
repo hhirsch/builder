@@ -2,7 +2,8 @@ package interpreter
 
 import (
 	"bufio"
-	format "fmt"
+	"errors"
+	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/hhirsch/builder/internal/models/interpreter/commands"
@@ -65,10 +66,10 @@ func (this *Interpreter) AddCommand(command commands.Command) {
 	this.commands[command.GetName()] = command
 }
 
-func (this *Interpreter) Run(fileName string) {
+func (this *Interpreter) Run(fileName string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
-		this.logger.Fatal(err.Error())
+		return errors.New(fmt.Sprintf("Can't open file: %v", err))
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -78,9 +79,10 @@ func (this *Interpreter) Run(fileName string) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		this.logger.Fatal(format.Printf("Error scanning file: %s", err.Error()))
+		return errors.New(fmt.Sprintf("Unable to scan file: %v", err))
 	}
 	file.Close()
+	return nil
 }
 
 func (this *Interpreter) requireConnection() {
@@ -92,7 +94,6 @@ func (this *Interpreter) requireConnection() {
 func (this *Interpreter) handleCommandLine(tokens []string) string {
 	var commandName string = tokens[0]
 	if commandName == "connect" || commandName == "setupHost" {
-		//this.checkedRequirements = this.checkedRequirements[:0]
 		this.checkedRequirements = []string{}
 	}
 	var command com.Command

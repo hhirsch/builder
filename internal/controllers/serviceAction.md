@@ -7,7 +7,7 @@
 | install      | Install service.                  |
 | uninstall    | Uninstall service.                |
 | health       | Show health of the service.       |
-| action       | Perform an action for the service |
+| command      | Perform a command for the service |
 | list-actions | List the service actions.         |
 
 # Examples
