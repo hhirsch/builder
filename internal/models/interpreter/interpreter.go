@@ -69,7 +69,7 @@ func (this *Interpreter) AddCommand(command commands.Command) {
 func (this *Interpreter) Run(fileName string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Can't open file: %v", err))
+		return fmt.Errorf("Can't open file: %v", err)
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -79,7 +79,7 @@ func (this *Interpreter) Run(fileName string) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return errors.New(fmt.Sprintf("Unable to scan file: %v", err))
+		return fmt.Errorf("Unable to scan file: %v", err)
 	}
 	file.Close()
 	return nil
