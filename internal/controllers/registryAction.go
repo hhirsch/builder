@@ -40,6 +40,9 @@ func (this *RegistryAction) Execute() {
 		return
 	}
 	this.logger.Info("Builder started")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run(this.controller.Arguments[0])
+	var interpreter = *interpreter.NewInterpreter(this.environment)
+	err := interpreter.Run(this.controller.Arguments[0])
+	if err != nil {
+		this.logger.Error(err.Error())
+	}
 }

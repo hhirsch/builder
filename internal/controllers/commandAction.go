@@ -37,7 +37,10 @@ func (this *CommandAction) Execute() {
 		return
 	}
 	this.logger.Info("Executing user defined command.")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	var commandName string = this.controller.Arguments[0]
-	interpreter.Run(this.environment.GetProjectCommandsPath() + commandName + ".bld")
+	var interpreter = *interpreter.NewInterpreter(this.environment)
+	var commandName = this.controller.Arguments[0]
+	err := interpreter.Run(this.environment.GetProjectCommandsPath() + commandName + ".bld")
+	if err != nil {
+		this.logger.Error(err.Error())
+	}
 }

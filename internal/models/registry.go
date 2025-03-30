@@ -91,7 +91,12 @@ func (this *Registry) Save() (err error) {
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 
 	jsonData, err := json.Marshal(this.data)
 	if err != nil {
@@ -107,7 +112,12 @@ func (this *Registry) Load() (err error) {
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 
 	jsonData, err := io.ReadAll(file)
 	if err != nil {

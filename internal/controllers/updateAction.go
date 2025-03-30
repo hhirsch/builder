@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
 type UpdateAction struct {
@@ -23,13 +22,6 @@ func NewUpdateAction(controller *Controller) *UpdateAction {
 }
 
 func (this *UpdateAction) Execute(controller *Controller) {
-	if this.ParameterValidationFailed(1, "command needs a command name as argument") {
-		controller.ShowHelp()
-		return
-	}
-	this.logger.Print("executing user defined command")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run("./.builder/commands/" + controller.Arguments[0] + ".bld")
 }
 
 func (this *UpdateAction) GetName() string {

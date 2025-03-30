@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
 type ServerAction struct {
@@ -35,12 +34,6 @@ func NewServerAction(controller *Controller) *ServerAction {
 }
 
 func (this *ServerAction) Execute() {
-	if this.ParameterValidationFailed(1, "server needs a file name as argument") {
-		return
-	}
-	this.logger.Info("Builder started")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run(this.controller.Arguments[0])
 }
 
 func (this *ServerAction) GetDescription() string {

@@ -38,8 +38,11 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 
 func (this *ServiceAction) install(serviceName string) {
 	this.logger.Info("Builder started")
-	var interpreter interpreter.Interpreter = *interpreter.NewInterpreter(this.environment)
-	interpreter.Run(this.controller.Arguments[0])
+	var interpreter = *interpreter.NewInterpreter(this.environment)
+	err := interpreter.Run(this.controller.Arguments[0])
+	if err != nil {
+		this.logger.Error(err.Error())
+	}
 }
 func (this *ServiceAction) uninstall(serviceName string) {}
 
@@ -47,8 +50,8 @@ func (this *ServiceAction) Execute() {
 	if this.ParameterValidationFailed(2, "service needs a modifier and service name as an argument") {
 		return
 	}
-	var modifier string = this.controller.Arguments[0]
-	var serviceName string = this.controller.Arguments[1]
+	var modifier = this.controller.Arguments[0]
+	var serviceName = this.controller.Arguments[1]
 	if modifier == "install" {
 		this.install(serviceName)
 		return

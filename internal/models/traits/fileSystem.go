@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 )
@@ -51,7 +52,12 @@ func (this *FileSystem) WriteStringToFile(path string, content string) (err erro
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 
 	_, err = file.Write([]byte(content))
 	if err != nil {
@@ -78,7 +84,12 @@ func (this *FileSystem) getStringFromFile(path string) (content string, err erro
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 	var byteContent []byte
 	byteContent, err = io.ReadAll(file)
 	content = string(byteContent)

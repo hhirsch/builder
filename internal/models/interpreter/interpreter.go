@@ -78,9 +78,14 @@ func (this *Interpreter) Run(fileName string) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("Unable to scan file: %v", err)
+		return fmt.Errorf("[functionName] unable to scan file: %w", err)
 	}
-	file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 	return nil
 }
 
@@ -91,7 +96,7 @@ func (this *Interpreter) requireConnection() {
 }
 
 func (this *Interpreter) handleCommandLine(tokens []string) string {
-	var commandName string = tokens[0]
+	commandName := tokens[0]
 	if commandName == "connect" || commandName == "setupHost" {
 		this.checkedRequirements = []string{}
 	}

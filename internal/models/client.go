@@ -147,7 +147,12 @@ func (this *Client) Upload(source string, target string) {
 	}
 	f, _ := os.Open(source)
 	defer client.Close()
-	defer f.Close()
+	defer func() {
+		err := f.Close()
+		if err != nil {
+			fmt.Printf("error closing file %v", err)
+		}
+	}()
 	err = client.CopyFromFile(context.Background(), *f, target, "0775")
 
 	if err != nil {
@@ -250,5 +255,10 @@ func (this *Client) ListPackages() {
 }
 
 func (this *Client) TearDown() {
-	defer this.sshClient.Close()
+	defer func() {
+		err := this.sshClient.Close()
+		if err != nil {
+			fmt.Printf("error closing ssh client %v", err)
+		}
+	}()
 }
