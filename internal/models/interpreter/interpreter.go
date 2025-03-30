@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
