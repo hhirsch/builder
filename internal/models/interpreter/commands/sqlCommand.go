@@ -22,32 +22,32 @@ func NewSqlCommand(environment *models.Environment) *SqlCommand {
 	}
 }
 
-func (this *SqlCommand) uploadSqlCredentials() (err error) {
-	userName, err := this.PromptEncryptedIfMissing("mysql.user")
+func (sqlCommand *SqlCommand) uploadSqlCredentials() (err error) {
+	userName, err := sqlCommand.PromptEncryptedIfMissing("mysql.user")
 	if err != nil {
 		return
 	}
 
-	password, err := this.PromptEncryptedIfMissing("mysql.password")
+	password, err := sqlCommand.PromptEncryptedIfMissing("mysql.password")
 	if err != nil {
 		return
 	}
-	filePath, err := this.WriteStringToTempFile(this.mysql.GetCredentialsFileContent(userName, password))
+	filePath, err := sqlCommand.WriteStringToTempFile(sqlCommand.mysql.GetCredentialsFileContent(userName, password))
 	if err != nil {
 		return
 	}
 
 	if password == "" || userName == "" {
-		return fmt.Errorf("Empty input for credentials received aborting SQL command.")
+		return fmt.Errorf("empty input for credentials received aborting SQL command")
 	}
-	this.environment.Client.Upload(filePath, this.mysql.GetMyConfigPath())
+	sqlCommand.environment.Client.Upload(filePath, sqlCommand.mysql.GetMyConfigPath())
 	return
 }
 
-func (this *SqlCommand) ExecuteSqlCommand(command string) string {
-	return this.environment.Client.Execute(fmt.Sprintf("mysql -u root -e \"%v;\"", command))
+func (sqlCommand *SqlCommand) ExecuteSqlCommand(command string) string {
+	return sqlCommand.environment.Client.Execute(fmt.Sprintf("mysql -u root -e \"%v;\"", command))
 }
 
-func (this *SqlCommand) wipeSqlCredentialsFromServer() {
-	this.environment.Client.Execute(fmt.Sprintf("rm %v", this.mysql.GetMyConfigPath()))
+func (sqlCommand *SqlCommand) wipeSqlCredentialsFromServer() {
+	sqlCommand.environment.Client.Execute(fmt.Sprintf("rm %v", sqlCommand.mysql.GetMyConfigPath()))
 }
