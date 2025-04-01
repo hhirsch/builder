@@ -38,16 +38,16 @@ func NewLogger(fileName string) *Logger {
 	}
 }
 
-func (this *Logger) Print(string string) {
-	this.print(string)
+func (logger *Logger) Print(string string) {
+	logger.print(string)
 }
 
-func (this *Logger) writeFile(level string, message string) {
+func (logger *Logger) writeFile(level string, message string) {
 	time := time.Now()
-	this.writeLog(time.Format("2006/01/02 15:04:05") + " " + level + " " + message + "\n")
+	logger.writeLog(time.Format("2006/01/02 15:04:05") + " " + level + " " + message + "\n")
 }
 
-func (this *Logger) splitNamespaceFromFunctionName(functionName string) (isolatedNamespaceName string, isolatedFunctionName string) {
+func (logger *Logger) splitNamespaceFromFunctionName(functionName string) (isolatedNamespaceName string, isolatedFunctionName string) {
 	lastSlash := strings.LastIndex(functionName, "/")
 	if lastSlash == -1 {
 		return "", functionName
@@ -60,7 +60,7 @@ func (this *Logger) splitNamespaceFromFunctionName(functionName string) (isolate
 	return functionName[:lastSlash], functionName[lastSlash+lastDot+1:]
 }
 
-func (this *Logger) getCallerName() (result string) {
+func (logger *Logger) getCallerName() (result string) {
 	callAdresses := make([]uintptr, 10)
 	callers := runtime.Callers(4, callAdresses)
 	result = ""
@@ -83,20 +83,20 @@ func (this *Logger) getCallerName() (result string) {
 	callerTypeWithNamespace := parts[len(parts)-2]
 	callerType := expression.ReplaceAllString(callerTypeWithNamespace, "")
 	if callerType == callerTypeWithNamespace {
-		_, callerType = this.splitNamespaceFromFunctionName(callerTypeWithNamespace)
+		_, callerType = logger.splitNamespaceFromFunctionName(callerTypeWithNamespace)
 	}
 	return callerType + "->" + parts[len(parts)-1]
 }
 
-func (this *Logger) genericLog(module string, logLevel string, message interface{}, data ...interface{}) {
+func (logger *Logger) genericLog(module string, logLevel string, message interface{}, data ...interface{}) {
 	charmLog.SetPrefix("")
 	if module != "" {
 		charmLog.SetPrefix(module)
-		this.writeFile(logLevel, module+": "+message.(string))
+		logger.writeFile(logLevel, module+": "+message.(string))
 	} else {
-		this.writeFile(logLevel, message.(string))
+		logger.writeFile(logLevel, message.(string))
 	}
-	if operation, exists := this.logOperations[logLevel]; exists {
+	if operation, exists := logger.logOperations[logLevel]; exists {
 		if len(data) >= 2 {
 			operation(message)
 		} else {
@@ -106,50 +106,50 @@ func (this *Logger) genericLog(module string, logLevel string, message interface
 	charmLog.SetPrefix("")
 }
 
-func (this *Logger) Debug(message interface{}, data ...interface{}) {
-	this.genericLog(this.getCallerName(), "DEBUG", message, data)
+func (logger *Logger) Debug(message interface{}, data ...interface{}) {
+	logger.genericLog(logger.getCallerName(), "DEBUG", message, data)
 }
 
-func (this *Logger) Debugf(message string, data ...interface{}) {
-	this.Debug(fmt.Sprintf(message, data...))
+func (logger *Logger) Debugf(message string, data ...interface{}) {
+	logger.Debug(fmt.Sprintf(message, data...))
 }
 
-func (this *Logger) Info(message interface{}, data ...interface{}) {
-	this.genericLog(this.getCallerName(), "INFO", message, data)
+func (logger *Logger) Info(message interface{}, data ...interface{}) {
+	logger.genericLog(logger.getCallerName(), "INFO", message, data)
 }
 
-func (this *Logger) Infof(message string, data ...interface{}) {
-	this.Info(fmt.Sprintf(message, data...))
+func (logger *Logger) Infof(message string, data ...interface{}) {
+	logger.Info(fmt.Sprintf(message, data...))
 }
 
-func (this *Logger) Warn(message interface{}, data ...interface{}) {
-	this.genericLog(this.getCallerName(), "WARN", message, data)
+func (logger *Logger) Warn(message interface{}, data ...interface{}) {
+	logger.genericLog(logger.getCallerName(), "WARN", message, data)
 }
 
-func (this *Logger) Error(message interface{}, data ...interface{}) {
-	this.genericLog(this.getCallerName(), "ERROR", message, data)
+func (logger *Logger) Error(message interface{}, data ...interface{}) {
+	logger.genericLog(logger.getCallerName(), "ERROR", message, data)
 }
 
-func (this *Logger) Errorf(message string, data ...interface{}) {
-	this.Error(fmt.Sprintf(message, data...))
+func (logger *Logger) Errorf(message string, data ...interface{}) {
+	logger.Error(fmt.Sprintf(message, data...))
 }
 
-func (this *Logger) Fatal(message interface{}, data ...interface{}) {
-	this.genericLog(this.getCallerName(), "FATAL", message, data)
+func (logger *Logger) Fatal(message interface{}, data ...interface{}) {
+	logger.genericLog(logger.getCallerName(), "FATAL", message, data)
 }
 
-func (this *Logger) Fatalf(message string, data ...interface{}) {
-	this.Fatal(fmt.Sprintf(message, data...))
+func (logger *Logger) Fatalf(message string, data ...interface{}) {
+	logger.Fatal(fmt.Sprintf(message, data...))
 }
 
-func (this *Logger) writeLog(string string) {
-	_, err := this.file.WriteString(string)
+func (logger *Logger) writeLog(string string) {
+	_, err := logger.file.WriteString(string)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (this *Logger) print(string string) {
+func (logger *Logger) print(string string) {
 	fmt.Println(string)
-	this.writeLog(string)
+	logger.writeLog(string)
 }
