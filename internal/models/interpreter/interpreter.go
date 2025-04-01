@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter/commands"
 	com "github.com/hhirsch/builder/internal/models/interpreter/commands"
 	"os"
 	"slices"
@@ -58,7 +57,7 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 	return interpreter
 }
 
-func (this *Interpreter) AddCommand(command commands.Command) {
+func (this *Interpreter) AddCommand(command com.Command) {
 	if command.RequiresConnection() {
 		this.onlineCommands[command.GetName()] = command
 	}
@@ -68,7 +67,7 @@ func (this *Interpreter) AddCommand(command commands.Command) {
 func (this *Interpreter) Run(fileName string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
-		return fmt.Errorf("Can't open file: %v", err)
+		return fmt.Errorf("can't open file: %v", err)
 	}
 
 	scanner := bufio.NewScanner(file)
