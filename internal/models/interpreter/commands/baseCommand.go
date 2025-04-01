@@ -84,7 +84,7 @@ func (this *BaseCommand) IsTrue(string string) bool {
 }
 
 func (this *BaseCommand) FindBinary(binaryName string) bool {
-	var command string = fmt.Sprintf("command -v %s >/dev/null 2>&1 && echo true || echo false", binaryName)
+	var command = fmt.Sprintf("command -v %s >/dev/null 2>&1 && echo true || echo false", binaryName)
 	if this.IsTrue(this.environment.Client.Execute(command)) {
 		this.logger.Infof("Binary %s found.", binaryName)
 		return true
