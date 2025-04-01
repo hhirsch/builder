@@ -33,12 +33,12 @@ func NewInitAction(controller *Controller) *InitAction {
 	return initAction
 }
 
-func (this *InitAction) Execute() {
-	if this.model.IsInitialized() {
-		this.logger.Info("Already initialized, nothing to do.")
+func (initAction *InitAction) Execute() {
+	if initAction.model.IsInitialized() {
+		initAction.logger.Info("Already initialized, nothing to do.")
 	}
-	this.model.CreateDirectories()
-	this.logger.Info("Initializing")
+	initAction.model.CreateDirectories()
+	initAction.logger.Info("Initializing")
 }
 
 func (this *InitAction) GetDescription() string {

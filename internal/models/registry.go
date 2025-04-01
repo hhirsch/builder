@@ -33,7 +33,7 @@ func (this *Registry) EnableRsa(encryption Encryption) {
 
 func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
 	if this.encryption == nil {
-		err = errors.New("Encryption is disabled.")
+		err = errors.New("encryption is disabled")
 	}
 	this.data[key], _ = this.encryption.Encrypt(value)
 	return
@@ -41,12 +41,12 @@ func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
 
 func (this *Registry) GetEncryptedString(key string) (string, error) {
 	if this.encryption == nil {
-		return "", errors.New("Encryption is disabled.")
+		return "", errors.New("encryption is disabled")
 	}
 
 	value, err := this.encryption.Decrypt(this.data[key])
 	if err == nil {
-		return "", errors.New("Value does not exist.")
+		return "", errors.New("value does not exist")
 	}
 	return value, nil
 }
@@ -54,7 +54,7 @@ func (this *Registry) GetEncryptedString(key string) (string, error) {
 func (this *Registry) GetBool(key string) (value bool, err error) {
 	stringValue, exists := this.data[key]
 	if !exists {
-		err = fmt.Errorf("Key %s not found.", key)
+		err = fmt.Errorf("key %s not found", key)
 		return
 	}
 
@@ -64,7 +64,7 @@ func (this *Registry) GetBool(key string) (value bool, err error) {
 	case "false":
 		value = false
 	default:
-		err = fmt.Errorf("Value for key %s is not a valid boolean string.", key)
+		err = fmt.Errorf("value for key %s is not a valid boolean string", key)
 	}
 	return
 }
@@ -72,7 +72,7 @@ func (this *Registry) GetBool(key string) (value bool, err error) {
 func (this *Registry) GetValue(key string) (string, error) {
 	value, exists := this.data[key]
 	if !exists {
-		return "", errors.New("Value does not exist.")
+		return "", errors.New("value does not exist")
 	}
 	return value, nil
 }
@@ -80,7 +80,7 @@ func (this *Registry) GetValue(key string) (string, error) {
 func (this *Registry) EraseValue(key string) error {
 	_, exists := this.data[key]
 	if !exists {
-		return errors.New("No value to remove.")
+		return errors.New("no value to remove")
 	}
 	delete(this.data, key)
 	return nil
