@@ -57,14 +57,14 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 	return interpreter
 }
 
-func (this *Interpreter) AddCommand(command com.Command) {
+func (interpreter *Interpreter) AddCommand(command com.Command) {
 	if command.RequiresConnection() {
-		this.onlineCommands[command.GetName()] = command
+		interpreter.onlineCommands[command.GetName()] = command
 	}
-	this.commands[command.GetName()] = command
+	interpreter.commands[command.GetName()] = command
 }
 
-func (this *Interpreter) Run(fileName string) error {
+func (interpreter *Interpreter) Run(fileName string) error {
 	file, err := os.Open(fileName)
 	if err != nil {
 		return fmt.Errorf("can't open file: %v", err)
@@ -73,7 +73,7 @@ func (this *Interpreter) Run(fileName string) error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		this.handleLine(line)
+		interpreter.handleLine(line)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -88,63 +88,63 @@ func (this *Interpreter) Run(fileName string) error {
 	return nil
 }
 
-func (this *Interpreter) requireConnection() {
-	if this.environment.Client == (models.Client{}) { // if the client is not initialized we don't have a connection
-		this.logger.Fatal("Setup a host before using a command that requires a connection.")
+func (interpreter *Interpreter) requireConnection() {
+	if interpreter.environment.Client == (models.Client{}) { // if the client is not initialized we don't have a connection
+		interpreter.logger.Fatal("Setup a host before using a command that requires a connection.")
 	}
 }
 
-func (this *Interpreter) handleCommandLine(tokens []string) string {
+func (interpreter *Interpreter) handleCommandLine(tokens []string) string {
 	commandName := tokens[0]
 	if commandName == "connect" || commandName == "setupHost" {
-		this.checkedRequirements = []string{}
+		interpreter.checkedRequirements = []string{}
 	}
 	var command com.Command
-	if offlineCommand, isOfflineCommand := this.commands[commandName]; isOfflineCommand {
+	if offlineCommand, isOfflineCommand := interpreter.commands[commandName]; isOfflineCommand {
 		command = offlineCommand
 	}
 
-	if onlineCommand, isOnlineCommand := this.onlineCommands[commandName]; isOnlineCommand {
-		this.requireConnection()
+	if onlineCommand, isOnlineCommand := interpreter.onlineCommands[commandName]; isOnlineCommand {
+		interpreter.requireConnection()
 		command = onlineCommand
 	}
 
 	if command == nil {
-		this.logger.Fatalf("Invalid command %s.", commandName)
+		interpreter.logger.Fatalf("Invalid command %s.", commandName)
 	}
 
-	this.logger.Debugf("Testing requirements for %s.", commandName)
-	if slices.Contains(this.checkedRequirements, commandName) {
-		this.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
+	interpreter.logger.Debugf("Testing requirements for %s.", commandName)
+	if slices.Contains(interpreter.checkedRequirements, commandName) {
+		interpreter.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
 	} else if command.TestRequirements() {
-		this.logger.Debugf("Passed requirements for %s.", commandName)
-		this.checkedRequirements = append(this.checkedRequirements, commandName)
+		interpreter.logger.Debugf("Passed requirements for %s.", commandName)
+		interpreter.checkedRequirements = append(interpreter.checkedRequirements, commandName)
 	} else {
-		this.logger.Fatalf("Failed requirenments for %s.", commandName)
+		interpreter.logger.Fatalf("Failed requirenments for %s.", commandName)
 	}
 
 	return command.Execute(tokens)
 }
 
-func (this *Interpreter) handleVariableLine(tokens []string) {
+func (interpreter *Interpreter) handleVariableLine(tokens []string) {
 	variableName := strings.TrimPrefix(tokens[0], "$")
-	this.variables[variableName] = this.handleCommandLine(tokens[2:])
+	interpreter.variables[variableName] = interpreter.handleCommandLine(tokens[2:])
 }
 
-func (this *Interpreter) handleLine(input string) {
+func (interpreter *Interpreter) handleLine(input string) {
 	tokens := strings.Fields(input)
 	if strings.HasPrefix(tokens[0], "//") {
 		return
 	}
 
 	if strings.HasPrefix(tokens[0], "$") && tokens[1] == "=" {
-		this.handleVariableLine(tokens)
+		interpreter.handleVariableLine(tokens)
 		return
 	}
 
-	this.handleCommandLine(tokens)
+	interpreter.handleCommandLine(tokens)
 }
 
-func (this *Interpreter) GetReferencePage() string {
+func (interpreter *Interpreter) GetReferencePage() string {
 	return ""
 }

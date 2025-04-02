@@ -23,28 +23,28 @@ func NewListDatabasesCommand(environment *models.Environment) *ListDatabasesComm
 	return controller
 }
 
-func (this *ListDatabasesCommand) TestRequirements() bool {
-	return this.FindBinary("mysql")
+func (listDatabasesCommand *ListDatabasesCommand) TestRequirements() bool {
+	return listDatabasesCommand.FindBinary("mysql")
 }
 
-func (this *ListDatabasesCommand) Execute(tokens []string) string {
-	err := this.uploadSqlCredentials()
+func (listDatabasesCommand *ListDatabasesCommand) Execute(tokens []string) string {
+	err := listDatabasesCommand.uploadSqlCredentials()
 	if err != nil {
-		this.environment.GetLogger().Fatalf("Error uploading SQL credentials: %v", err)
+		listDatabasesCommand.environment.GetLogger().Fatalf("Error uploading SQL credentials: %v", err)
 	}
-	this.environment.GetLogger().Info(this.ExecuteSqlCommand(this.mysql.GetListDatabasesQuery()))
-	this.wipeSqlCredentialsFromServer()
+	listDatabasesCommand.environment.GetLogger().Info(listDatabasesCommand.ExecuteSqlCommand(listDatabasesCommand.mysql.GetListDatabasesQuery()))
+	listDatabasesCommand.wipeSqlCredentialsFromServer()
 	return ""
 }
 
-func (this *ListDatabasesCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo.")
+func (listDatabasesCommand *ListDatabasesCommand) Undo() {
+	listDatabasesCommand.environment.GetLogger().Info("Nothing to undo.")
 }
 
-func (this *ListDatabasesCommand) GetDescription(tokens []string) string {
+func (listDatabasesCommand *ListDatabasesCommand) GetDescription(tokens []string) string {
 	return "Lists all databases."
 }
 
-func (this *ListDatabasesCommand) GetHelp() string {
+func (listDatabasesCommand *ListDatabasesCommand) GetHelp() string {
 	return "[]\tLists all databases."
 }

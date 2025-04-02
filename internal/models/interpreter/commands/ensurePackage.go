@@ -22,21 +22,21 @@ func NewEnsurePackageCommand(environment *models.Environment) *EnsurePackageComm
 	return controller
 }
 
-func (this *EnsurePackageCommand) Execute(tokens []string) string {
+func (ensurePackageCommand *EnsurePackageCommand) Execute(tokens []string) string {
 	tokens = tokens[1:]
 	parameters := strings.Join(tokens, " ")
-	this.environment.Client.EnsurePackage(parameters)
+	ensurePackageCommand.environment.Client.EnsurePackage(parameters)
 	return ""
 }
 
-func (this *EnsurePackageCommand) Undo() {
-	this.environment.GetLogger().Info("Undoing ensurePackage.")
+func (ensurePackageCommand *EnsurePackageCommand) Undo() {
+	ensurePackageCommand.environment.GetLogger().Info("Undoing ensurePackage.")
 }
 
-func (this *EnsurePackageCommand) GetDescription(tokens []string) string {
+func (ensurePackageCommand *EnsurePackageCommand) GetDescription(tokens []string) string {
 	return "Create a system service from a binary"
 }
 
-func (this *EnsurePackageCommand) GetHelp() string {
+func (ensurePackageCommand *EnsurePackageCommand) GetHelp() string {
 	return "[packageName <string>]\tInstalls a package"
 }

@@ -17,26 +17,26 @@ func NewEnsureCapabilityConnectionCommand(environment *models.Environment) *Ensu
 	return controller
 }
 
-func (this *EnsureCapabilityConnectionCommand) TestRequirement() bool {
+func (ensureCapabilityConnectionCommand *EnsureCapabilityConnectionCommand) TestRequirement() bool {
 	return true
 }
 
-func (this *EnsureCapabilityConnectionCommand) Execute(tokens []string) string {
+func (ensureCapabilityConnectionCommand *EnsureCapabilityConnectionCommand) Execute(tokens []string) string {
 	if len(tokens) != 2 {
-		this.environment.GetLogger().Fatal("ensureCapabilityConnection needs 1 parameters")
+		ensureCapabilityConnectionCommand.environment.GetLogger().Fatal("ensureCapabilityConnection needs 1 parameters")
 	}
-	this.environment.Client.EnsureCapabilityConnection(tokens[1])
+	ensureCapabilityConnectionCommand.environment.Client.EnsureCapabilityConnection(tokens[1])
 	return ""
 }
 
-func (this *EnsureCapabilityConnectionCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo.")
+func (ensureCapabilityConnectionCommand *EnsureCapabilityConnectionCommand) Undo() {
+	ensureCapabilityConnectionCommand.environment.GetLogger().Info("Nothing to undo.")
 }
 
-func (this *EnsureCapabilityConnectionCommand) GetDescription(tokens []string) string {
+func (ensureCapabilityConnectionCommand *EnsureCapabilityConnectionCommand) GetDescription(tokens []string) string {
 	return "Ensure a binary is allowed to open ports."
 }
 
-func (this *EnsureCapabilityConnectionCommand) GetHelp() string {
+func (ensureCapabilityConnectionCommand *EnsureCapabilityConnectionCommand) GetHelp() string {
 	return "[binaryPath <string>]\tEnsure a binary is allowed to open ports."
 }

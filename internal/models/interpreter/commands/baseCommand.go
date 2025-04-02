@@ -34,23 +34,23 @@ func NewBaseCommand(environment *models.Environment) *BaseCommand {
 	}
 }
 
-func (this *BaseCommand) GetResult() string {
-	return this.result
+func (baseCommand *BaseCommand) GetResult() string {
+	return baseCommand.result
 }
 
-func (this *BaseCommand) Execute(tokens []string) string {
-	this.logger.Infof("Running %s", this.command)
-	result := this.environment.Client.Execute(this.command)
-	this.logger.Info(result)
+func (baseCommand *BaseCommand) Execute(tokens []string) string {
+	baseCommand.logger.Infof("Running %s", baseCommand.command)
+	result := baseCommand.environment.Client.Execute(baseCommand.command)
+	baseCommand.logger.Info(result)
 	return result
 }
 
-func (this *BaseCommand) ExecuteOnLocalhost(tokens []string) string {
-	parts := strings.Fields(this.command)
+func (baseCommand *BaseCommand) ExecuteOnLocalhost(tokens []string) string {
+	parts := strings.Fields(baseCommand.command)
 	if len(parts) == 0 {
-		this.logger.Fatal("Command needs to be set.")
+		baseCommand.logger.Fatal("Command needs to be set.")
 	}
-	this.logger.Infof("Running %s on localhost.", parts[0])
+	baseCommand.logger.Infof("Running %s on localhost.", parts[0])
 	cmd := exec.Command(parts[0], parts[1:]...)
 
 	// Run the command and capture the output
@@ -61,59 +61,59 @@ func (this *BaseCommand) ExecuteOnLocalhost(tokens []string) string {
 	}
 	result := strings.TrimSpace(string(output))
 
-	this.logger.Info(result)
+	baseCommand.logger.Info(result)
 	return result
 }
 
-func (this *BaseCommand) TestRequirements() bool {
+func (baseCommand *BaseCommand) TestRequirements() bool {
 	return true
 }
 
-func (this *BaseCommand) requireParameterAmount(tokens []string, requiredParameterAmount int) {
+func (baseCommand *BaseCommand) requireParameterAmount(tokens []string, requiredParameterAmount int) {
 	if len(tokens) != requiredParameterAmount+1 {
-		this.logger.Fatalf("%s needs %d parameters", this.commandName, requiredParameterAmount)
+		baseCommand.logger.Fatalf("%s needs %d parameters", baseCommand.commandName, requiredParameterAmount)
 	}
 }
 
-func (this *BaseCommand) TrimResponseString(string string) string {
+func (baseCommand *BaseCommand) TrimResponseString(string string) string {
 	return strings.TrimSpace(string)
 }
 
-func (this *BaseCommand) IsTrue(string string) bool {
+func (baseCommand *BaseCommand) IsTrue(string string) bool {
 	return strings.TrimSpace(string) == "true"
 }
 
-func (this *BaseCommand) FindBinary(binaryName string) bool {
+func (baseCommand *BaseCommand) FindBinary(binaryName string) bool {
 	var command = fmt.Sprintf("command -v %s >/dev/null 2>&1 && echo true || echo false", binaryName)
-	if this.IsTrue(this.environment.Client.Execute(command)) {
-		this.logger.Infof("Binary %s found.", binaryName)
+	if baseCommand.IsTrue(baseCommand.environment.Client.Execute(command)) {
+		baseCommand.logger.Infof("Binary %s found.", binaryName)
 		return true
 	}
 
-	this.logger.Fatalf("Unable to find required binary %s on target system.", binaryName)
+	baseCommand.logger.Fatalf("Unable to find required binary %s on target system.", binaryName)
 	return false
 }
 
-func (this *BaseCommand) Undo() {
-	this.logger.Info("Undo not possible.")
+func (baseCommand *BaseCommand) Undo() {
+	baseCommand.logger.Info("Undo not possible.")
 }
 
-func (this *BaseCommand) GetName() string {
-	return this.name
+func (baseCommand *BaseCommand) GetName() string {
+	return baseCommand.name
 }
 
-func (this *BaseCommand) GetDescription() string {
-	return this.description
+func (baseCommand *BaseCommand) GetDescription() string {
+	return baseCommand.description
 }
 
-func (this *BaseCommand) GetBrief() string {
-	return this.brief
+func (baseCommand *BaseCommand) GetBrief() string {
+	return baseCommand.brief
 }
 
-func (this *BaseCommand) GetHelp() string {
-	return this.help
+func (baseCommand *BaseCommand) GetHelp() string {
+	return baseCommand.help
 }
 
-func (this *BaseCommand) RequiresConnection() bool {
-	return this.requiresConnection
+func (baseCommand *BaseCommand) RequiresConnection() bool {
+	return baseCommand.requiresConnection
 }

@@ -6,7 +6,7 @@ import (
 
 type Package struct{}
 
-func (this *Package) GetDpkgData(data string) string {
+func (packageHelper *Package) GetDpkgData(data string) string {
 	lines := strings.Split(data, "\n")
 
 	metadata := make(map[string]string)

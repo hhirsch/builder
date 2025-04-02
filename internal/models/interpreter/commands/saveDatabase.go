@@ -17,17 +17,17 @@ func NewSaveDatabaseCommand(environment *models.Environment) *SaveDatabaseComman
 	return controller
 }
 
-func (this *SaveDatabaseCommand) Execute(tokens []string) {
+func (saveDatabaseCommand *SaveDatabaseCommand) Execute(tokens []string) {
 }
 
-func (this *SaveDatabaseCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo.")
+func (saveDatabaseCommand *SaveDatabaseCommand) Undo() {
+	saveDatabaseCommand.environment.GetLogger().Info("Nothing to undo.")
 }
 
-func (this *SaveDatabaseCommand) GetDescription(tokens []string) string {
+func (saveDatabaseCommand *SaveDatabaseCommand) GetDescription(tokens []string) string {
 	return "Ensure a binary is allowed to open ports."
 }
 
-func (this *SaveDatabaseCommand) GetHelp() string {
+func (saveDatabaseCommand *SaveDatabaseCommand) GetHelp() string {
 	return "[source <string>, target <string>]\tPush a file to the server."
 }

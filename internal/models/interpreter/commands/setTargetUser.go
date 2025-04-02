@@ -19,23 +19,23 @@ func NewSetTargetUserCommand(environment *models.Environment) *SetTargetUserComm
 	return controller
 }
 
-func (this *SetTargetUserCommand) Execute(tokens []string) string {
-	this.environment.GetLogger().Info("Setting target user.")
+func (setTargetUserCommand *SetTargetUserCommand) Execute(tokens []string) string {
+	setTargetUserCommand.environment.GetLogger().Info("Setting target user.")
 	if len(tokens) != 2 {
-		this.environment.GetLogger().Fatal("setTargetUser needs 1 parameter")
+		setTargetUserCommand.environment.GetLogger().Fatal("setTargetUser needs 1 parameter")
 	}
-	this.environment.Client.SetTargetUser(tokens[1])
+	setTargetUserCommand.environment.Client.SetTargetUser(tokens[1])
 	return ""
 }
 
-func (this *SetTargetUserCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo.")
+func (setTargetUserCommand *SetTargetUserCommand) Undo() {
+	setTargetUserCommand.environment.GetLogger().Info("Nothing to undo.")
 }
 
-func (this *SetTargetUserCommand) GetDescription(tokens []string) string {
+func (setTargetUserCommand *SetTargetUserCommand) GetDescription(tokens []string) string {
 	return "Ensure a binary is allowed to open ports."
 }
 
-func (this *SetTargetUserCommand) GetHelp() string {
+func (setTargetUserCommand *SetTargetUserCommand) GetHelp() string {
 	return "[binaryPath <string>]\tEnsure a binary is allowed to open ports."
 }

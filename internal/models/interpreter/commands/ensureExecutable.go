@@ -22,23 +22,23 @@ func NewEnsureExecutableCommand(environment *models.Environment) *EnsureExecutab
 	}
 }
 
-func (this *EnsureExecutableCommand) Execute(tokens []string) string {
-	this.environment.GetLogger().Info("Ensuring target is executable.")
+func (ensureExecutableCommand *EnsureExecutableCommand) Execute(tokens []string) string {
+	ensureExecutableCommand.environment.GetLogger().Info("Ensuring target is executable.")
 	if len(tokens) != 2 {
-		this.environment.GetLogger().Fatal("ensureExecutable needs 1 parameter")
+		ensureExecutableCommand.environment.GetLogger().Fatal("ensureExecutable needs 1 parameter")
 	}
-	this.environment.Client.EnsureExecutable(tokens[1])
+	ensureExecutableCommand.environment.Client.EnsureExecutable(tokens[1])
 	return ""
 }
 
-func (this *EnsureExecutableCommand) Undo() {
-	this.environment.GetLogger().Info("Undoing ensureExecutable.")
+func (ensureExecutableCommand *EnsureExecutableCommand) Undo() {
+	ensureExecutableCommand.environment.GetLogger().Info("Undoing ensureExecutable.")
 }
 
-func (this *EnsureExecutableCommand) GetDescription(tokens []string) string {
+func (ensureExecutableCommand *EnsureExecutableCommand) GetDescription(tokens []string) string {
 	return "make sure a binary is executable"
 }
 
-func (this *EnsureExecutableCommand) GetHelp() string {
+func (ensureExecutableCommand *EnsureExecutableCommand) GetHelp() string {
 	return "[binaryPath <string>]\tEnsure a binary is executable."
 }

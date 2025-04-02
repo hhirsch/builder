@@ -21,24 +21,24 @@ func NewExecuteAndPrintCommand(environment *models.Environment) *ExecuteAndPrint
 	}
 }
 
-func (this *ExecuteAndPrintCommand) getCommandFromTokens(tokens []string) string {
+func (executeAndPrintCommand *ExecuteAndPrintCommand) getCommandFromTokens(tokens []string) string {
 	tokens = tokens[1:]
 	return strings.Join(tokens, " ")
 }
 
-func (this *ExecuteAndPrintCommand) Execute(tokens []string) string {
-	this.environment.Client.ExecuteAndPrint(this.getCommandFromTokens(tokens))
+func (executeAndPrintCommand *ExecuteAndPrintCommand) Execute(tokens []string) string {
+	executeAndPrintCommand.environment.Client.ExecuteAndPrint(executeAndPrintCommand.getCommandFromTokens(tokens))
 	return ""
 }
 
-func (this *ExecuteAndPrintCommand) Undo() {
-	this.environment.GetLogger().Info("Undo unavailable for execute and print.")
+func (executeAndPrintCommand *ExecuteAndPrintCommand) Undo() {
+	executeAndPrintCommand.environment.GetLogger().Info("Undo unavailable for execute and print.")
 }
 
-func (this *ExecuteAndPrintCommand) GetDescription(tokens []string) string {
-	return "Execute " + this.getCommandFromTokens(tokens) + " and print the output."
+func (executeAndPrintCommand *ExecuteAndPrintCommand) GetDescription(tokens []string) string {
+	return "Execute " + executeAndPrintCommand.getCommandFromTokens(tokens) + " and print the output."
 }
 
-func (this *ExecuteAndPrintCommand) GetHelp() string {
+func (executeAndPrintCommand *ExecuteAndPrintCommand) GetHelp() string {
 	return "[command <string>]\tExecute a command and print the output."
 }

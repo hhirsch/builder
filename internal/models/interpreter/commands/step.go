@@ -22,20 +22,20 @@ func NewStepCommand(environment *models.Environment) *StepCommand {
 	return controller
 }
 
-func (this *StepCommand) Execute(tokens []string) string {
-	this.description = strings.Join(tokens, " ")
-	this.environment.GetLogger().Info(this.description)
+func (stepCommand *StepCommand) Execute(tokens []string) string {
+	stepCommand.description = strings.Join(tokens, " ")
+	stepCommand.environment.GetLogger().Info(stepCommand.description)
 	return ""
 }
 
-func (this *StepCommand) Undo() {
-	this.environment.GetLogger().Info("Undoing step \"" + this.description + "\"")
+func (stepCommand *StepCommand) Undo() {
+	stepCommand.environment.GetLogger().Info("Undoing step \"" + stepCommand.description + "\"")
 }
 
-func (this *StepCommand) GetDescription(tokens []string) string {
-	return "Prints " + this.description + " on screen and logs it to file."
+func (stepCommand *StepCommand) GetDescription(tokens []string) string {
+	return "Prints " + stepCommand.description + " on screen and logs it to file."
 }
 
-func (this *StepCommand) GetHelp() string {
+func (stepCommand *StepCommand) GetHelp() string {
 	return "[step <string>]\tPrints description on screen and logs it to file."
 }

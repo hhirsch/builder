@@ -22,25 +22,25 @@ func NewPrintCommand(environment *models.Environment) *PrintCommand {
 	return controller
 }
 
-func (this *PrintCommand) TestRequirement() bool {
+func (printCommand *PrintCommand) TestRequirement() bool {
 	return true
 }
 
-func (this *PrintCommand) Execute(tokens []string) string {
+func (printCommand *PrintCommand) Execute(tokens []string) string {
 	tokens = tokens[1:]
 	parameters := strings.Join(tokens, " ")
 	format.Println(parameters)
 	return ""
 }
 
-func (this *PrintCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo for printing")
+func (printCommand *PrintCommand) Undo() {
+	printCommand.environment.GetLogger().Info("Nothing to undo for printing")
 }
 
-func (this *PrintCommand) GetDescription(tokens []string) string {
+func (printCommand *PrintCommand) GetDescription(tokens []string) string {
 	return "Prints text on screen."
 }
 
-func (this *PrintCommand) GetHelp() string {
+func (printCommand *PrintCommand) GetHelp() string {
 	return "[print <string>]\tPrints text on screen."
 }

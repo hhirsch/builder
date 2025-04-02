@@ -26,66 +26,66 @@ func NewSetupHostCommand(environment *models.Environment) *SetupHostCommand {
 	return controller
 }
 
-func (this *SetupHostCommand) Execute(tokens []string) string {
+func (setupHostCommand *SetupHostCommand) Execute(tokens []string) string {
 	if len(tokens) != 2 {
-		this.logger.Fatal("setupHost needs 1 parameter")
+		setupHostCommand.logger.Fatal("setupHost needs 1 parameter")
 	}
 	var err error
 	var userName string
 	var userPath = "host." + tokens[1] + ".user"
-	userName, err = this.environment.GetRegistry().GetValue(userPath)
+	userName, err = setupHostCommand.environment.GetRegistry().GetValue(userPath)
 	if err != nil {
-		this.logger.Info("No user found in registry asking for user input.")
+		setupHostCommand.logger.Info("No user found in registry asking for user input.")
 		userName = "root"
 		nameInput := huh.NewInput().
 			Title("Enter user name").
 			Value(&userName)
 		err = nameInput.Run()
 		if err != nil {
-			this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+			setupHostCommand.logger.Fatalf("Error reading input for user name: %s", err.Error())
 		}
-		this.logger.Info("Registering " + userPath + " as " + userName)
-		this.environment.GetRegistry().Register(userPath, userName)
+		setupHostCommand.logger.Info("Registering " + userPath + " as " + userName)
+		setupHostCommand.environment.GetRegistry().Register(userPath, userName)
 	}
 	if len(userName) == 0 {
-		this.logger.Fatal("User name must not be empty!")
+		setupHostCommand.logger.Fatal("User name must not be empty!")
 	}
 	var hostName string
 	var hostPath = "host." + tokens[1] + ".host"
-	hostName, err = this.environment.GetRegistry().GetValue(hostPath)
+	hostName, err = setupHostCommand.environment.GetRegistry().GetValue(hostPath)
 	if err != nil {
-		this.logger.Info("No host found in registry asking for user input.")
+		setupHostCommand.logger.Info("No host found in registry asking for user input.")
 		hostInput := huh.NewInput().
 			Title("Enter host name or IP").
 			Value(&hostName)
 		err = hostInput.Run()
 		if err != nil {
-			this.logger.Fatalf("Error reading input for host name: %s", err.Error())
+			setupHostCommand.logger.Fatalf("Error reading input for host name: %s", err.Error())
 		}
-		this.logger.Info("Registering " + hostPath + " as " + hostName)
-		this.environment.GetRegistry().Register(hostPath, hostName)
+		setupHostCommand.logger.Info("Registering " + hostPath + " as " + hostName)
+		setupHostCommand.environment.GetRegistry().Register(hostPath, hostName)
 	}
 
 	if len(hostName) == 0 {
-		this.logger.Fatal("Host name must not be empty!")
+		setupHostCommand.logger.Fatal("Host name must not be empty!")
 	}
 
-	err = this.environment.GetRegistry().Save()
+	err = setupHostCommand.environment.GetRegistry().Save()
 	if err != nil {
-		this.logger.Fatalf("Error saving registry: %s", err.Error())
+		setupHostCommand.logger.Fatalf("Error saving registry: %s", err.Error())
 	}
-	this.environment.Client = *models.NewClient(this.environment, userName, hostName)
+	setupHostCommand.environment.Client = *models.NewClient(setupHostCommand.environment, userName, hostName)
 	return ""
 }
 
-func (this *SetupHostCommand) Undo() {
-	this.environment.GetLogger().Info("Undo not implemented")
+func (setupHostCommand *SetupHostCommand) Undo() {
+	setupHostCommand.environment.GetLogger().Info("Undo not implemented")
 }
 
-func (this *SetupHostCommand) GetDescription(tokens []string) string {
+func (setupHostCommand *SetupHostCommand) GetDescription(tokens []string) string {
 	return "Interactively setup your host. Only supports key auth."
 }
 
-func (this *SetupHostCommand) GetHelp() string {
+func (setupHostCommand *SetupHostCommand) GetHelp() string {
 	return "(host name <string>)\tPrompt for some information of the host to connect to."
 }

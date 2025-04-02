@@ -26,17 +26,17 @@ func NewConnectCommand(environment *models.Environment) *ConnectCommand {
 	return controller
 }
 
-func (this *ConnectCommand) Execute(tokens []string) string {
-	this.requireParameterAmount(tokens, 1)
-	this.environment.Client = *models.NewClient(this.environment, "root", tokens[1])
-	this.logger.Info("Connected to " + tokens[1])
+func (connectCommand *ConnectCommand) Execute(tokens []string) string {
+	connectCommand.requireParameterAmount(tokens, 1)
+	connectCommand.environment.Client = *models.NewClient(connectCommand.environment, "root", tokens[1])
+	connectCommand.logger.Info("Connected to " + tokens[1])
 	return "true"
 }
 
-func (this *ConnectCommand) GetDescription(tokens []string) string {
+func (connectCommand *ConnectCommand) GetDescription(tokens []string) string {
 	return "Connect to a host. Only supports key auth."
 }
 
-func (this *ConnectCommand) GetHelp() string {
+func (connectCommand *ConnectCommand) GetHelp() string {
 	return "(hostName <string>)\tConnect to host."
 }

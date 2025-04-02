@@ -20,22 +20,22 @@ func NewPushFileCommand(environment *models.Environment) *PushFileCommand {
 	}
 }
 
-func (this *PushFileCommand) Execute(tokens []string) string {
+func (pushFileCommand *PushFileCommand) Execute(tokens []string) string {
 	if len(tokens) != 3 {
-		this.environment.GetLogger().Fatal("pushFile needs 2 parameters.")
+		pushFileCommand.environment.GetLogger().Fatal("pushFile needs 2 parameters.")
 	}
-	this.environment.Client.PushFile(tokens[1], tokens[2])
+	pushFileCommand.environment.Client.PushFile(tokens[1], tokens[2])
 	return ""
 }
 
-func (this *PushFileCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo.")
+func (pushFileCommand *PushFileCommand) Undo() {
+	pushFileCommand.environment.GetLogger().Info("Nothing to undo.")
 }
 
-func (this *PushFileCommand) GetDescription(tokens []string) string {
+func (pushFileCommand *PushFileCommand) GetDescription(tokens []string) string {
 	return "Push a file to the server."
 }
 
-func (this *PushFileCommand) GetHelp() string {
+func (pushFileCommand *PushFileCommand) GetHelp() string {
 	return "[source <string>, target <string>]\tPush a file to the server."
 }
