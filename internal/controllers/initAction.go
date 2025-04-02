@@ -41,6 +41,6 @@ func (initAction *InitAction) Execute() {
 	initAction.logger.Info("Initializing")
 }
 
-func (this *InitAction) GetDescription() string {
-	return "Create builder directories in " + this.environment.GetProjectPath() + "."
+func (initAction *InitAction) GetDescription() string {
+	return "Create builder directories in " + initAction.environment.GetProjectPath() + "."
 }

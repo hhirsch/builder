@@ -33,9 +33,9 @@ func NewServerAction(controller *Controller) *ServerAction {
 
 }
 
-func (this *ServerAction) Execute() {
+func (serverAction *ServerAction) Execute() {
 }
 
-func (this *ServerAction) GetDescription() string {
+func (serverAction *ServerAction) GetDescription() string {
 	return "Manage the list of servers."
 }

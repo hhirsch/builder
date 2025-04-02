@@ -13,7 +13,7 @@ func NewReflectionHelper(fileName string) *ReflectionHelper {
 }
 
 // Function to call a method based on method name as a string
-func (this *ReflectionHelper) CallMethodByName(instance interface{}, methodName string) {
+func (reflectionHelper *ReflectionHelper) CallMethodByName(instance interface{}, methodName string) {
 	// Get the reflect.Value of the instance
 	v := reflect.ValueOf(instance)
 

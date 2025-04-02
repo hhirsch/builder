@@ -39,7 +39,7 @@ func NewReferenceAction(controller *Controller) *ReferenceAction {
 
 }
 
-func (this *ReferenceAction) rightPadString(string string, length int) string {
+func (referenceAction *ReferenceAction) rightPadString(string string, length int) string {
 	if len(string) >= length {
 		return string
 	}
@@ -48,35 +48,35 @@ func (this *ReferenceAction) rightPadString(string string, length int) string {
 	return string + pad
 }
 
-func (this *ReferenceAction) Execute() {
+func (referenceAction *ReferenceAction) Execute() {
 	var markdownRenderer = models.NewMarkdownRenderer()
 
-	if this.HasEnoughParameters(1) {
-		var actionName = this.controller.Arguments[0]
-		this.logger.Print(helpers.GetBannerText())
-		if this.environment.IsColorEnabled() {
+	if referenceAction.HasEnoughParameters(1) {
+		var actionName = referenceAction.controller.Arguments[0]
+		referenceAction.logger.Print(helpers.GetBannerText())
+		if referenceAction.environment.IsColorEnabled() {
 			markdownRenderer.EnableColor()
 		}
-		action := this.controller.actionsMap[actionName]
+		action := referenceAction.controller.actionsMap[actionName]
 		template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
 		markdownContent := template.ExecuteString(map[string]interface{}{
 			"actionName": actionName,
-			"binaryName": this.environment.GetArguments()[0],
+			"binaryName": referenceAction.environment.GetArguments()[0],
 			"brief":      action.GetBrief(),
 		})
 		markdownRenderer.Render(markdownContent)
 		return
 	} else {
-		this.logger.Print(helpers.GetBannerText())
+		referenceAction.logger.Print(helpers.GetBannerText())
 	}
 
-	fmt.Printf("  %s <command> [<arguments>]\n\n", this.environment.GetArguments()[0])
-	for _, action := range this.controller.GetActions() {
-		this.logger.Print(fmt.Sprintf("  %s\t%+v", this.rightPadString(action.GetName(), 10), action.GetBrief()))
+	fmt.Printf("  %s <command> [<arguments>]\n\n", referenceAction.environment.GetArguments()[0])
+	for _, action := range referenceAction.controller.GetActions() {
+		referenceAction.logger.Print(fmt.Sprintf("  %s\t%+v", referenceAction.rightPadString(action.GetName(), 10), action.GetBrief()))
 	}
 	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
 }
 
-func (this *ReferenceAction) GetDescription() string {
-	return "Create builder directories in " + this.environment.GetProjectPath() + "."
+func (referenceAction *ReferenceAction) GetDescription() string {
+	return "Create builder directories in " + referenceAction.environment.GetProjectPath() + "."
 }

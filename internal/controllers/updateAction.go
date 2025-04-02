@@ -21,17 +21,17 @@ func NewUpdateAction(controller *Controller) *UpdateAction {
 	}
 }
 
-func (this *UpdateAction) Execute(controller *Controller) {
+func (updateAction *UpdateAction) Execute(controller *Controller) {
 }
 
-func (this *UpdateAction) GetName() string {
+func (updateAction *UpdateAction) GetName() string {
 	return "update"
 }
 
-func (this *UpdateAction) GetDescription() string {
+func (updateAction *UpdateAction) GetDescription() string {
 	return "Run migrations."
 }
 
-func (this *UpdateAction) GetHelp() string {
+func (updateAction *UpdateAction) GetHelp() string {
 	return "Run migrations."
 }

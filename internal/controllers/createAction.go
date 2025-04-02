@@ -44,10 +44,10 @@ func NewCreateAction(controller *Controller) *CreateAction {
 
 }
 
-func (this *CreateAction) Execute() {
-	this.logger.Print(helpers.GetBannerText())
+func (createAction *CreateAction) Execute() {
+	createAction.logger.Print(helpers.GetBannerText())
 
-	if this.ParameterValidationFailed(1, "create needs a file path as parameter.") {
+	if createAction.ParameterValidationFailed(1, "create needs a file path as parameter.") {
 		return
 	}
 	var structName string
@@ -56,7 +56,7 @@ func (this *CreateAction) Execute() {
 		Value(&structName)
 	err := structNameInput.Run()
 	if err != nil {
-		this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+		createAction.logger.Fatalf("Error reading input for user name: %s", err.Error())
 	}
 
 	var packageName string
@@ -65,11 +65,11 @@ func (this *CreateAction) Execute() {
 		Value(&packageName)
 	err = packageNameInput.Run()
 	if err != nil {
-		this.logger.Fatalf("Error reading input for user name: %s", err.Error())
+		createAction.logger.Fatalf("Error reading input for user name: %s", err.Error())
 	}
 
-	if !strings.HasSuffix(this.controller.Arguments[0], ".go") {
-		this.logger.Fatal("File ending .go not found in parameter.")
+	if !strings.HasSuffix(createAction.controller.Arguments[0], ".go") {
+		createAction.logger.Fatal("File ending .go not found in parameter.")
 	}
 
 	template := fasttemplate.New(structTemplate, "{{", "}}")
@@ -77,12 +77,12 @@ func (this *CreateAction) Execute() {
 		"packageName": packageName,
 		"structName":  structName,
 	})
-	err = this.WriteStringToFile(this.controller.Arguments[0], fileContent)
+	err = createAction.WriteStringToFile(createAction.controller.Arguments[0], fileContent)
 	if err != nil {
-		this.logger.Fatalf("Error writing to file: %s", err.Error())
+		createAction.logger.Fatalf("Error writing to file: %s", err.Error())
 	}
 }
 
-func (this *CreateAction) GetName() string {
+func (createAction *CreateAction) GetName() string {
 	return "create"
 }

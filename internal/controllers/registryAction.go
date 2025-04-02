@@ -35,14 +35,14 @@ func NewRegistryAction(controller *Controller) *RegistryAction {
 
 }
 
-func (this *RegistryAction) Execute() {
-	if this.ParameterValidationFailed(1, "registry needs an argument") {
+func (registryAction *RegistryAction) Execute() {
+	if registryAction.ParameterValidationFailed(1, "registry needs an argument") {
 		return
 	}
-	this.logger.Info("Builder started")
-	var interpreter = *interpreter.NewInterpreter(this.environment)
-	err := interpreter.Run(this.controller.Arguments[0])
+	registryAction.logger.Info("Builder started")
+	var interpreter = *interpreter.NewInterpreter(registryAction.environment)
+	err := interpreter.Run(registryAction.controller.Arguments[0])
 	if err != nil {
-		this.logger.Error(err.Error())
+		registryAction.logger.Error(err.Error())
 	}
 }

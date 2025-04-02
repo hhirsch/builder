@@ -41,43 +41,43 @@ func NewController(environment *models.Environment) *Controller {
 	return controller
 }
 
-func (this *Controller) AddAction(action Action) {
-	this.actions = append(this.actions, action)
-	this.actionsMap[action.GetName()] = action
+func (controller *Controller) AddAction(action Action) {
+	controller.actions = append(controller.actions, action)
+	controller.actionsMap[action.GetName()] = action
 }
 
-func (this *Controller) GetEnvironment() *models.Environment {
-	return this.environment
+func (controller *Controller) GetEnvironment() *models.Environment {
+	return controller.environment
 }
 
-func (this *Controller) GetActionsMap() map[string]Action {
-	return this.actionsMap
+func (controller *Controller) GetActionsMap() map[string]Action {
+	return controller.actionsMap
 }
 
-func (this *Controller) GetActions() []Action {
-	return this.actions
+func (controller *Controller) GetActions() []Action {
+	return controller.actions
 }
 
-func (this *Controller) ExecuteAction() {
-	if len(this.Arguments) < 1 {
-		this.logger.Info("You need to pass a command name as argument.")
-		this.ShowHelp()
+func (controller *Controller) ExecuteAction() {
+	if len(controller.Arguments) < 1 {
+		controller.logger.Info("You need to pass a command name as argument.")
+		controller.ShowHelp()
 		return
 	}
 
-	var actionName = this.environment.GetArguments()[1]
-	if action, exists := this.actionsMap[actionName]; exists {
+	var actionName = controller.environment.GetArguments()[1]
+	if action, exists := controller.actionsMap[actionName]; exists {
 		action.Execute()
 		return
 	}
-	this.logger.Info("Builder called with unrecognized command " + actionName + ".")
-	this.ShowHelp()
+	controller.logger.Info("Builder called with unrecognized command " + actionName + ".")
+	controller.ShowHelp()
 }
 
-func (this *Controller) ShowHelp() {
-	this.helpAction.Execute()
+func (controller *Controller) ShowHelp() {
+	controller.helpAction.Execute()
 }
 
-func (this *Controller) GetArguments() []string {
-	return this.Arguments
+func (controller *Controller) GetArguments() []string {
+	return controller.Arguments
 }

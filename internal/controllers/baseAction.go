@@ -13,29 +13,29 @@ type BaseAction struct {
 	help        string //detailed description of parameters with examples
 }
 
-func (this *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
-	if !this.HasEnoughParameters(requiredAmountOfParameters) {
-		this.environment.GetLogger().Fatal(errorMessage)
+func (baseAction *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
+	if !baseAction.HasEnoughParameters(requiredAmountOfParameters) {
+		baseAction.environment.GetLogger().Fatal(errorMessage)
 	}
 	return false
 }
 
-func (this *BaseAction) HasEnoughParameters(requiredAmountOfParameters int) bool {
-	return len(this.controller.GetArguments()) >= requiredAmountOfParameters
+func (baseAction *BaseAction) HasEnoughParameters(requiredAmountOfParameters int) bool {
+	return len(baseAction.controller.GetArguments()) >= requiredAmountOfParameters
 }
 
-func (this *BaseAction) GetName() string {
-	return this.name
+func (baseAction *BaseAction) GetName() string {
+	return baseAction.name
 }
 
-func (this *BaseAction) GetDescription() string {
-	return this.description
+func (baseAction *BaseAction) GetDescription() string {
+	return baseAction.description
 }
 
-func (this *BaseAction) GetBrief() string {
-	return this.brief
+func (baseAction *BaseAction) GetBrief() string {
+	return baseAction.brief
 }
 
-func (this *BaseAction) GetHelp() string {
-	return this.help
+func (baseAction *BaseAction) GetHelp() string {
+	return baseAction.help
 }

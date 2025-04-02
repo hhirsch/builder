@@ -42,7 +42,7 @@ func NewHelpAction(controller *Controller) *HelpAction {
 
 }
 
-func (this *HelpAction) rightPadString(string string, length int) string {
+func (helpAction *HelpAction) rightPadString(string string, length int) string {
 	if len(string) >= length {
 		return string
 	}
@@ -51,35 +51,35 @@ func (this *HelpAction) rightPadString(string string, length int) string {
 	return string + pad
 }
 
-func (this *HelpAction) Execute() {
+func (helpAction *HelpAction) Execute() {
 	var markdownRenderer = models.NewMarkdownRenderer()
 
-	if this.HasEnoughParameters(1) {
-		var actionName = this.controller.Arguments[0]
-		this.logger.Print(helpers.GetBannerText())
-		if this.environment.IsColorEnabled() {
+	if helpAction.HasEnoughParameters(1) {
+		var actionName = helpAction.controller.Arguments[0]
+		helpAction.logger.Print(helpers.GetBannerText())
+		if helpAction.environment.IsColorEnabled() {
 			markdownRenderer.EnableColor()
 		}
-		action := this.controller.actionsMap[actionName]
+		action := helpAction.controller.actionsMap[actionName]
 		template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
 		markdownContent := template.ExecuteString(map[string]interface{}{
 			"actionName": actionName,
-			"binaryName": this.environment.GetArguments()[0],
+			"binaryName": helpAction.environment.GetArguments()[0],
 			"brief":      action.GetBrief(),
 		})
 		markdownRenderer.Render(markdownContent)
 		return
 	} else {
-		this.logger.Print(helpers.GetBannerText())
+		helpAction.logger.Print(helpers.GetBannerText())
 	}
 
-	fmt.Printf("  %s <command> [<arguments>]\n\n", this.environment.GetArguments()[0])
-	for _, action := range this.controller.GetActions() {
-		this.logger.Print(fmt.Sprintf("  %s\t%+v", this.rightPadString(action.GetName(), 10), action.GetBrief()))
+	fmt.Printf("  %s <command> [<arguments>]\n\n", helpAction.environment.GetArguments()[0])
+	for _, action := range helpAction.controller.GetActions() {
+		helpAction.logger.Print(fmt.Sprintf("  %s\t%+v", helpAction.rightPadString(action.GetName(), 10), action.GetBrief()))
 	}
 	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
 }
 
-func (this *HelpAction) GetDescription() string {
-	return "Create builder directories in " + this.environment.GetProjectPath() + "."
+func (helpAction *HelpAction) GetDescription() string {
+	return "Create builder directories in " + helpAction.environment.GetProjectPath() + "."
 }
