@@ -20,23 +20,23 @@ func NewSystemInfoCommand(environment *models.Environment) *SystemInfoCommand {
 	}
 }
 
-func (this *SystemInfoCommand) TestRequirements() bool {
-	return this.FindBinary("lsb_release")
+func (systemInfoCommand *SystemInfoCommand) TestRequirements() bool {
+	return systemInfoCommand.FindBinary("lsb_release")
 }
 
-func (this *SystemInfoCommand) Execute(tokens []string) string {
-	this.environment.GetLogger().Infof("System is %s.", this.TrimResponseString(this.environment.Client.Execute("lsb_release -ds")))
+func (systemInfoCommand *SystemInfoCommand) Execute(tokens []string) string {
+	systemInfoCommand.environment.GetLogger().Infof("System is %s.", systemInfoCommand.TrimResponseString(systemInfoCommand.environment.Client.Execute("lsb_release -ds")))
 	return ""
 }
 
-func (this *SystemInfoCommand) Undo() {
-	this.environment.GetLogger().Info("Nothing to undo for printing")
+func (systemInfoCommand *SystemInfoCommand) Undo() {
+	systemInfoCommand.environment.GetLogger().Info("Nothing to undo for printing")
 }
 
-func (this *SystemInfoCommand) GetDescription(tokens []string) string {
+func (systemInfoCommand *SystemInfoCommand) GetDescription(tokens []string) string {
 	return "SystemInfos text on screen."
 }
 
-func (this *SystemInfoCommand) GetHelp() string {
+func (systemInfoCommand *SystemInfoCommand) GetHelp() string {
 	return "[print <string>]\tSystemInfos text on screen."
 }

@@ -17,13 +17,13 @@ func NewMarkdownRenderer() *MarkdownRenderer {
 
 }
 
-func (this *MarkdownRenderer) EnableColor() {
-	this.colour = true
+func (markdownRenderer *MarkdownRenderer) EnableColor() {
+	markdownRenderer.colour = true
 }
 
-func (this *MarkdownRenderer) Render(markdown string) {
+func (markdownRenderer *MarkdownRenderer) Render(markdown string) {
 	var renderedMarkdown string
-	if this.colour {
+	if markdownRenderer.colour {
 		renderedMarkdown, _ = glamour.Render(markdown, "dark")
 	} else {
 		renderedMarkdown, _ = glamour.Render(markdown, "notty")

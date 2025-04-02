@@ -98,21 +98,21 @@ func NewEncryptionPkcs8(environment *Environment) *Encryption {
 	return &Encryption{environment: environment, logger: environment.GetLogger(), privateKey: rsaPrivKey}
 }
 
-func (this *Encryption) Encrypt(plainValue string) (encryptedValue string, err error) {
-	publicKey := this.privateKey.PublicKey
+func (encryption *Encryption) Encrypt(plainValue string) (encryptedValue string, err error) {
+	publicKey := encryption.privateKey.PublicKey
 	var encryptedValueByteSlices []byte
 	encryptedValueByteSlices, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, &publicKey, []byte(plainValue), nil)
 	if err != nil {
-		this.logger.Errorf("Encryption failed: %v", err)
+		encryption.logger.Errorf("Encryption failed: %v", err)
 		return "", err
 	}
 	return string(encryptedValueByteSlices), nil
 }
 
-func (this *Encryption) Decrypt(encryptedValue string) (decryptedValue string, err error) {
-	plainValue, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, this.privateKey, []byte(encryptedValue), nil)
+func (encryption *Encryption) Decrypt(encryptedValue string) (decryptedValue string, err error) {
+	plainValue, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, encryption.privateKey, []byte(encryptedValue), nil)
 	if err != nil {
-		this.logger.Errorf("Decryption failed: %v", err)
+		encryption.logger.Errorf("Decryption failed: %v", err)
 		return "", err
 	}
 	return string(plainValue), nil

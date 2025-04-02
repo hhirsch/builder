@@ -22,20 +22,20 @@ func NewListPackagesCommand(environment *models.Environment) *ListPackagesComman
 	return controller
 }
 
-func (this *ListPackagesCommand) Execute(tokens []string) string {
+func (listPackagesCommand *ListPackagesCommand) Execute(tokens []string) string {
 	format.Println("list")
-	this.environment.Client.ListPackages()
+	listPackagesCommand.environment.Client.ListPackages()
 	return ""
 }
 
-func (this *ListPackagesCommand) Undo() {
-	this.environment.GetLogger().Info("tbd")
+func (listPackagesCommand *ListPackagesCommand) Undo() {
+	listPackagesCommand.environment.GetLogger().Info("tbd")
 }
 
-func (this *ListPackagesCommand) GetDescription(tokens []string) string {
+func (listPackagesCommand *ListPackagesCommand) GetDescription(tokens []string) string {
 	return "tbd"
 }
 
-func (this *ListPackagesCommand) GetHelp() string {
+func (listPackagesCommand *ListPackagesCommand) GetHelp() string {
 	return "tbd"
 }
