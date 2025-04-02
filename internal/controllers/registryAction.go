@@ -25,7 +25,7 @@ func NewRegistryAction(controller *Controller) *RegistryAction {
 		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
+		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
 		controller:  controller,
 	}
 

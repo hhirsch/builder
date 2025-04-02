@@ -38,7 +38,7 @@ func NewCreateAction(controller *Controller) *CreateAction {
 		FileSystem:  traits.FileSystem{},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
+		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
 		controller:  controller,
 	}
 

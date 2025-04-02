@@ -19,7 +19,7 @@ func NewController(environment *models.Environment) *Controller {
 	controller := &Controller{
 		environment: environment,
 		logger:      environment.GetLogger(),
-		model:       models.NewBuilderModel(environment),
+		model:       models.NewBuilderModel(environment.GetProjectPath()),
 		actionsMap:  make(map[string]Action),
 	}
 

@@ -33,7 +33,7 @@ func NewReferenceAction(controller *Controller) *ReferenceAction {
 		BaseAction:  baseAction,
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
+		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
 		controller:  controller,
 	}
 

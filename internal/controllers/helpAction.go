@@ -11,7 +11,6 @@ import (
 
 type HelpAction struct {
 	environment *models.Environment
-	model       *models.BuilderModel
 	controller  *Controller
 	BaseAction
 }
@@ -34,7 +33,6 @@ func NewHelpAction(controller *Controller) *HelpAction {
 	return &HelpAction{
 		BaseAction:  baseAction,
 		environment: controller.GetEnvironment(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
 		controller:  controller,
 	}
 

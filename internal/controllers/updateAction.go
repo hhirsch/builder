@@ -8,7 +8,6 @@ import (
 type UpdateAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
-	model       *models.BuilderModel
 	BaseAction
 }
 
@@ -17,7 +16,6 @@ func NewUpdateAction(controller *Controller) *UpdateAction {
 	return &UpdateAction{
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
 	}
 }
 

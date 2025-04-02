@@ -26,7 +26,7 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 	registry := models.NewRegistry(environment.GetGlobalRegistryPath())
 	err := registry.Load()
 	if err != nil {
-		logger.Fatalf("Unable to load registry: %s", err.Error())
+		logger.Fatalf("unable to load registry: %s", err.Error())
 	}
 	variables := map[string]string{}
 	commands := map[string]com.Command{}

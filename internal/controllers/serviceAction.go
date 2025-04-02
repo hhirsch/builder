@@ -13,7 +13,6 @@ var serviceMarkdown string
 type ServiceAction struct {
 	environment *models.Environment
 	logger      *helpers.Logger
-	model       *models.BuilderModel
 	controller  *Controller
 	BaseAction
 }
@@ -30,7 +29,6 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 		},
 		environment: controller.GetEnvironment(),
 		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
 		controller:  controller,
 	}
 

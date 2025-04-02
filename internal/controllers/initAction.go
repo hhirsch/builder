@@ -22,7 +22,7 @@ func NewInitAction(controller *Controller) *InitAction {
 			brief:       "Initialize builder in the current directory.",
 			help:        initMarkdown,
 		},
-		model: models.NewBuilderModel(controller.GetEnvironment()),
+		model: models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
 	}
 
 	return initAction
