@@ -23,36 +23,36 @@ func NewRegistry(fileName string) *Registry {
 	}
 }
 
-func (this *Registry) Register(key string, value string) {
-	this.data[key] = value
+func (registry *Registry) Register(key string, value string) {
+	registry.data[key] = value
 }
 
-func (this *Registry) EnableRsa(encryption Encryption) {
-	this.encryption = &encryption
+func (registry *Registry) EnableRsa(encryption Encryption) {
+	registry.encryption = &encryption
 }
 
-func (this *Registry) RegisterEncrypted(key string, value string) (err error) {
-	if this.encryption == nil {
+func (registry *Registry) RegisterEncrypted(key string, value string) (err error) {
+	if registry.encryption == nil {
 		err = errors.New("encryption is disabled")
 	}
-	this.data[key], _ = this.encryption.Encrypt(value)
+	registry.data[key], _ = registry.encryption.Encrypt(value)
 	return
 }
 
-func (this *Registry) GetEncryptedString(key string) (string, error) {
-	if this.encryption == nil {
+func (registry *Registry) GetEncryptedString(key string) (string, error) {
+	if registry.encryption == nil {
 		return "", errors.New("encryption is disabled")
 	}
 
-	value, err := this.encryption.Decrypt(this.data[key])
+	value, err := registry.encryption.Decrypt(registry.data[key])
 	if err == nil {
 		return "", errors.New("value does not exist")
 	}
 	return value, nil
 }
 
-func (this *Registry) GetBool(key string) (value bool, err error) {
-	stringValue, exists := this.data[key]
+func (registry *Registry) GetBool(key string) (value bool, err error) {
+	stringValue, exists := registry.data[key]
 	if !exists {
 		err = fmt.Errorf("key %s not found", key)
 		return
@@ -69,25 +69,25 @@ func (this *Registry) GetBool(key string) (value bool, err error) {
 	return
 }
 
-func (this *Registry) GetValue(key string) (string, error) {
-	value, exists := this.data[key]
+func (registry *Registry) GetValue(key string) (string, error) {
+	value, exists := registry.data[key]
 	if !exists {
 		return "", errors.New("value does not exist")
 	}
 	return value, nil
 }
 
-func (this *Registry) EraseValue(key string) error {
-	_, exists := this.data[key]
+func (registry *Registry) EraseValue(key string) error {
+	_, exists := registry.data[key]
 	if !exists {
 		return errors.New("no value to remove")
 	}
-	delete(this.data, key)
+	delete(registry.data, key)
 	return nil
 }
 
-func (this *Registry) Save() (err error) {
-	file, err := os.Create(this.fileName)
+func (registry *Registry) Save() (err error) {
+	file, err := os.Create(registry.fileName)
 	if err != nil {
 		return
 	}
@@ -98,7 +98,7 @@ func (this *Registry) Save() (err error) {
 		}
 	}()
 
-	jsonData, err := json.Marshal(this.data)
+	jsonData, err := json.Marshal(registry.data)
 	if err != nil {
 		return
 	}
@@ -107,8 +107,8 @@ func (this *Registry) Save() (err error) {
 	return
 }
 
-func (this *Registry) Load() (err error) {
-	file, err := os.Open(this.fileName)
+func (registry *Registry) Load() (err error) {
+	file, err := os.Open(registry.fileName)
 	if err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func (this *Registry) Load() (err error) {
 		return
 	}
 
-	err = json.Unmarshal(jsonData, &this.data)
+	err = json.Unmarshal(jsonData, &registry.data)
 	if err != nil {
 		return
 	}
@@ -132,7 +132,7 @@ func (this *Registry) Load() (err error) {
 	return
 }
 
-func (this *Registry) GetRegistryDump() map[string]string {
+func (registry *Registry) GetRegistryDump() map[string]string {
 
-	return this.data
+	return registry.data
 }

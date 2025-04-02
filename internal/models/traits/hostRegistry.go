@@ -14,25 +14,25 @@ func NewHostRegistry(environment *models.Environment) *HostRegistry {
 	return &HostRegistry{environment: environment}
 }
 
-func (this *HostRegistry) getKeyPath(key string) (string, error) {
-	var hostName = this.environment.Client.GetHost()
+func (hostRegistry *HostRegistry) getKeyPath(key string) (string, error) {
+	var hostName = hostRegistry.environment.Client.GetHost()
 	if hostName == "" {
-		return "", fmt.Errorf("Hostname is empty.")
+		return "", fmt.Errorf("hostname is empty")
 	}
-	keyPath := "host." + this.environment.Client.GetHost() + "." + key
+	keyPath := "host." + hostRegistry.environment.Client.GetHost() + "." + key
 
 	return keyPath, nil
 }
 
-func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, err error) {
+func (hostRegistry *HostRegistry) PromptEncryptedIfMissing(key string) (value string, err error) {
 	var keyPath string
-	keyPath, err = this.getKeyPath(key)
+	keyPath, err = hostRegistry.getKeyPath(key)
 	if err != nil {
 		return "", err
 	}
-	_, err = this.environment.GetRegistry().GetEncryptedString(keyPath)
+	_, err = hostRegistry.environment.GetRegistry().GetEncryptedString(keyPath)
 	if err != nil {
-		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
+		hostRegistry.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
 		inputField := huh.NewInput().
 			Title("Enter a value for" + key).
 			Value(&value)
@@ -40,8 +40,8 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 		if err != nil {
 			return "", err
 		}
-		this.environment.GetLogger().Info("Registering " + key)
-		err = this.environment.GetRegistry().RegisterEncrypted(keyPath, value)
+		hostRegistry.environment.GetLogger().Info("Registering " + key)
+		err = hostRegistry.environment.GetRegistry().RegisterEncrypted(keyPath, value)
 		if err != nil {
 			return "", err
 		}
@@ -50,15 +50,15 @@ func (this *HostRegistry) PromptEncryptedIfMissing(key string) (value string, er
 	return value, err
 }
 
-func (this *HostRegistry) PromptIfMissing(key string) (value string, err error) {
+func (hostRegistry *HostRegistry) PromptIfMissing(key string) (value string, err error) {
 	var keyPath string
-	keyPath, err = this.getKeyPath(key)
+	keyPath, err = hostRegistry.getKeyPath(key)
 	if err != nil {
 		return "", err
 	}
-	_, err = this.environment.GetRegistry().GetValue(keyPath)
+	_, err = hostRegistry.environment.GetRegistry().GetValue(keyPath)
 	if err != nil {
-		this.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
+		hostRegistry.environment.GetLogger().Infof("No host key for %s found in registry asking for user input.", key)
 		input := huh.NewInput().
 			Title("Enter a value for" + key).
 			Value(&value)
@@ -66,8 +66,8 @@ func (this *HostRegistry) PromptIfMissing(key string) (value string, err error) 
 		if err != nil {
 			return "", err
 		}
-		this.environment.GetLogger().Info("Registering " + key)
-		this.environment.GetRegistry().Register(keyPath, value)
+		hostRegistry.environment.GetLogger().Info("Registering " + key)
+		hostRegistry.environment.GetRegistry().Register(keyPath, value)
 	}
 
 	return value, nil

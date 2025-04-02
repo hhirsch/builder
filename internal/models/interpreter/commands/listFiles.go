@@ -21,14 +21,14 @@ func NewListFilesCommand(environment *models.Environment) *ListFilesCommand {
 	}
 }
 
-func (this *ListFilesCommand) TestRequirements() bool {
-	return this.FindBinary(this.command)
+func (listFilesCommand *ListFilesCommand) TestRequirements() bool {
+	return listFilesCommand.FindBinary(listFilesCommand.command)
 }
 
-func (this *ListFilesCommand) GetDescription(tokens []string) string {
+func (listFilesCommand *ListFilesCommand) GetDescription(tokens []string) string {
 	return "List files in current directory."
 }
 
-func (this *ListFilesCommand) GetHelp() string {
+func (listFilesCommand *ListFilesCommand) GetHelp() string {
 	return "[]\tList files in current directory."
 }

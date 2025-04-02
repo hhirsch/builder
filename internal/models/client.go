@@ -59,115 +59,115 @@ func NewClient(environment *Environment, userName string, host string) *Client {
 	return client
 }
 
-func (this *Client) GetHost() (hostName string) {
-	return this.host
+func (client *Client) GetHost() (hostName string) {
+	return client.host
 }
 
-func (this *Client) ensureSnapshotDirectoryExists() {
+func (client *Client) ensureSnapshotDirectoryExists() {
 	path := "snapshots"
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(path, os.ModePerm)
 		if err != nil {
-			this.logger.Warn(err.Error())
+			client.logger.Warn(err.Error())
 		}
 	}
 }
 
-func (this *Client) Execute(command string) string {
-	out, error := this.sshClient.Run(command)
+func (client *Client) Execute(command string) string {
+	out, error := client.sshClient.Run(command)
 
 	if error != nil {
-		this.logger.Warn(error.Error())
+		client.logger.Warn(error.Error())
 	}
 	return string(out)
 }
 
-func (this *Client) ExecuteAndPrint(command string) {
+func (client *Client) ExecuteAndPrint(command string) {
 	log.Info("Executing " + command)
-	fmt.Println(this.Execute(command))
+	fmt.Println(client.Execute(command))
 }
 
-func (this *Client) EnsurePath(path string) {
-	_, error := this.sshClient.Run("ls " + path)
+func (client *Client) EnsurePath(path string) {
+	_, error := client.sshClient.Run("ls " + path)
 	if error != nil {
-		this.logger.Warn(error.Error())
-		if len(this.targetUser) > 0 {
-			this.Execute("sudo -u " + this.targetUser + " mkdir -p " + path)
+		client.logger.Warn(error.Error())
+		if len(client.targetUser) > 0 {
+			client.Execute("sudo -u " + client.targetUser + " mkdir -p " + path)
 		} else {
-			this.Execute("mkdir -p " + path)
+			client.Execute("mkdir -p " + path)
 		}
 	}
 }
 
-func (this *Client) PushFile(source string, target string) {
-	this.logger.Info("Source for the upload: " + source)
+func (client *Client) PushFile(source string, target string) {
+	client.logger.Info("Source for the upload: " + source)
 	var adaptedTarget = target
-	if len(this.targetUser) > 0 && !strings.HasPrefix(target, "/") {
-		adaptedTarget = "/home/" + this.targetUser + "/" + target
+	if len(client.targetUser) > 0 && !strings.HasPrefix(target, "/") {
+		adaptedTarget = "/home/" + client.targetUser + "/" + target
 	}
 	lastIndex := strings.LastIndex(adaptedTarget, "/")
 	if lastIndex == -1 {
-		this.logger.Fatal("Target must contain a slash.")
+		client.logger.Fatal("Target must contain a slash.")
 		return
 	}
 
 	path := adaptedTarget[:lastIndex]
-	this.EnsurePath(path)
-	this.logger.Info("Uploading file from: " + source + " to: " + adaptedTarget)
-	this.Upload(source, adaptedTarget)
-	this.logger.Info("File Uploaded")
-	if len(this.targetUser) > 0 {
-		this.SetFileOwner(adaptedTarget, this.targetUser)
+	client.EnsurePath(path)
+	client.logger.Info("Uploading file from: " + source + " to: " + adaptedTarget)
+	client.Upload(source, adaptedTarget)
+	client.logger.Info("File Uploaded")
+	if len(client.targetUser) > 0 {
+		client.SetFileOwner(adaptedTarget, client.targetUser)
 	}
 }
 
-func (this *Client) UploadSftp(source string, target string) {
-	err := this.sshClient.Upload(source, target)
+func (client *Client) UploadSftp(source string, target string) {
+	err := client.sshClient.Upload(source, target)
 	if err != nil {
-		this.logger.Fatal("Error uploading: " + err.Error())
+		client.logger.Fatal("Error uploading: " + err.Error())
 	}
 }
 
 // Gives a binary file permission to open network ports
-func (this *Client) EnsureCapabilityConnection(path string) {
-	if len(this.targetUser) > 0 && !strings.HasPrefix(path, "/") {
-		this.ExecuteAndPrint("setcap 'cap_net_bind_service=+ep' /home/" + this.targetUser + "/" + path)
+func (client *Client) EnsureCapabilityConnection(path string) {
+	if len(client.targetUser) > 0 && !strings.HasPrefix(path, "/") {
+		client.ExecuteAndPrint("setcap 'cap_net_bind_service=+ep' /home/" + client.targetUser + "/" + path)
 		return
 	}
-	this.ExecuteAndPrint("setcap 'cap_net_bind_service=+ep' " + path)
+	client.ExecuteAndPrint("setcap 'cap_net_bind_service=+ep' " + path)
 }
 
-func (this *Client) Upload(source string, target string) {
-	clientConfig, _ := auth.PrivateKey(this.user, this.keyPath, ssh.InsecureIgnoreHostKey())
-	client := scp.NewClient(this.host+":22", &clientConfig)
-	err := client.Connect()
+func (client *Client) Upload(source string, target string) {
+	clientConfig, _ := auth.PrivateKey(client.user, client.keyPath, ssh.InsecureIgnoreHostKey())
+	sshClient := scp.NewClient(client.host+":22", &clientConfig)
+	err := sshClient.Connect()
 	if err != nil {
 		fmt.Println("Couldn't establish a connection to the remote server ", err)
 		return
 	}
 	f, _ := os.Open(source)
-	defer client.Close()
+	defer sshClient.Close()
 	defer func() {
 		err := f.Close()
 		if err != nil {
 			fmt.Printf("error closing file %v", err)
 		}
 	}()
-	err = client.CopyFromFile(context.Background(), *f, target, "0775")
+	err = sshClient.CopyFromFile(context.Background(), *f, target, "0775")
 
 	if err != nil {
 		fmt.Println("Error while copying file ", err)
 	}
 }
 
-func (this *Client) EnsureService(serviceName string, path string, description string) {
-	if len(this.targetUser) <= 0 {
-		this.logger.Fatal("ensureService requires a target user to be set run the command setTargetUser")
+func (client *Client) EnsureService(serviceName string, path string, description string) {
+	if len(client.targetUser) <= 0 {
+		client.logger.Fatal("ensureService requires a target user to be set run the command setTargetUser")
 	}
-	this.EnsureCustomService(serviceName, this.targetUser, "/home/"+this.targetUser+"/"+path, description)
+	client.EnsureCustomService(serviceName, client.targetUser, "/home/"+client.targetUser+"/"+path, description)
 }
 
-func (this *Client) EnsureCustomService(serviceName string, userName string, path string, description string) {
+func (client *Client) EnsureCustomService(serviceName string, userName string, path string, description string) {
 	systemd := system.Systemd{}
 	config := systemd.GetConfig(userName, path, description)
 
@@ -181,82 +181,82 @@ func (this *Client) EnsureCustomService(serviceName string, userName string, pat
 		log.Fatalf("Error writing file: %v", err)
 		return
 	}
-	this.logger.Info("Temporary file" + tempFilePath + " for service config created.")
-	this.logger.Info("Uploading file")
-	this.Upload(tempFilePath, "/etc/systemd/system/"+serviceName+".service")
-	this.logger.Info("Reloading systemd config")
-	this.ExecuteAndPrint("systemctl daemon-reload")
-	this.logger.Info("Enable service on start " + serviceName)
-	this.ExecuteAndPrint("systemctl enable " + serviceName)
-	this.logger.Info("Start service " + serviceName)
-	this.ExecuteAndPrint("systemctl start " + serviceName)
-	this.logger.Info("Service status " + serviceName)
-	this.ExecuteAndPrint("systemctl status " + serviceName)
+	client.logger.Info("Temporary file" + tempFilePath + " for service config created.")
+	client.logger.Info("Uploading file")
+	client.Upload(tempFilePath, "/etc/systemd/system/"+serviceName+".service")
+	client.logger.Info("Reloading systemd config")
+	client.ExecuteAndPrint("systemctl daemon-reload")
+	client.logger.Info("Enable service on start " + serviceName)
+	client.ExecuteAndPrint("systemctl enable " + serviceName)
+	client.logger.Info("Start service " + serviceName)
+	client.ExecuteAndPrint("systemctl start " + serviceName)
+	client.logger.Info("Service status " + serviceName)
+	client.ExecuteAndPrint("systemctl status " + serviceName)
 }
 
-func (this *Client) SetTargetUser(userName string) {
-	this.targetUser = userName
-	this.ensureUserExists(userName)
+func (client *Client) SetTargetUser(userName string) {
+	client.targetUser = userName
+	client.ensureUserExists(userName)
 }
 
-func (this *Client) SetFileOwner(path string, userName string) {
-	this.logger.Info("Ensure file " + path + " belongs to user " + userName + ".")
-	result := this.Execute("chown -R " + userName + ":" + userName + " " + path)
+func (client *Client) SetFileOwner(path string, userName string) {
+	client.logger.Info("Ensure file " + path + " belongs to user " + userName + ".")
+	result := client.Execute("chown -R " + userName + ":" + userName + " " + path)
 	if len(result) == 0 {
-		this.logger.Info("Success")
+		client.logger.Info("Success")
 	} else {
-		this.logger.Info("Setting user permission")
+		client.logger.Info("Setting user permission")
 	}
 }
 
-func (this *Client) EnsureExecutable(path string) {
-	this.logger.Info("Ensure file is Executable ")
-	if len(this.targetUser) > 0 && !strings.HasPrefix(path, "/") {
-		this.Execute("chmod +x " + "/home/" + this.targetUser + "/" + path)
-		this.logger.Info("Path: " + "/home/" + this.targetUser + "/" + path)
+func (client *Client) EnsureExecutable(path string) {
+	client.logger.Info("Ensure file is Executable ")
+	if len(client.targetUser) > 0 && !strings.HasPrefix(path, "/") {
+		client.Execute("chmod +x " + "/home/" + client.targetUser + "/" + path)
+		client.logger.Info("Path: " + "/home/" + client.targetUser + "/" + path)
 		return
 	}
-	this.Execute("chmod +x " + path)
-	this.logger.Info("Path: " + path)
+	client.Execute("chmod +x " + path)
+	client.logger.Info("Path: " + path)
 }
 
-func (this *Client) ensureUserExists(userName string) {
-	this.logger.Info("Checking for user " + userName)
-	result := this.Execute("getent passwd " + userName)
+func (client *Client) ensureUserExists(userName string) {
+	client.logger.Info("Checking for user " + userName)
+	result := client.Execute("getent passwd " + userName)
 	if len(result) == 0 {
-		this.createUser(userName)
+		client.createUser(userName)
 	} else {
-		this.logger.Info("User " + userName + " exists.")
+		client.logger.Info("User " + userName + " exists.")
 	}
 }
 
-func (this *Client) createUser(userName string) {
-	this.logger.Info("User " + userName + " does not exist.")
-	result := this.Execute("useradd -m " + userName)
+func (client *Client) createUser(userName string) {
+	client.logger.Info("User " + userName + " does not exist.")
+	result := client.Execute("useradd -m " + userName)
 	if len(result) == 0 {
-		this.logger.Info("User " + userName + " created successfully.")
+		client.logger.Info("User " + userName + " created successfully.")
 	} else {
-		this.logger.Fatal("Error during User creation")
+		client.logger.Fatal("Error during User creation")
 	}
 }
 
-func (this *Client) EnsurePackage(packageName string) {
-	this.logger.Info("Checking status of package " + packageName)
-	this.logger.Info("Status of " + packageName + " is not installed")
-	this.ExecuteAndPrint("dpkg --status " + packageName)
-	this.logger.Info("Installing " + packageName)
-	this.ExecuteAndPrint("apt-get update")
-	this.ExecuteAndPrint("apt-get install " + packageName)
+func (client *Client) EnsurePackage(packageName string) {
+	client.logger.Info("Checking status of package " + packageName)
+	client.logger.Info("Status of " + packageName + " is not installed")
+	client.ExecuteAndPrint("dpkg --status " + packageName)
+	client.logger.Info("Installing " + packageName)
+	client.ExecuteAndPrint("apt-get update")
+	client.ExecuteAndPrint("apt-get install " + packageName)
 }
 
-func (this *Client) ListPackages() {
-	this.logger.Info("Listing Packages")
-	this.ExecuteAndPrint("dpkg --get-selections")
+func (client *Client) ListPackages() {
+	client.logger.Info("Listing Packages")
+	client.ExecuteAndPrint("dpkg --get-selections")
 }
 
-func (this *Client) TearDown() {
+func (client *Client) TearDown() {
 	defer func() {
-		err := this.sshClient.Close()
+		err := client.sshClient.Close()
 		if err != nil {
 			fmt.Printf("error closing ssh client %v", err)
 		}

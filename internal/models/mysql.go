@@ -16,11 +16,11 @@ func NewMySql() *MySql {
 	return &MySql{}
 }
 
-func (this *MySql) GetMyConfigPath() string {
+func (mySql *MySql) GetMyConfigPath() string {
 	return "~/.my.cfg"
 }
 
-func (this *MySql) GetCredentialsFileContent(user string, password string) string {
+func (mySql *MySql) GetCredentialsFileContent(user string, password string) string {
 	template := fasttemplate.New(myConfigTemplate, "{{", "}}")
 	myConfig := template.ExecuteString(map[string]interface{}{
 		"user":     user,
@@ -34,23 +34,23 @@ func (this *MySql) GetCredentialsFileContent(user string, password string) strin
 
 }
 
-func (this *MySql) DeleteCredentialsFileCommand() string {
-	return "rm " + this.GetMyConfigPath()
+func (mySql *MySql) DeleteCredentialsFileCommand() string {
+	return "rm " + mySql.GetMyConfigPath()
 }
 
-func (this *MySql) EnsureReadOnlyFilePermissionCommand() string {
-	return "chmod 0600 " + this.GetMyConfigPath()
+func (mySql *MySql) EnsureReadOnlyFilePermissionCommand() string {
+	return "chmod 0600 " + mySql.GetMyConfigPath()
 }
 
-func (this *MySql) GetListDatabasesCommand() string {
+func (mySql *MySql) GetListDatabasesCommand() string {
 	return "mysql -u root -e \"SHOW DATABASES;\""
 }
 
-func (this *MySql) GetListDatabasesQuery() string {
+func (mySql *MySql) GetListDatabasesQuery() string {
 	return "SHOW DATABASES;"
 }
 
-func (this *MySql) DumpDatabaseCommand(databaseName string, fileName string) string {
+func (mySql *MySql) DumpDatabaseCommand(databaseName string, fileName string) string {
 	//return "mysqldump -u username -p database_name > database_dump.sql"
 	//return fmt.Sprintf("mysqldump -u %s -p%s %s > %s", username, password, databaseName, outputFile)
 	//mysqldump --socket=/tmp/mysqlsecond.sock --all-databases > $sqlfile
@@ -58,14 +58,14 @@ func (this *MySql) DumpDatabaseCommand(databaseName string, fileName string) str
 	return fmt.Sprintf("mysqldump --socket=/var/run/mysqld/mysqld.sock %s > %s", databaseName, fileName)
 }
 
-func (this *MySql) InstallDatabase(databaseName string, fileName string) {
+func (mySql *MySql) InstallDatabase(databaseName string, fileName string) {
 
 }
 
-func (this *MySql) CheckDatabaseExists(databaseName string) {
+func (mySql *MySql) CheckDatabaseExists(databaseName string) {
 
 }
 
-func (this *MySql) MoveDatabase(sourceHostHandle string, targetHostHandle string) {
+func (mySql *MySql) MoveDatabase(sourceHostHandle string, targetHostHandle string) {
 
 }

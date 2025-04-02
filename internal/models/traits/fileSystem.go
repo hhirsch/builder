@@ -16,38 +16,38 @@ func NewFileSystem() *FileSystem {
 	return &FileSystem{}
 }
 
-func (this *FileSystem) WriteMapToTemporaryFileAsJson(path string, data map[string]string) (filePath string, err error) {
+func (fileSystem *FileSystem) WriteMapToTemporaryFileAsJson(path string, data map[string]string) (filePath string, err error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return "", err
 	}
-	filePath = this.getTemporaryFilePath(string(jsonData))
-	return filePath, this.writeMapToFileAsJson(path, data)
+	filePath = fileSystem.getTemporaryFilePath(string(jsonData))
+	return filePath, fileSystem.writeMapToFileAsJson(path, data)
 }
 
-func (this *FileSystem) writeMapToFileAsJson(path string, data map[string]string) (err error) {
+func (fileSystem *FileSystem) writeMapToFileAsJson(path string, data map[string]string) (err error) {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
-	return this.WriteStringToFile(path, string(jsonData))
+	return fileSystem.WriteStringToFile(path, string(jsonData))
 }
 
-func (this *FileSystem) getTemporaryFilePath(content string) string {
+func (fileSystem *FileSystem) getTemporaryFilePath(content string) string {
 	hash := md5.New()
 	hash.Write([]byte(content))
 	hashSum := hash.Sum(nil)
 	return "/tmp/builder-" + hex.EncodeToString(hashSum)
 }
 
-func (this *FileSystem) WriteStringToTempFile(content string) (filePath string, err error) {
-	filePath = this.getTemporaryFilePath(content)
-	err = this.WriteStringToFile(filePath, content)
+func (fileSystem *FileSystem) WriteStringToTempFile(content string) (filePath string, err error) {
+	filePath = fileSystem.getTemporaryFilePath(content)
+	err = fileSystem.WriteStringToFile(filePath, content)
 	return
 }
 
-func (this *FileSystem) WriteStringToFile(path string, content string) (err error) {
+func (fileSystem *FileSystem) WriteStringToFile(path string, content string) (err error) {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -66,9 +66,9 @@ func (this *FileSystem) WriteStringToFile(path string, content string) (err erro
 	return
 }
 
-func (this *FileSystem) GetMapFromJsonFile(path string) (data map[string]string, err error) {
+func (fileSystem *FileSystem) GetMapFromJsonFile(path string) (data map[string]string, err error) {
 	var content string
-	content, err = this.getStringFromFile(path)
+	content, err = fileSystem.getStringFromFile(path)
 	if err != nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (this *FileSystem) GetMapFromJsonFile(path string) (data map[string]string,
 	return
 }
 
-func (this *FileSystem) getStringFromFile(path string) (content string, err error) {
+func (fileSystem *FileSystem) getStringFromFile(path string) (content string, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return

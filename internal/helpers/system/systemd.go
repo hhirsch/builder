@@ -11,7 +11,7 @@ var serviceConfig string
 type Systemd struct {
 }
 
-func (this *Systemd) GetConfig(userName string, path string, description string) string {
+func (systemd *Systemd) GetConfig(userName string, path string, description string) string {
 	template := fasttemplate.New(serviceConfig, "{{", "}}")
 	fileContent := template.ExecuteString(map[string]interface{}{
 		"description": description,

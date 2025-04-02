@@ -39,42 +39,42 @@ func NewEnvironment() *Environment {
 	return environment
 }
 
-func (this *Environment) getHomePath() string {
+func (environment *Environment) getHomePath() string {
 	currentUser, err := user.Current()
 	if err != nil {
-		this.logger.Fatal(err.Error())
+		environment.logger.Fatal(err.Error())
 	}
 
 	return currentUser.HomeDir
 }
 
-func (this *Environment) GetLogFilePath() string {
+func (environment *Environment) GetLogFilePath() string {
 	return "builder.log"
 }
 
-func (this *Environment) GetProjectPath() string {
+func (environment *Environment) GetProjectPath() string {
 	return ".builder"
 }
 
-func (this *Environment) GetProjectCommandsPath() string {
-	return this.GetProjectPath() + "/commands/"
+func (environment *Environment) GetProjectCommandsPath() string {
+	return environment.GetProjectPath() + "/commands/"
 }
 
-func (this *Environment) GetGlobalRegistryPath() string {
-	return this.GetBuilderHomePath() + "/builderGlobal.reg"
+func (environment *Environment) GetGlobalRegistryPath() string {
+	return environment.GetBuilderHomePath() + "/builderGlobal.reg"
 }
 
-func (this *Environment) GetKeyPath() string {
-	return this.getHomePath() + "/.ssh/id_rsa"
+func (environment *Environment) GetKeyPath() string {
+	return environment.getHomePath() + "/.ssh/id_rsa"
 }
 
-func (this *Environment) IsColorEnabled() bool {
+func (environment *Environment) IsColorEnabled() bool {
 	value := os.Getenv("CLICOLOR")
 	return value == "1"
 }
 
-func (this *Environment) GetLogger() *helpers.Logger {
-	if this.logger == nil {
+func (environment *Environment) GetLogger() *helpers.Logger {
+	if environment.logger == nil {
 		_, file, line, ok := runtime.Caller(1)
 		if ok {
 			fmt.Fprintf(os.Stderr, "Error: logger must be set before accessing logger at: %s:%d", file, line)
@@ -83,43 +83,43 @@ func (this *Environment) GetLogger() *helpers.Logger {
 		}
 		os.Exit(1)
 	}
-	return this.logger
+	return environment.logger
 }
 
-func (this *Environment) GetRegistry() *Registry {
-	if this.registry == nil {
-		this.logger.Fatal("No registry exists at this point failing disgracefully.")
+func (environment *Environment) GetRegistry() *Registry {
+	if environment.registry == nil {
+		environment.logger.Fatal("No registry exists at environment point failing disgracefully.")
 	}
-	return this.registry
+	return environment.registry
 }
 
-func (this *Environment) SetLogger(logger *helpers.Logger) {
-	this.logger = logger
+func (environment *Environment) SetLogger(logger *helpers.Logger) {
+	environment.logger = logger
 }
 
-func (this *Environment) SetRegistry(registry *Registry) {
-	this.registry = registry
+func (environment *Environment) SetRegistry(registry *Registry) {
+	environment.registry = registry
 }
 
-func (this *Environment) GetArguments() []string {
-	return this.arguments
+func (environment *Environment) GetArguments() []string {
+	return environment.arguments
 }
 
-func (this *Environment) GetBuilderHomePath() string {
-	path := this.getHomePath() + "/" + this.GetProjectPath()
+func (environment *Environment) GetBuilderHomePath() string {
+	path := environment.getHomePath() + "/" + environment.GetProjectPath()
 
 	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(path, os.ModePerm)
 		if err != nil {
-			this.logger.Fatal(err.Error())
+			environment.logger.Fatal(err.Error())
 		}
 	}
 
 	return path
 }
 
-func (this *Environment) GetBuilderWorkingPath() {
+func (environment *Environment) GetBuilderWorkingPath() {
 }
 
-func (this *Environment) GetCommandsPath() {
+func (environment *Environment) GetCommandsPath() {
 }

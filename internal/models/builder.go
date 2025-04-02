@@ -22,15 +22,15 @@ func NewBuilderModel(environment *Environment) *BuilderModel {
 	return controller
 }
 
-func (this *BuilderModel) IsInitialized() bool {
-	if _, err := os.Stat(this.environment.GetProjectPath()); os.IsNotExist(err) {
+func (builderModel *BuilderModel) IsInitialized() bool {
+	if _, err := os.Stat(builderModel.environment.GetProjectPath()); os.IsNotExist(err) {
 		return false
 	}
 	return true
 }
 
-func (this *BuilderModel) CreateDirectories() {
-	err := os.Mkdir(this.environment.GetProjectPath(), 0755)
+func (builderModel *BuilderModel) CreateDirectories() {
+	err := os.Mkdir(builderModel.environment.GetProjectPath(), 0755)
 	if err != nil {
 		fmt.Println("Error creating directory:", err)
 		return
