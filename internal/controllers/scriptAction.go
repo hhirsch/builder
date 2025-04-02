@@ -36,18 +36,18 @@ func NewScriptAction(controller *Controller) *ScriptAction {
 
 }
 
-func (this *ScriptAction) Execute() {
-	if this.ParameterValidationFailed(1, "script needs a file name as argument") {
+func (scriptAction *ScriptAction) Execute() {
+	if scriptAction.ParameterValidationFailed(1, "script needs a file name as argument") {
 		return
 	}
-	this.logger.Info("Builder started")
-	var interpreter = *interpreter.NewInterpreter(this.environment)
-	err := interpreter.Run(this.controller.Arguments[0])
+	scriptAction.logger.Info("Builder started")
+	var interpreter = *interpreter.NewInterpreter(scriptAction.environment)
+	err := interpreter.Run(scriptAction.controller.Arguments[0])
 	if err != nil {
-		this.logger.Error(err.Error())
+		scriptAction.logger.Error(err.Error())
 	}
 }
 
-func (this *ScriptAction) GetDescription() string {
+func (scriptAction *ScriptAction) GetDescription() string {
 	return "Run the script in <scriptpath>."
 }
