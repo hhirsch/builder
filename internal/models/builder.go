@@ -29,10 +29,10 @@ func (builderModel *BuilderModel) IsInitialized() bool {
 	return true
 }
 
-func (builderModel *BuilderModel) CreateDirectories() {
+func (builderModel *BuilderModel) CreateDirectories() error {
 	err := os.Mkdir(builderModel.environment.GetProjectPath(), 0755)
 	if err != nil {
-		fmt.Println("Error creating directory:", err)
-		return
+		return fmt.Errorf("#[file:line] can't create directory: %w", err)
 	}
+	return nil
 }

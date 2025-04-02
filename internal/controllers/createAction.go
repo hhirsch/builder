@@ -44,19 +44,20 @@ func NewCreateAction(controller *Controller) *CreateAction {
 
 }
 
-func (createAction *CreateAction) Execute() {
+func (createAction *CreateAction) Execute() (string, error) {
 	createAction.logger.Print(helpers.GetBannerText())
-
-	if createAction.ParameterValidationFailed(1, "create needs a file path as parameter.") {
-		return
+	err := createAction.RequireAmountOfParameters(1)
+	if err != nil {
+		return "", err
 	}
+
 	var structName string
 	structNameInput := huh.NewInput().
 		Title("Name the struct").
 		Value(&structName)
-	err := structNameInput.Run()
+	err = structNameInput.Run()
 	if err != nil {
-		createAction.logger.Fatalf("Error reading input for user name: %s", err.Error())
+		return "", err
 	}
 
 	var packageName string
@@ -65,7 +66,7 @@ func (createAction *CreateAction) Execute() {
 		Value(&packageName)
 	err = packageNameInput.Run()
 	if err != nil {
-		createAction.logger.Fatalf("Error reading input for user name: %s", err.Error())
+		return "", err
 	}
 
 	if !strings.HasSuffix(createAction.controller.Arguments[0], ".go") {
@@ -81,6 +82,7 @@ func (createAction *CreateAction) Execute() {
 	if err != nil {
 		createAction.logger.Fatalf("Error writing to file: %s", err.Error())
 	}
+	return "", nil
 }
 
 func (createAction *CreateAction) GetName() string {

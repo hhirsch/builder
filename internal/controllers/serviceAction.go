@@ -46,18 +46,18 @@ func (serviceAction *ServiceAction) install(serviceName string) {
 }
 func (serviceAction *ServiceAction) uninstall(serviceName string) {}
 
-func (serviceAction *ServiceAction) Execute() {
-	if serviceAction.ParameterValidationFailed(2, "service needs a modifier and service name as an argument") {
-		return
+func (serviceAction *ServiceAction) Execute() (string, error) {
+	err := serviceAction.RequireAmountOfParameters(1)
+	if err != nil {
+		return "", err
 	}
 	var modifier = serviceAction.controller.Arguments[0]
 	var serviceName = serviceAction.controller.Arguments[1]
 	if modifier == "install" {
 		serviceAction.install(serviceName)
-		return
 	}
 	if modifier == "uninstall" {
 		serviceAction.uninstall(serviceName)
-		return
 	}
+	return "", nil
 }

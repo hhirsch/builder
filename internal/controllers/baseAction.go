@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/hhirsch/builder/internal/models"
 )
 
@@ -18,6 +19,13 @@ func (baseAction *BaseAction) ParameterValidationFailed(requiredAmountOfParamete
 		baseAction.environment.GetLogger().Fatal(errorMessage)
 	}
 	return false
+}
+
+func (baseAction *BaseAction) RequireAmountOfParameters(requiredAmountOfParameters int) error {
+	if !baseAction.HasEnoughParameters(requiredAmountOfParameters) {
+		return fmt.Errorf("required amount of parameters is %d but got %d", requiredAmountOfParameters, len(baseAction.controller.GetArguments()))
+	}
+	return nil
 }
 
 func (baseAction *BaseAction) HasEnoughParameters(requiredAmountOfParameters int) bool {

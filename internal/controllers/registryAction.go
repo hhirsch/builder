@@ -14,10 +14,6 @@ type RegistryAction struct {
 	BaseAction
 }
 
-/*
- * Eg server list, server add, server alias, server require {serviceName} {serverName}
- * service list, service health, service health {serviceName}, service install {serviceName}
- */
 func NewRegistryAction(controller *Controller) *RegistryAction {
 
 	return &RegistryAction{
@@ -35,14 +31,16 @@ func NewRegistryAction(controller *Controller) *RegistryAction {
 
 }
 
-func (registryAction *RegistryAction) Execute() {
-	if registryAction.ParameterValidationFailed(1, "registry needs an argument") {
-		return
+func (registryAction *RegistryAction) Execute() (string, error) {
+	err := registryAction.RequireAmountOfParameters(1)
+	if err != nil {
+		return "", err
 	}
 	registryAction.logger.Info("Builder started")
 	var interpreter = *interpreter.NewInterpreter(registryAction.environment)
-	err := interpreter.Run(registryAction.controller.Arguments[0])
+	err = interpreter.Run(registryAction.controller.Arguments[0])
 	if err != nil {
-		registryAction.logger.Error(err.Error())
+		return "", err
 	}
+	return "", nil
 }

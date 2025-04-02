@@ -33,7 +33,8 @@ func NewServerAction(controller *Controller) *ServerAction {
 
 }
 
-func (serverAction *ServerAction) Execute() {
+func (serverAction *ServerAction) Execute() (string, error) {
+	return "", nil
 }
 
 func (serverAction *ServerAction) GetDescription() string {

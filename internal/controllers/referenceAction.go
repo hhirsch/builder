@@ -48,33 +48,32 @@ func (referenceAction *ReferenceAction) rightPadString(string string, length int
 	return string + pad
 }
 
-func (referenceAction *ReferenceAction) Execute() {
+func (referenceAction *ReferenceAction) Execute() (string, error) {
 	var markdownRenderer = models.NewMarkdownRenderer()
-
-	if referenceAction.HasEnoughParameters(1) {
-		var actionName = referenceAction.controller.Arguments[0]
-		referenceAction.logger.Print(helpers.GetBannerText())
-		if referenceAction.environment.IsColorEnabled() {
-			markdownRenderer.EnableColor()
-		}
-		action := referenceAction.controller.actionsMap[actionName]
-		template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
-		markdownContent := template.ExecuteString(map[string]interface{}{
-			"actionName": actionName,
-			"binaryName": referenceAction.environment.GetArguments()[0],
-			"brief":      action.GetBrief(),
-		})
-		markdownRenderer.Render(markdownContent)
-		return
-	} else {
-		referenceAction.logger.Print(helpers.GetBannerText())
+	err := referenceAction.RequireAmountOfParameters(1)
+	if err != nil {
+		return "", err
 	}
+	var actionName = referenceAction.controller.Arguments[0]
+	referenceAction.logger.Print(helpers.GetBannerText())
+	if referenceAction.environment.IsColorEnabled() {
+		markdownRenderer.EnableColor()
+	}
+	action := referenceAction.controller.actionsMap[actionName]
+	template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
+	markdownContent := template.ExecuteString(map[string]interface{}{
+		"actionName": actionName,
+		"binaryName": referenceAction.environment.GetArguments()[0],
+		"brief":      action.GetBrief(),
+	})
+	markdownRenderer.Render(markdownContent)
 
 	fmt.Printf("  %s <command> [<arguments>]\n\n", referenceAction.environment.GetArguments()[0])
 	for _, action := range referenceAction.controller.GetActions() {
 		referenceAction.logger.Print(fmt.Sprintf("  %s\t%+v", referenceAction.rightPadString(action.GetName(), 10), action.GetBrief()))
 	}
 	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
+	return "", nil
 }
 
 func (referenceAction *ReferenceAction) GetDescription() string {

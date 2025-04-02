@@ -2,7 +2,6 @@ package controllers
 
 import (
 	_ "embed"
-	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 )
 
@@ -10,9 +9,7 @@ import (
 var initMarkdown string
 
 type InitAction struct {
-	environment *models.Environment
-	logger      *helpers.Logger
-	model       *models.BuilderModel
+	model *models.BuilderModel
 	BaseAction
 }
 
@@ -25,20 +22,21 @@ func NewInitAction(controller *Controller) *InitAction {
 			brief:       "Initialize builder in the current directory.",
 			help:        initMarkdown,
 		},
-		environment: controller.GetEnvironment(),
-		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment()),
+		model: models.NewBuilderModel(controller.GetEnvironment()),
 	}
 
 	return initAction
 }
 
-func (initAction *InitAction) Execute() {
+func (initAction *InitAction) Execute() (string, error) {
 	if initAction.model.IsInitialized() {
-		initAction.logger.Info("Already initialized, nothing to do.")
+		return "Already initialized, nothing to do.\n", nil
 	}
-	initAction.model.CreateDirectories()
-	initAction.logger.Info("Initializing")
+	err := initAction.model.CreateDirectories()
+	if err != nil {
+		return "", err
+	}
+	return "Initializing\n", nil
 }
 
 func (initAction *InitAction) GetDescription() string {

@@ -67,7 +67,10 @@ func (controller *Controller) ExecuteAction() {
 
 	var actionName = controller.environment.GetArguments()[1]
 	if action, exists := controller.actionsMap[actionName]; exists {
-		action.Execute()
+		_, err := action.Execute()
+		if err != nil {
+			controller.logger.Errorf("action failed %v", err)
+		}
 		return
 	}
 	controller.logger.Info("Builder called with unrecognized command " + actionName + ".")
@@ -75,7 +78,10 @@ func (controller *Controller) ExecuteAction() {
 }
 
 func (controller *Controller) ShowHelp() {
-	controller.helpAction.Execute()
+	_, err := controller.helpAction.Execute()
+	if err != nil {
+		controller.logger.Errorf("show help failed %v", err)
+	}
 }
 
 func (controller *Controller) GetArguments() []string {

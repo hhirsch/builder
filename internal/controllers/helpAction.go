@@ -11,7 +11,6 @@ import (
 
 type HelpAction struct {
 	environment *models.Environment
-	logger      *helpers.Logger
 	model       *models.BuilderModel
 	controller  *Controller
 	BaseAction
@@ -35,7 +34,6 @@ func NewHelpAction(controller *Controller) *HelpAction {
 	return &HelpAction{
 		BaseAction:  baseAction,
 		environment: controller.GetEnvironment(),
-		logger:      controller.GetEnvironment().GetLogger(),
 		model:       models.NewBuilderModel(controller.GetEnvironment()),
 		controller:  controller,
 	}
@@ -51,12 +49,11 @@ func (helpAction *HelpAction) rightPadString(string string, length int) string {
 	return string + pad
 }
 
-func (helpAction *HelpAction) Execute() {
+func (helpAction *HelpAction) Execute() (string, error) {
 	var markdownRenderer = models.NewMarkdownRenderer()
-
+	buffer := helpers.GetBannerText()
 	if helpAction.HasEnoughParameters(1) {
 		var actionName = helpAction.controller.Arguments[0]
-		helpAction.logger.Print(helpers.GetBannerText())
 		if helpAction.environment.IsColorEnabled() {
 			markdownRenderer.EnableColor()
 		}
@@ -68,16 +65,15 @@ func (helpAction *HelpAction) Execute() {
 			"brief":      action.GetBrief(),
 		})
 		markdownRenderer.Render(markdownContent)
-		return
-	} else {
-		helpAction.logger.Print(helpers.GetBannerText())
+		return "", nil
 	}
 
-	fmt.Printf("  %s <command> [<arguments>]\n\n", helpAction.environment.GetArguments()[0])
+	buffer += fmt.Sprintf("  %s <command> [<arguments>]\n\n", helpAction.environment.GetArguments()[0])
 	for _, action := range helpAction.controller.GetActions() {
-		helpAction.logger.Print(fmt.Sprintf("  %s\t%+v", helpAction.rightPadString(action.GetName(), 10), action.GetBrief()))
+		buffer += fmt.Sprintf("  %s\t%+v", helpAction.rightPadString(action.GetName(), 10), action.GetBrief())
 	}
-	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
+	buffer += "\n  Set the environment variable CLICOLOR to 1 to enable colors.\n"
+	return buffer, nil
 }
 
 func (helpAction *HelpAction) GetDescription() string {

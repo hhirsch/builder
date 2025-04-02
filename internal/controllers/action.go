@@ -1,7 +1,7 @@
 package controllers
 
 type Action interface {
-	Execute()
+	Execute() (string, error)
 	GetName() string
 	GetDescription() string
 	GetHelp() string
