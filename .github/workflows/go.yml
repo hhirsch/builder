@@ -20,8 +20,6 @@ jobs:
         go-version: '1.22'
     - name: Build Builder
       run: go build ./cmd/builder
-    - name: Build Registry
-      run: go build ./cmd/registry 
     - name: Test
       run: go test github.com/hhirsch/builder/internal/...
     - name: Release
