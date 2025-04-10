@@ -11,7 +11,6 @@ func NewBuilderController(environment *models.Environment) *Controller {
 	controller.AddAction(NewInitAction(controller))
 	controller.AddAction(NewScriptAction(controller, parameter))
 	controller.AddAction(NewCommandAction(controller, commandPath))
-	controller.AddAction(NewCreateAction(controller))
 	controller.AddAction(NewServerAction(controller))
 	controller.AddAction(NewServiceAction(controller))
 	controller.AddAction(NewRegistryAction(controller))
