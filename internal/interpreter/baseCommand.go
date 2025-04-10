@@ -1,9 +1,10 @@
-package commands
+package interpreter
 
 import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
+	"github.com/melbahja/goph"
 	"os/exec"
 	"strings"
 )
@@ -17,35 +18,53 @@ type BaseCommand struct {
 	result             string
 	name               string
 	description        string //describes what the program will do if run
-	brief              string //information what the program is for
+	brief              string //short description
 	help               string //detailed description of parameters with examples
 	parameters         int
 	requiresConnection bool
+	requirements       []string
+	Interpreter        *Interpreter
 }
 
 func NewBaseCommand(environment *models.Environment) *BaseCommand {
 	return &BaseCommand{
-		environment: environment,
-		logger:      environment.GetLogger(),
-		commands:    []string{},
-		command:     "",
-		commandName: "undefined",
-		result:      "",
+		environment:  environment,
+		logger:       environment.GetLogger(),
+		commands:     []string{},
+		command:      "",
+		commandName:  "undefined",
+		result:       "",
+		requirements: []string{}, // the binaries that need to be present on the target system
 	}
+}
+
+func (baseCommand *BaseCommand) TestRequirements() bool {
+	if baseCommand.requirements == nil {
+		return true
+	}
+	for _, value := range baseCommand.requirements {
+		if !baseCommand.FindBinary(value) {
+			baseCommand.logger.Errorf("binary %s not present on the target system", value)
+			return false
+		}
+	}
+	baseCommand.logger.Info("all required binaries found on the target system")
+	return true
 }
 
 func (baseCommand *BaseCommand) GetResult() string {
 	return baseCommand.result
 }
 
-func (baseCommand *BaseCommand) Execute(tokens []string) string {
+func (baseCommand *BaseCommand) Execute(tokens []string) (string, error) {
 	baseCommand.logger.Infof("Running %s", baseCommand.command)
-	result := baseCommand.environment.Client.Execute(baseCommand.command)
-	baseCommand.logger.Info(result)
-	return result
+	result, _ := baseCommand.Interpreter.Client.Run(baseCommand.command)
+	baseCommand.logger.Info(string(result))
+	return string(result), nil
 }
 
-func (baseCommand *BaseCommand) ExecuteOnLocalhost(tokens []string) string {
+// this absolutely belongs into the client whenever the ssh client is nil
+func (baseCommand *BaseCommand) ExecuteOnLocalhost(tokens []string) (string, error) {
 	parts := strings.Fields(baseCommand.command)
 	if len(parts) == 0 {
 		baseCommand.logger.Fatal("Command needs to be set.")
@@ -53,20 +72,21 @@ func (baseCommand *BaseCommand) ExecuteOnLocalhost(tokens []string) string {
 	baseCommand.logger.Infof("Running %s on localhost.", parts[0])
 	cmd := exec.Command(parts[0], parts[1:]...)
 
-	// Run the command and capture the output
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("Error:", err)
-		return ""
+		return "", err
 	}
 	result := strings.TrimSpace(string(output))
 
 	baseCommand.logger.Info(result)
-	return result
+	return result, nil
 }
 
-func (baseCommand *BaseCommand) TestRequirements() bool {
-	return true
+func (baseCommand *BaseCommand) GetClient() *goph.Client {
+	if baseCommand.Interpreter.Client == nil {
+		baseCommand.logger.Error("Client was nill when tried to get it")
+	}
+	return baseCommand.Interpreter.Client
 }
 
 func (baseCommand *BaseCommand) requireParameterAmount(tokens []string, requiredParameterAmount int) {
@@ -85,7 +105,12 @@ func (baseCommand *BaseCommand) IsTrue(string string) bool {
 
 func (baseCommand *BaseCommand) FindBinary(binaryName string) bool {
 	var command = fmt.Sprintf("command -v %s >/dev/null 2>&1 && echo true || echo false", binaryName)
-	if baseCommand.IsTrue(baseCommand.environment.Client.Execute(command)) {
+	if baseCommand.Interpreter.Client == nil {
+		baseCommand.logger.Error("Client is nil when trying to run FindBinary")
+		return false
+	}
+	executionResult, _ := baseCommand.Interpreter.Client.Run(command)
+	if baseCommand.IsTrue(string(executionResult)) {
 		baseCommand.logger.Infof("Binary %s found.", binaryName)
 		return true
 	}
@@ -95,7 +120,7 @@ func (baseCommand *BaseCommand) FindBinary(binaryName string) bool {
 }
 
 func (baseCommand *BaseCommand) Undo() {
-	baseCommand.logger.Info("Undo not possible.")
+	baseCommand.logger.Infof("No undo available for %v", baseCommand.commandName)
 }
 
 func (baseCommand *BaseCommand) GetName() string {

@@ -1,22 +1,21 @@
-package commands
+package interpreter
 
 import (
-	"github.com/hhirsch/builder/internal/models"
+	"github.com/hhirsch/builder/internal/helpers"
 )
 
 type ListFilesCommand struct {
-	environment *models.Environment
 	BaseCommand
 }
 
-func NewListFilesCommand(environment *models.Environment) *ListFilesCommand {
+func NewListFilesCommand(interpreter *Interpreter, logger *helpers.Logger) *ListFilesCommand {
 	return &ListFilesCommand{
-		environment: environment,
-		BaseCommand: BaseCommand{environment: environment,
-			logger:             environment.GetLogger(),
+		BaseCommand: BaseCommand{
+			logger:             logger,
 			command:            "ls",
 			name:               "listFiles",
 			requiresConnection: true,
+			Interpreter:        interpreter,
 		},
 	}
 }

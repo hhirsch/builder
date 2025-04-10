@@ -1,6 +1,7 @@
-package commands
+package interpreter
 
 import (
+	"errors"
 	format "fmt"
 	"github.com/hhirsch/builder/internal/models"
 	"strings"
@@ -8,12 +9,14 @@ import (
 
 type PrintCommand struct {
 	environment *models.Environment
+	interpreter *Interpreter
 	BaseCommand
 }
 
-func NewPrintCommand(environment *models.Environment) *PrintCommand {
+func NewPrintCommand(interpreter *Interpreter, environment *models.Environment) *PrintCommand {
 	controller := &PrintCommand{
 		environment: environment,
+		interpreter: interpreter,
 		BaseCommand: BaseCommand{
 			environment: environment,
 			name:        "print",
@@ -26,11 +29,24 @@ func (printCommand *PrintCommand) TestRequirement() bool {
 	return true
 }
 
-func (printCommand *PrintCommand) Execute(tokens []string) string {
+func (printCommand *PrintCommand) Execute(tokens []string) (string, error) {
 	tokens = tokens[1:]
+	if printCommand.interpreter.Variables == nil {
+		return "", errors.New("variables uninitialized expected empty map got nil")
+	}
+	for index, variable := range tokens {
+		if strings.HasPrefix(variable, "$") {
+			variableName := strings.TrimPrefix(variable, "$")
+			if foundVariable, isFoundVariable := printCommand.interpreter.Variables[variableName]; isFoundVariable {
+				variable := foundVariable
+				tokens[index], _ = variable.GetFlatString()
+			}
+		}
+
+	}
 	parameters := strings.Join(tokens, " ")
 	format.Println(parameters)
-	return ""
+	return "", nil
 }
 
 func (printCommand *PrintCommand) Undo() {

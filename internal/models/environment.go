@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
+	"github.com/melbahja/goph"
 	"os"
 	"os/user"
 	"runtime"
 )
 
 type Environment struct {
-	Client    Client
+	//Client    Client
+	Client    *goph.Client
 	logger    *helpers.Logger
 	arguments []string
 	registry  *Registry

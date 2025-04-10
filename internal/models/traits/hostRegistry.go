@@ -1,3 +1,4 @@
+// needs to be replaced or sunset
 package traits
 
 import (
@@ -14,19 +15,19 @@ func NewHostRegistry(environment *models.Environment) *HostRegistry {
 	return &HostRegistry{environment: environment}
 }
 
-func (hostRegistry *HostRegistry) getKeyPath(key string) (string, error) {
-	var hostName = hostRegistry.environment.Client.GetHost()
+func (hostRegistry *HostRegistry) getKeyPath(key string, hostName string) (string, error) {
 	if hostName == "" {
 		return "", fmt.Errorf("hostname is empty")
 	}
-	keyPath := "host." + hostRegistry.environment.Client.GetHost() + "." + key
+	keyPath := "host." + hostName + "." + key
 
 	return keyPath, nil
 }
 
+// todo get the hostname again
 func (hostRegistry *HostRegistry) PromptEncryptedIfMissing(key string) (value string, err error) {
 	var keyPath string
-	keyPath, err = hostRegistry.getKeyPath(key)
+	keyPath, err = hostRegistry.getKeyPath(key, "")
 	if err != nil {
 		return "", err
 	}

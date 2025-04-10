@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/hhirsch/builder/internal/helpers"
+	"github.com/hhirsch/builder/internal/interpreter"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
 type RegistryAction struct {

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/hhirsch/builder/internal/interpreter"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
 func main() {

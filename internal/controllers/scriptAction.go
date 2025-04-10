@@ -2,8 +2,8 @@ package controllers
 
 import (
 	_ "embed"
+	"github.com/hhirsch/builder/internal/interpreter"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/hhirsch/builder/internal/models/interpreter"
 )
 
 type ScriptAction struct {

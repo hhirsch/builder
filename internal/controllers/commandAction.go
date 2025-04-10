@@ -2,7 +2,7 @@ package controllers
 
 import (
 	_ "embed"
-	"github.com/hhirsch/builder/internal/models/interpreter"
+	"github.com/hhirsch/builder/internal/interpreter"
 )
 
 //go:embed commandAction.md

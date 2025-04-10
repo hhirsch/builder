@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	com "github.com/hhirsch/builder/internal/models/interpreter/commands"
+	"github.com/melbahja/goph"
 	"os"
 	"slices"
 	"strings"
@@ -15,10 +15,12 @@ type Interpreter struct {
 	logger              *helpers.Logger
 	environment         *models.Environment
 	registry            *models.Registry
-	commands            map[string]com.Command
-	onlineCommands      map[string]com.Command
-	variables           map[string]string
+	commands            map[string]Command
+	Variables           map[string]Variable
 	checkedRequirements []string
+	includes            []string
+	Client              *goph.Client
+	Aliases             map[string]string
 }
 
 func NewInterpreter(environment *models.Environment) *Interpreter {
@@ -28,39 +30,27 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 	if err != nil {
 		logger.Fatalf("unable to load registry: %s", err.Error())
 	}
-	variables := map[string]string{}
-	commands := map[string]com.Command{}
-	onlineCommands := map[string]com.Command{}
+	variables := map[string]Variable{}
+	commands := map[string]Command{}
+	aliases := map[string]string{}
 	interpreter := &Interpreter{
-		logger:         logger,
-		registry:       registry,
-		environment:    environment,
-		commands:       commands,
-		variables:      variables,
-		onlineCommands: onlineCommands,
+		logger:      logger,
+		registry:    registry,
+		environment: environment,
+		commands:    commands,
+		Variables:   variables,
+		Aliases:     aliases,
 	}
-	interpreter.AddCommand(com.NewSetupHostCommand(environment))
-	interpreter.AddCommand(com.NewConnectCommand(environment))
-	interpreter.AddCommand(com.NewStepCommand(environment))
-	interpreter.AddCommand(com.NewPrintCommand(environment))
-	interpreter.AddCommand(com.NewListFilesCommand(environment))
-	interpreter.AddCommand(com.NewSystemInfoCommand(environment))
-	interpreter.AddCommand(com.NewEnsurePackageCommand(environment))
-	interpreter.AddCommand(com.NewEnsureExecutableCommand(environment))
-	interpreter.AddCommand(com.NewEnsureServiceCommand(environment))
-	interpreter.AddCommand(com.NewListPackagesCommand(environment))
-	interpreter.AddCommand(com.NewDumpPackagesCommand(environment))
-	interpreter.AddCommand(com.NewExecuteAndPrintCommand(environment))
-	interpreter.AddCommand(com.NewSetTargetUserCommand(environment))
-	interpreter.AddCommand(com.NewPushFileCommand(environment))
-	interpreter.AddCommand(com.NewListDatabasesCommand(environment))
+	interpreter.AddCommand(NewConnectCommand(interpreter))
+	interpreter.AddCommand(NewStepCommand(logger))
+	interpreter.AddCommand(NewPrintCommand(interpreter, environment))
+	interpreter.AddCommand(NewListFilesCommand(interpreter, environment.GetLogger()))
+	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
+	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
 	return interpreter
 }
 
-func (interpreter *Interpreter) AddCommand(command com.Command) {
-	if command.RequiresConnection() {
-		interpreter.onlineCommands[command.GetName()] = command
-	}
+func (interpreter *Interpreter) AddCommand(command Command) {
 	interpreter.commands[command.GetName()] = command
 }
 
@@ -88,47 +78,53 @@ func (interpreter *Interpreter) Run(fileName string) error {
 	return nil
 }
 
+func (interpreter *Interpreter) HasConnection() bool {
+	return interpreter.Client != nil
+}
+
 func (interpreter *Interpreter) requireConnection() {
-	if interpreter.environment.Client == (models.Client{}) { // if the client is not initialized we don't have a connection
+	if interpreter.HasConnection() { // if the client is not initialized we don't have a connection
 		interpreter.logger.Fatal("Setup a host before using a command that requires a connection.")
 	}
 }
 
 func (interpreter *Interpreter) handleCommandLine(tokens []string) string {
 	commandName := tokens[0]
+
 	if commandName == "connect" || commandName == "setupHost" {
 		interpreter.checkedRequirements = []string{}
 	}
-	var command com.Command
-	if offlineCommand, isOfflineCommand := interpreter.commands[commandName]; isOfflineCommand {
-		command = offlineCommand
-	}
+	var command Command
 
-	if onlineCommand, isOnlineCommand := interpreter.onlineCommands[commandName]; isOnlineCommand {
-		interpreter.requireConnection()
-		command = onlineCommand
+	if foundCommand, isFoundCommand := interpreter.commands[commandName]; isFoundCommand {
+		command = foundCommand
+		if command.RequiresConnection() {
+			interpreter.requireConnection()
+		}
 	}
 
 	if command == nil {
 		interpreter.logger.Fatalf("Invalid command %s.", commandName)
 	}
 
-	interpreter.logger.Debugf("Testing requirements for %s.", commandName)
 	if slices.Contains(interpreter.checkedRequirements, commandName) {
 		interpreter.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
 	} else if command.TestRequirements() {
-		interpreter.logger.Debugf("Passed requirements for %s.", commandName)
 		interpreter.checkedRequirements = append(interpreter.checkedRequirements, commandName)
 	} else {
 		interpreter.logger.Fatalf("Failed requirenments for %s.", commandName)
 	}
-
-	return command.Execute(tokens)
+	commandOutput, err := command.Execute(tokens)
+	if err != nil {
+		interpreter.logger.Errorf("error while executing command %v", err)
+	}
+	return commandOutput
 }
 
 func (interpreter *Interpreter) handleVariableLine(tokens []string) {
 	variableName := strings.TrimPrefix(tokens[0], "$")
-	interpreter.variables[variableName] = interpreter.handleCommandLine(tokens[2:])
+	//interpreter.variables[variableName] = interpreter.handleCommandLine(tokens[2:])
+	interpreter.Variables[variableName] = *NewVariable(interpreter.handleCommandLine(tokens[2:]))
 }
 
 func (interpreter *Interpreter) handleLine(input string) {
