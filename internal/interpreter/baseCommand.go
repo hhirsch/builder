@@ -59,7 +59,7 @@ func (baseCommand *BaseCommand) GetResult() string {
 func (baseCommand *BaseCommand) Execute(tokens []string) (string, error) {
 	baseCommand.logger.Infof("Running %s", baseCommand.command)
 	result, _ := baseCommand.Interpreter.Client.Run(baseCommand.command)
-	baseCommand.logger.Info(string(result))
+	baseCommand.logger.Debugf("Command %s gave us the following result:\n%s", baseCommand.command, string(result))
 	return string(result), nil
 }
 

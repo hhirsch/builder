@@ -36,8 +36,8 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 
 func (serviceAction *ServiceAction) install(serviceName string) {
 	serviceAction.logger.Info("Builder started")
-	var interpreter = *interpreter.NewInterpreter(serviceAction.environment)
-	err := interpreter.Run(serviceAction.controller.Arguments[0])
+	interpreter, err := interpreter.NewInterpreter(serviceAction.environment)
+	err = interpreter.Run(serviceAction.controller.Arguments[0])
 	if err != nil {
 		serviceAction.logger.Error(err.Error())
 	}

@@ -69,7 +69,7 @@ func (controller *Controller) ExecuteAction() {
 	if action, exists := controller.actionsMap[actionName]; exists {
 		_, err := action.Execute()
 		if err != nil {
-			controller.logger.Errorf("action failed %v", err)
+			controller.logger.Errorf("action failed %s", err.Error())
 		}
 		return
 	}

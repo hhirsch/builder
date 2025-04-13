@@ -30,7 +30,10 @@ func (commandAction *CommandAction) Execute() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var interpreter = *interpreter.NewInterpreter(commandAction.environment)
+	interpreter, err := interpreter.NewInterpreter(commandAction.environment)
+	if err != nil {
+		return "", err
+	}
 	var commandName = commandAction.controller.Arguments[0]
 	err = interpreter.Run(commandAction.environment.GetProjectCommandsPath() + commandName + ".bld")
 	if err != nil {

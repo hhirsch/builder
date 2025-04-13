@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"fmt"
 	"github.com/hhirsch/builder/internal/interpreter"
 	"github.com/hhirsch/builder/internal/models"
 )
@@ -40,10 +41,14 @@ func (scriptAction *ScriptAction) Execute() (string, error) {
 		return "", err
 	}
 	buffer := "Builder started\n"
-	var interpreter = *interpreter.NewInterpreter(scriptAction.environment)
+	interpreterObject, err := interpreter.NewInterpreter(scriptAction.environment)
+	if err != nil {
+		return "", fmt.Errorf("new interpreter: %w", err)
+	}
+	interpreter := *interpreterObject
 	err = interpreter.Run(scriptAction.fileName)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("interpreter run: %w", err)
 	}
 	return buffer, nil
 }

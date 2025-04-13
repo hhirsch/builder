@@ -37,7 +37,10 @@ func (registryAction *RegistryAction) Execute() (string, error) {
 		return "", err
 	}
 	registryAction.logger.Info("Builder started")
-	var interpreter = *interpreter.NewInterpreter(registryAction.environment)
+	interpreter, err := interpreter.NewInterpreter(registryAction.environment)
+	if err != nil {
+		return "", err
+	}
 	err = interpreter.Run(registryAction.controller.Arguments[0])
 	if err != nil {
 		return "", err

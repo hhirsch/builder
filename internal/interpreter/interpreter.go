@@ -23,12 +23,12 @@ type Interpreter struct {
 	Aliases             map[string]string
 }
 
-func NewInterpreter(environment *models.Environment) *Interpreter {
+func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	logger := environment.GetLogger()
 	registry := models.NewRegistry(environment.GetGlobalRegistryPath())
 	err := registry.Load()
 	if err != nil {
-		logger.Fatalf("unable to load registry: %s", err.Error())
+		return nil, fmt.Errorf("load registry: %w", err)
 	}
 	variables := map[string]Variable{}
 	commands := map[string]Command{}
@@ -44,20 +44,20 @@ func NewInterpreter(environment *models.Environment) *Interpreter {
 	interpreter.AddCommand(NewConnectCommand(interpreter))
 	interpreter.AddCommand(NewStepCommand(logger))
 	interpreter.AddCommand(NewPrintCommand(interpreter, environment))
-	interpreter.AddCommand(NewListFilesCommand(interpreter, environment.GetLogger()))
+	interpreter.AddCommand(NewListFilesCommand(interpreter, logger))
 	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
 	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
-	return interpreter
+	return interpreter, nil
 }
 
 func (interpreter *Interpreter) AddCommand(command Command) {
 	interpreter.commands[command.GetName()] = command
 }
 
-func (interpreter *Interpreter) Run(fileName string) error {
+func (interpreter *Interpreter) Run(fileName string) (err error) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		return fmt.Errorf("can't open file: %v", err)
+		return fmt.Errorf("open file: %w", err)
 	}
 
 	scanner := bufio.NewScanner(file)
@@ -65,17 +65,34 @@ func (interpreter *Interpreter) Run(fileName string) error {
 		line := scanner.Text()
 		interpreter.handleLine(line)
 	}
-
-	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("[functionName] unable to scan file: %w", err)
+	err = scanner.Err()
+	if err != nil {
+		return fmt.Errorf("scanning file: %w", err)
 	}
 	defer func() {
-		err := file.Close()
+		err = file.Close()
 		if err != nil {
-			fmt.Printf("error closing file %v", err)
+			err = fmt.Errorf("closing file: %w", err)
 		}
 	}()
-	return nil
+	return err
+}
+
+func (interpreter *Interpreter) handleLine(input string) error {
+	if strings.TrimSpace(input) == "" {
+		interpreter.logger.Debugf("Skipped empty line in builder file.")
+		return nil
+	}
+	tokens := strings.Fields(input)
+	if strings.HasPrefix(tokens[0], "//") {
+		return nil
+	}
+
+	if strings.HasPrefix(tokens[0], "$") && tokens[1] == "=" {
+		return interpreter.handleVariableLine(tokens)
+	}
+	_, err := interpreter.handleCommandLine(tokens)
+	return err
 }
 
 func (interpreter *Interpreter) HasConnection() bool {
@@ -88,7 +105,7 @@ func (interpreter *Interpreter) requireConnection() {
 	}
 }
 
-func (interpreter *Interpreter) handleCommandLine(tokens []string) string {
+func (interpreter *Interpreter) handleCommandLine(tokens []string) (string, error) {
 	commandName := tokens[0]
 
 	if commandName == "connect" || commandName == "setupHost" {
@@ -104,41 +121,32 @@ func (interpreter *Interpreter) handleCommandLine(tokens []string) string {
 	}
 
 	if command == nil {
-		interpreter.logger.Fatalf("Invalid command %s.", commandName)
+		return "", fmt.Errorf("invalid command %s", commandName)
 	}
 
 	if slices.Contains(interpreter.checkedRequirements, commandName) {
-		interpreter.logger.Debugf("Passed requirenments for %s. (cached)", commandName)
+		interpreter.logger.Debugf("passed requirenments for %s (cached)", commandName)
 	} else if command.TestRequirements() {
 		interpreter.checkedRequirements = append(interpreter.checkedRequirements, commandName)
 	} else {
-		interpreter.logger.Fatalf("Failed requirenments for %s.", commandName)
+		return "", fmt.Errorf("failed requirenments for %s", commandName)
 	}
-	commandOutput, err := command.Execute(tokens)
+	output, err := command.Execute(tokens)
 	if err != nil {
-		interpreter.logger.Errorf("error while executing command %v", err)
+		return "", fmt.Errorf("execution failed: %w", err)
 	}
-	return commandOutput
+	return output, nil
 }
 
-func (interpreter *Interpreter) handleVariableLine(tokens []string) {
+func (interpreter *Interpreter) handleVariableLine(tokens []string) error {
 	variableName := strings.TrimPrefix(tokens[0], "$")
-	//interpreter.variables[variableName] = interpreter.handleCommandLine(tokens[2:])
-	interpreter.Variables[variableName] = *NewVariable(interpreter.handleCommandLine(tokens[2:]))
-}
-
-func (interpreter *Interpreter) handleLine(input string) {
-	tokens := strings.Fields(input)
-	if strings.HasPrefix(tokens[0], "//") {
-		return
+	result, error := interpreter.handleCommandLine(tokens[2:])
+	if error != nil {
+		return error
 	}
 
-	if strings.HasPrefix(tokens[0], "$") && tokens[1] == "=" {
-		interpreter.handleVariableLine(tokens)
-		return
-	}
-
-	interpreter.handleCommandLine(tokens)
+	interpreter.Variables[variableName] = *NewVariable(result)
+	return nil
 }
 
 func (interpreter *Interpreter) GetReferencePage() string {
