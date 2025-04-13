@@ -8,8 +8,12 @@ import (
 
 func main() {
 	var environment = models.NewEnvironment()
-	var interpreter = *interpreter.NewInterpreter(environment)
-	err := interpreter.Run("./cmd/interpreterDemo/example.bld")
+	interpreterObject, err := interpreter.NewInterpreter(environment)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+	interpreter := *interpreterObject
+	err = interpreter.Run("./cmd/interpreterDemo/example.bld")
 	if err != nil {
 		fmt.Print(err.Error())
 	}

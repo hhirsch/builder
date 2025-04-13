@@ -63,7 +63,10 @@ func (interpreter *Interpreter) Run(fileName string) (err error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		interpreter.handleLine(line)
+		err = interpreter.handleLine(line)
+		if err != nil {
+			return fmt.Errorf("handling line: %w", err)
+		}
 	}
 	err = scanner.Err()
 	if err != nil {

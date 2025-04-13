@@ -37,6 +37,9 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 func (serviceAction *ServiceAction) install(serviceName string) {
 	serviceAction.logger.Info("Builder started")
 	interpreter, err := interpreter.NewInterpreter(serviceAction.environment)
+	if err != nil {
+		serviceAction.logger.Error(err.Error())
+	}
 	err = interpreter.Run(serviceAction.controller.Arguments[0])
 	if err != nil {
 		serviceAction.logger.Error(err.Error())

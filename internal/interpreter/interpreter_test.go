@@ -9,8 +9,6 @@ func TestRunOnNonExistingFileCausesError(t *testing.T) {
 	error := interpreter.Run("nonExistingFileName")
 	if error == nil {
 		t.Errorf("Expected non nil error.")
-	} else {
-
 	}
 	expectedErrorMessage := "open file: open nonExistingFileName: no such file or directory"
 
