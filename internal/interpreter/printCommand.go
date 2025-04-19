@@ -42,7 +42,6 @@ func (printCommand *PrintCommand) Execute(tokens []string) (string, error) {
 				tokens[index], _ = variable.GetFlatString()
 			}
 		}
-
 	}
 	parameters := strings.Join(tokens, " ")
 	format.Println(parameters)

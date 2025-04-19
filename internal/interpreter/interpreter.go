@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
@@ -20,7 +21,14 @@ type Interpreter struct {
 	checkedRequirements []string
 	includes            []string
 	Client              *goph.Client
+	System              System
 	Aliases             map[string]string
+	ReadingBufferActive bool
+	ReadingBuffer       string
+	BufferName          string
+	FunctionPool        map[string]string
+	BufferParameters    []string
+	ConnectToLocalhost  bool
 }
 
 func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
@@ -30,16 +38,18 @@ func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load registry: %w", err)
 	}
-	variables := map[string]Variable{}
-	commands := map[string]Command{}
-	aliases := map[string]string{}
+
 	interpreter := &Interpreter{
-		logger:      logger,
-		registry:    registry,
-		environment: environment,
-		commands:    commands,
-		Variables:   variables,
-		Aliases:     aliases,
+		logger:              logger,
+		registry:            registry,
+		environment:         environment,
+		commands:            map[string]Command{},
+		Variables:           map[string]Variable{},
+		Aliases:             map[string]string{},
+		ReadingBufferActive: false,
+		BufferName:          "",
+		FunctionPool:        map[string]string{},
+		ConnectToLocalhost:  false,
 	}
 	interpreter.AddCommand(NewConnectCommand(interpreter))
 	interpreter.AddCommand(NewStepCommand(logger))
@@ -47,6 +57,8 @@ func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	interpreter.AddCommand(NewListFilesCommand(interpreter, logger))
 	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
 	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
+	interpreter.AddCommand(NewRequireParametersCommand(interpreter, environment))
+	interpreter.AddCommand(NewEnsurePackageCommand(interpreter, logger))
 	return interpreter, nil
 }
 
@@ -88,6 +100,26 @@ func (interpreter *Interpreter) handleLine(input string) error {
 	}
 	tokens := strings.Fields(input)
 	if strings.HasPrefix(tokens[0], "//") {
+		return nil
+	}
+
+	if interpreter.ReadingBufferActive {
+		if tokens[0] == "storeBuffer" {
+			interpreter.ReadingBufferActive = false
+			interpreter.FunctionPool[interpreter.BufferName] = interpreter.ReadingBuffer
+			interpreter.ReadingBuffer = ""
+			return nil
+		}
+		interpreter.ReadingBuffer += strings.Join(tokens, " ") + "\n"
+		return nil
+	}
+
+	if tokens[0] == "buffer" {
+		if len(tokens) != 2 {
+			return errors.New("buffer needs 1 parameter")
+		}
+		interpreter.ReadingBufferActive = true
+		interpreter.BufferName = tokens[1]
 		return nil
 	}
 

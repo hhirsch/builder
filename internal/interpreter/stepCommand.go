@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/hhirsch/builder/internal/helpers"
@@ -25,6 +26,7 @@ func NewStepCommand(logger *helpers.Logger) *StepCommand {
 func (stepCommand *StepCommand) Execute(tokens []string) (string, error) {
 	stepCommand.description = strings.Join(tokens, " ")
 	stepCommand.logger.Info(stepCommand.description)
+	fmt.Println("Step: " + strings.Join(tokens[1:], " "))
 	return "", nil
 }
 

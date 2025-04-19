@@ -5,7 +5,6 @@ import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/melbahja/goph"
-	"os/exec"
 	"strings"
 )
 
@@ -58,28 +57,12 @@ func (baseCommand *BaseCommand) GetResult() string {
 
 func (baseCommand *BaseCommand) Execute(tokens []string) (string, error) {
 	baseCommand.logger.Infof("Running %s", baseCommand.command)
-	result, _ := baseCommand.Interpreter.Client.Run(baseCommand.command)
-	baseCommand.logger.Debugf("Command %s gave us the following result:\n%s", baseCommand.command, string(result))
-	return string(result), nil
-}
-
-// this absolutely belongs into the client whenever the ssh client is nil
-func (baseCommand *BaseCommand) ExecuteOnLocalhost(tokens []string) (string, error) {
-	parts := strings.Fields(baseCommand.command)
-	if len(parts) == 0 {
-		baseCommand.logger.Fatal("Command needs to be set.")
-	}
-	baseCommand.logger.Infof("Running %s on localhost.", parts[0])
-	cmd := exec.Command(parts[0], parts[1:]...)
-
-	output, err := cmd.Output()
+	result, err := baseCommand.Interpreter.System.Execute(baseCommand.command)
 	if err != nil {
 		return "", err
 	}
-	result := strings.TrimSpace(string(output))
-
-	baseCommand.logger.Info(result)
-	return result, nil
+	baseCommand.logger.Debugf("Command %s gave us the following result:\n%s", baseCommand.command, string(result))
+	return string(result), nil
 }
 
 func (baseCommand *BaseCommand) GetClient() *goph.Client {
@@ -105,17 +88,16 @@ func (baseCommand *BaseCommand) IsTrue(string string) bool {
 
 func (baseCommand *BaseCommand) FindBinary(binaryName string) bool {
 	var command = fmt.Sprintf("command -v %s >/dev/null 2>&1 && echo true || echo false", binaryName)
-	if baseCommand.Interpreter.Client == nil {
-		baseCommand.logger.Error("Client is nil when trying to run FindBinary")
-		return false
+	executionResult, err := baseCommand.Interpreter.System.Execute(command)
+	if err != nil {
+		baseCommand.logger.Infof("Error during execution:  %s", err.Error())
 	}
-	executionResult, _ := baseCommand.Interpreter.Client.Run(command)
+
 	if baseCommand.IsTrue(string(executionResult)) {
 		baseCommand.logger.Infof("Binary %s found.", binaryName)
 		return true
 	}
 
-	baseCommand.logger.Fatalf("Unable to find required binary %s on target system.", binaryName)
 	return false
 }
 

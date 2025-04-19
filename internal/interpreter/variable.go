@@ -17,6 +17,10 @@ func (variable *Variable) GetSlice() ([]string, error) {
 	return strings.Split(variable.stringContent, "\n"), nil
 }
 
+func (variable *Variable) SetString(content string) {
+	variable.stringContent = content
+}
+
 func (variable *Variable) GetString() (string, error) {
 	return variable.stringContent, nil
 }

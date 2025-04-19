@@ -11,9 +11,20 @@ import (
 	"time"
 )
 
+type LogLevel int64
+
+const (
+	DEBUG LogLevel = iota
+	INFO
+	WARN
+	ERROR
+	FATAL
+)
+
 type Logger struct {
 	file          *os.File
 	logOperations map[string]LogOperation
+	logLevel      LogLevel
 }
 
 type LogOperation func(msg interface{}, keyvals ...interface{})
@@ -35,6 +46,7 @@ func NewLogger(fileName string) *Logger {
 	return &Logger{
 		file:          file,
 		logOperations: logOperations,
+		logLevel:      ERROR,
 	}
 }
 
@@ -107,39 +119,57 @@ func (logger *Logger) genericLog(module string, logLevel string, message interfa
 }
 
 func (logger *Logger) Debug(message interface{}, data ...interface{}) {
-	logger.genericLog(logger.getCallerName(), "DEBUG", message, data)
+	if logger.logLevel == DEBUG {
+		logger.genericLog(logger.getCallerName(), "DEBUG", message, data)
+	}
 }
 
 func (logger *Logger) Debugf(message string, data ...interface{}) {
-	logger.Debug(fmt.Sprintf(message, data...))
+	if logger.logLevel == DEBUG {
+		logger.Debug(fmt.Sprintf(message, data...))
+	}
 }
 
 func (logger *Logger) Info(message interface{}, data ...interface{}) {
-	logger.genericLog(logger.getCallerName(), "INFO", message, data)
+	if logger.logLevel <= INFO {
+		logger.genericLog(logger.getCallerName(), "INFO", message, data)
+	}
 }
 
 func (logger *Logger) Infof(message string, data ...interface{}) {
-	logger.Info(fmt.Sprintf(message, data...))
+	if logger.logLevel <= INFO {
+		logger.Info(fmt.Sprintf(message, data...))
+	}
 }
 
 func (logger *Logger) Warn(message interface{}, data ...interface{}) {
-	logger.genericLog(logger.getCallerName(), "WARN", message, data)
+	if logger.logLevel <= WARN {
+		logger.genericLog(logger.getCallerName(), "WARN", message, data)
+	}
 }
 
 func (logger *Logger) Error(message interface{}, data ...interface{}) {
-	logger.genericLog(logger.getCallerName(), "ERROR", message, data)
+	if logger.logLevel <= ERROR {
+		logger.genericLog(logger.getCallerName(), "ERROR", message, data)
+	}
 }
 
 func (logger *Logger) Errorf(message string, data ...interface{}) {
-	logger.Error(fmt.Sprintf(message, data...))
+	if logger.logLevel <= ERROR {
+		logger.Error(fmt.Sprintf(message, data...))
+	}
 }
 
 func (logger *Logger) Fatal(message interface{}, data ...interface{}) {
-	logger.genericLog(logger.getCallerName(), "FATAL", message, data)
+	if logger.logLevel <= FATAL {
+		logger.genericLog(logger.getCallerName(), "FATAL", message, data)
+	}
 }
 
 func (logger *Logger) Fatalf(message string, data ...interface{}) {
-	logger.Fatal(fmt.Sprintf(message, data...))
+	if logger.logLevel <= FATAL {
+		logger.Fatal(fmt.Sprintf(message, data...))
+	}
 }
 
 func (logger *Logger) writeLog(string string) {
