@@ -6,7 +6,10 @@ import (
 
 func NewBuilderController(environment *models.Environment) *Controller {
 	var controller = NewController(environment)
-	var parameter = controller.Arguments[0]
+	var parameter = ""
+	if len(controller.Arguments) > 0 {
+		parameter = controller.Arguments[0]
+	}
 	var commandPath = environment.GetProjectCommandsPath() + parameter + ".bld"
 	controller.AddAction(NewInitAction(controller))
 	controller.AddAction(NewScriptAction(controller, parameter))

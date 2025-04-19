@@ -68,9 +68,10 @@ func (helpAction *HelpAction) Execute() (string, error) {
 
 	buffer += fmt.Sprintf("  %s <command> [<arguments>]\n\n", helpAction.environment.GetArguments()[0])
 	for _, action := range helpAction.controller.GetActions() {
-		buffer += fmt.Sprintf("  %s\t%+v", helpAction.rightPadString(action.GetName(), 10), action.GetBrief())
+		buffer += fmt.Sprintf("  %s\t%+v\n", helpAction.rightPadString(action.GetName(), 10), action.GetBrief())
 	}
 	buffer += "\n  Set the environment variable CLICOLOR to 1 to enable colors.\n"
+	fmt.Print(buffer)
 	return buffer, nil
 }
 
