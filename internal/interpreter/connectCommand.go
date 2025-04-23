@@ -45,7 +45,6 @@ func (connectCommand *ConnectCommand) Execute(tokens []string) (string, error) {
 		domain = foundAlias
 	}
 	if domain == "localhost" {
-		connectCommand.interpreter.Client = nil
 		connectCommand.interpreter.System = NewLocalhost()
 		return "", nil
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/melbahja/goph"
 	"strings"
 )
 
@@ -51,10 +50,6 @@ func (baseCommand *BaseCommand) TestRequirements() bool {
 	return true
 }
 
-func (baseCommand *BaseCommand) GetResult() string {
-	return baseCommand.result
-}
-
 func (baseCommand *BaseCommand) Execute(tokens []string) (string, error) {
 	baseCommand.logger.Infof("Running %s", baseCommand.command)
 	result, err := baseCommand.Interpreter.System.Execute(baseCommand.command)
@@ -65,17 +60,26 @@ func (baseCommand *BaseCommand) Execute(tokens []string) (string, error) {
 	return string(result), nil
 }
 
-func (baseCommand *BaseCommand) GetClient() *goph.Client {
-	if baseCommand.Interpreter.Client == nil {
-		baseCommand.logger.Error("Client was nill when tried to get it")
-	}
-	return baseCommand.Interpreter.Client
-}
-
 func (baseCommand *BaseCommand) requireParameterAmount(tokens []string, requiredParameterAmount int) {
 	if len(tokens) != requiredParameterAmount+1 {
 		baseCommand.logger.Fatalf("%s needs %d parameters", baseCommand.commandName, requiredParameterAmount)
 	}
+}
+
+// skips the first token
+func (baseCommand *BaseCommand) replaceVariablesInTokens(tokens []string, variables map[string]Variable) []string {
+	for index := 1; index < len(tokens); index++ {
+		variable := tokens[index]
+		if strings.HasPrefix(variable, "$") {
+			baseCommand.logger.Debugf("Detected $ prefix for: %s", variable)
+			variableName := strings.TrimPrefix(variable, "$")
+			if foundVariable, isFoundVariable := variables[variableName]; isFoundVariable {
+				variable := foundVariable
+				tokens[index], _ = variable.GetFlatString()
+			}
+		}
+	}
+	return tokens
 }
 
 func (baseCommand *BaseCommand) TrimResponseString(string string) string {
@@ -109,7 +113,7 @@ func (baseCommand *BaseCommand) GetName() string {
 	return baseCommand.name
 }
 
-func (baseCommand *BaseCommand) GetDescription() string {
+func (baseCommand *BaseCommand) GetDescription(tokens []string) string {
 	return baseCommand.description
 }
 

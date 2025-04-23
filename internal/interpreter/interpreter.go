@@ -29,6 +29,7 @@ type Interpreter struct {
 	FunctionPool        map[string]string
 	BufferParameters    []string
 	ConnectToLocalhost  bool
+	customCommand       *CustomCommand
 }
 
 func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
@@ -57,7 +58,6 @@ func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	interpreter.AddCommand(NewListFilesCommand(interpreter, logger))
 	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
 	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
-	interpreter.AddCommand(NewRequireParametersCommand(interpreter, environment))
 	interpreter.AddCommand(NewEnsurePackageCommand(interpreter, logger))
 	return interpreter, nil
 }
@@ -93,6 +93,16 @@ func (interpreter *Interpreter) Run(fileName string) (err error) {
 	return err
 }
 
+func (interpreter *Interpreter) HandleStringSlices(input []string) error {
+	for _, line := range input {
+		err := interpreter.handleLine(line)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (interpreter *Interpreter) handleLine(input string) error {
 	if strings.TrimSpace(input) == "" {
 		interpreter.logger.Debugf("Skipped empty line in builder file.")
@@ -104,22 +114,25 @@ func (interpreter *Interpreter) handleLine(input string) error {
 	}
 
 	if interpreter.ReadingBufferActive {
-		if tokens[0] == "storeBuffer" {
+		if tokens[0] == "done" {
 			interpreter.ReadingBufferActive = false
 			interpreter.FunctionPool[interpreter.BufferName] = interpreter.ReadingBuffer
 			interpreter.ReadingBuffer = ""
+			interpreter.AddCommand(interpreter.customCommand)
 			return nil
 		}
 		interpreter.ReadingBuffer += strings.Join(tokens, " ") + "\n"
+		interpreter.customCommand.AppendToBuffer(strings.Join(tokens, " "))
 		return nil
 	}
 
-	if tokens[0] == "buffer" {
-		if len(tokens) != 2 {
-			return errors.New("buffer needs 1 parameter")
+	if tokens[0] == "function" {
+		if len(tokens) < 2 {
+			return errors.New("function needs 2 parameters")
 		}
 		interpreter.ReadingBufferActive = true
 		interpreter.BufferName = tokens[1]
+		interpreter.customCommand = NewCustomCommand(interpreter, tokens)
 		return nil
 	}
 
@@ -131,11 +144,11 @@ func (interpreter *Interpreter) handleLine(input string) error {
 }
 
 func (interpreter *Interpreter) HasConnection() bool {
-	return interpreter.Client != nil
+	return interpreter.System != nil
 }
 
 func (interpreter *Interpreter) requireConnection() {
-	if interpreter.HasConnection() { // if the client is not initialized we don't have a connection
+	if !interpreter.HasConnection() { // if the client is not initialized we don't have a connection
 		interpreter.logger.Fatal("Setup a host before using a command that requires a connection.")
 	}
 }
