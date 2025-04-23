@@ -9,7 +9,6 @@ type CustomCommand struct {
 	buffer             []string
 	localVariables     map[string]Variable
 	localVariableNames []string
-	variableNames      []string
 	BaseCommand
 }
 

@@ -23,20 +23,30 @@ func NewEnsurePackageCommand(interpreter *Interpreter, logger *helpers.Logger) *
 	return controller
 }
 
-func (ensurePackageCommand *EnsurePackageCommand) EnsurePackage(packageName string) {
+func (ensurePackageCommand *EnsurePackageCommand) EnsurePackage(packageName string) (err error) {
 	ensurePackageCommand.logger.Info("Checking status of package " + packageName)
 	ensurePackageCommand.logger.Info("Status of " + packageName + " is not installed")
-	ensurePackageCommand.Interpreter.System.Execute("dpkg --status " + packageName)
+	_, err = ensurePackageCommand.Interpreter.System.Execute("dpkg --status " + packageName)
+	if err != nil {
+		return
+	}
 	ensurePackageCommand.logger.Info("Installing " + packageName)
-	ensurePackageCommand.Interpreter.System.Execute("apt-get update")
-	ensurePackageCommand.Interpreter.System.Execute("apt-get install " + packageName)
+	_, err = ensurePackageCommand.Interpreter.System.Execute("apt-get update")
+	if err != nil {
+		return
+	}
+	_, err = ensurePackageCommand.Interpreter.System.Execute("apt-get install " + packageName)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func (ensurePackageCommand *EnsurePackageCommand) Execute(tokens []string) (string, error) {
 	tokens = tokens[1:]
 	parameters := strings.Join(tokens, " ")
-	ensurePackageCommand.EnsurePackage(parameters)
-	return "", nil
+	err := ensurePackageCommand.EnsurePackage(parameters)
+	return "", err
 }
 
 func (ensurePackageCommand *EnsurePackageCommand) Undo() {
