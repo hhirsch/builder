@@ -58,7 +58,7 @@ func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	interpreter.AddCommand(NewListFilesCommand(interpreter, logger))
 	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
 	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
-	interpreter.AddCommand(NewEnsurePackageCommand(interpreter, logger))
+	interpreter.AddCommand(NewEnsurePackageCommand(logger, interpreter.System))
 	return interpreter, nil
 }
 

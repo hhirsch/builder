@@ -7,17 +7,18 @@ import (
 )
 
 type EnsurePackageCommand struct {
+	system System
 	BaseCommand
 	environment *models.Environment
 }
 
-func NewEnsurePackageCommand(interpreter *Interpreter, logger *helpers.Logger) *EnsurePackageCommand {
+func NewEnsurePackageCommand(logger *helpers.Logger, system System) *EnsurePackageCommand {
 	controller := &EnsurePackageCommand{
+		system: system,
 		BaseCommand: BaseCommand{
 			logger:             logger,
 			name:               "ensurePackage",
 			requiresConnection: true,
-			Interpreter:        interpreter,
 		},
 	}
 	return controller
@@ -26,16 +27,16 @@ func NewEnsurePackageCommand(interpreter *Interpreter, logger *helpers.Logger) *
 func (ensurePackageCommand *EnsurePackageCommand) EnsurePackage(packageName string) (err error) {
 	ensurePackageCommand.logger.Info("Checking status of package " + packageName)
 	ensurePackageCommand.logger.Info("Status of " + packageName + " is not installed")
-	_, err = ensurePackageCommand.Interpreter.System.Execute("dpkg --status " + packageName)
+	_, err = ensurePackageCommand.system.Execute("dpkg --status " + packageName)
 	if err != nil {
 		return
 	}
 	ensurePackageCommand.logger.Info("Installing " + packageName)
-	_, err = ensurePackageCommand.Interpreter.System.Execute("apt-get update")
+	_, err = ensurePackageCommand.system.Execute("apt-get update")
 	if err != nil {
 		return
 	}
-	_, err = ensurePackageCommand.Interpreter.System.Execute("apt-get install " + packageName)
+	_, err = ensurePackageCommand.system.Execute("apt-get install " + packageName)
 	if err != nil {
 		return
 	}
