@@ -28,12 +28,17 @@ func NewCustomCommand(interpreter *Interpreter, tokens []string) *CustomCommand 
 }
 
 func (customCommand *CustomCommand) Execute(tokens []string) (string, error) {
-	for index, variableContent := range tokens[1:] {
-		variableName := customCommand.localVariableNames[index]
+	for index, variableName := range customCommand.localVariableNames {
+		strippedTokens := tokens[1:]
+		variableContent := strippedTokens[index]
+		if strings.HasSuffix(variableName, "...") {
+			variableName = strings.TrimSuffix(variableName, "...")
+			variableContent = strings.Join(strippedTokens[index:], " ")
+		}
+
 		customCommand.logger.Debugf("variable name: %v", variableName)
 		customCommand.localVariables[variableName] = *NewVariable(variableContent)
 	}
-
 	for _, line := range customCommand.buffer {
 		tokens := strings.Fields(line)
 		customCommand.logger.Debugf("replacing variables for line: %s", strings.Join(tokens, " "))
