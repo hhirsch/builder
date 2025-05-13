@@ -11,7 +11,6 @@ import (
 )
 
 type Environment struct {
-	//Client    Client
 	Client    *goph.Client
 	logger    *helpers.Logger
 	arguments []string

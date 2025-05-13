@@ -10,36 +10,14 @@ BUILD_FLAGS=-v
 all: builder
 
 linkBinary:
-	sudo ln -s $(PROJECT_PATH)/builder /usr/bin/bdev
+	sudo ln -s $(PROJECT_PATH)/bin/builder /usr/bin/bdev
 
 builder:
-	$(GO) build $(BUILD_FLAGS) -o builder builder.go client.go interpreter.go registry.go systemd.go helpers/*.go controllers/*.go
-
-demos: registryDemo interpreterDemo builderUiDemo
+	$(GO) build -o $(PROJECT_PATH)/bin/builder $(BUILD_FLAGS) $(PROJECT_PATH)/cmd/builder
 
 tests:
-	go test -v systemd_test.go systemd.go
-
-registryDemo:
-	$(GO) build $(BUILD_FLAGS) -o registryDemo registryDemo.go registry.go
-	mkdir -p demo
-	mv registryDemo ./demo
-
-interpreterDemo:
-	$(GO) build $(BUILD_FLAGS) -o interpreterDemo interpreterDemo.go client.go logger.go interpreter.go registry.go
-	mkdir -p demo
-	mv interpreterDemo ./demo
-
-builderUiDemo:
-	$(GO) build $(BUILD_FLAGS) -o builderUiDemo builderUi.go
-	mkdir -p demo
-	mv builderUiDemo ./demo
+	$(GO) test ./internal/interpreter $(BUILD_FLAGS)
 
 clean:
-	rm builder
-	rm update
-	rm demo/registryDemo
-	rm demo/builderUiDemo
-	rm demo/interpreterDemo
-
-.PHONY: builder clean registryDemo interpreterDemo builderUiDemo tests
+	rm bin/builder
+.PHONY: builder clean tests

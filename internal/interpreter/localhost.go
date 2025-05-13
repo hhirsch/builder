@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -20,4 +21,18 @@ func (localhost *Localhost) Execute(command string) (string, error) {
 	}
 	result := strings.TrimSpace(string(output))
 	return result, nil
+}
+
+func (localhost *Localhost) Upload(source string, target string) error {
+	_, err := localhost.Execute(fmt.Sprintf("cp %s %s", source, target))
+	return err
+}
+
+func (localhost *Localhost) Download(source string, target string) error {
+	_, err := localhost.Execute(fmt.Sprintf("cp %s %s", source, target))
+	return err
+}
+
+func (localhost *Localhost) Delete(target string) error {
+	return nil
 }

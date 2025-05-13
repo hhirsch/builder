@@ -34,18 +34,29 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 
 }
 
-func (serviceAction *ServiceAction) install(serviceName string) {
+func (serviceAction *ServiceAction) getServiceDirectory(serviceName string) string {
+	return "builder/services/" + serviceName
+}
+
+func (serviceAction *ServiceAction) runServiceScript(serviceName string, fileName string) {
 	serviceAction.logger.Info("Builder started")
 	interpreter, err := interpreter.NewInterpreter(serviceAction.environment)
 	if err != nil {
 		serviceAction.logger.Error(err.Error())
 	}
-	err = interpreter.Run(serviceAction.controller.Arguments[0])
+	err = interpreter.Run(serviceAction.getServiceDirectory(serviceName) + fileName)
 	if err != nil {
 		serviceAction.logger.Error(err.Error())
 	}
 }
-func (serviceAction *ServiceAction) uninstall(serviceName string) {}
+
+func (serviceAction *ServiceAction) install(serviceName string) {
+	serviceAction.runServiceScript(serviceName, "install.bld")
+}
+
+func (serviceAction *ServiceAction) uninstall(serviceName string) {
+	serviceAction.runServiceScript(serviceName, "uninstall.bld")
+}
 
 func (serviceAction *ServiceAction) Execute() (string, error) {
 	err := serviceAction.RequireAmountOfParameters(1)

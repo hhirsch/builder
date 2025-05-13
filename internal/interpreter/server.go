@@ -21,3 +21,15 @@ func (server *Server) Execute(command string) (string, error) {
 	}
 	return string(result), nil
 }
+
+func (server *Server) Upload(source string, target string) error {
+	return server.Client.Upload(source, target)
+}
+
+func (server *Server) Download(source string, target string) error {
+	return server.Client.Download(source, target)
+}
+
+func (localhost *Server) Delete(target string) error {
+	return nil
+}
