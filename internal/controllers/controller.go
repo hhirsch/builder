@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
+	"log/slog"
+	"os"
+	"strings"
 )
 
 type Controller struct {
@@ -18,7 +22,6 @@ type Controller struct {
 func NewController(environment *models.Environment) *Controller {
 	controller := &Controller{
 		environment: environment,
-		logger:      environment.GetLogger(),
 		model:       models.NewBuilderModel(environment.GetProjectPath()),
 		actionsMap:  make(map[string]Action),
 	}
@@ -46,10 +49,6 @@ func (controller *Controller) AddAction(action Action) {
 	controller.actionsMap[action.GetName()] = action
 }
 
-func (controller *Controller) GetEnvironment() *models.Environment {
-	return controller.environment
-}
-
 func (controller *Controller) GetActionsMap() map[string]Action {
 	return controller.actionsMap
 }
@@ -59,28 +58,31 @@ func (controller *Controller) GetActions() []Action {
 }
 
 func (controller *Controller) ExecuteAction() {
-	if len(controller.Arguments) < 1 {
-		controller.logger.Info("You need to pass a command name as argument.")
+	if len(os.Args) < 2 {
+		slog.Error("Controller called without command name argument.", slog.String("arguments", strings.Join(os.Args, " ")))
+		fmt.Println("You need to pass a command name as argument.")
 		controller.ShowHelp()
 		return
 	}
 
-	var actionName = controller.environment.GetArguments()[1]
+	var actionName = os.Args[1]
 	if action, exists := controller.actionsMap[actionName]; exists {
 		_, err := action.Execute()
 		if err != nil {
-			controller.logger.Errorf("executing action: %s", err.Error())
+			slog.Error("Executing action.", slog.String("error message", err.Error()))
+			fmt.Printf("Error executing action: %v.\n", err.Error())
+			controller.ShowHelp()
 		}
 		return
 	}
-	controller.logger.Info("Builder called with unrecognized command " + actionName + ".")
+	slog.Info("Builder called with unrecognized command. " + actionName + ".")
 	controller.ShowHelp()
 }
 
 func (controller *Controller) ShowHelp() {
 	_, err := controller.helpAction.Execute()
 	if err != nil {
-		controller.logger.Errorf("show help failed %v", err)
+		slog.Error("Unable to show help.", slog.String("error message", err.Error()))
 	}
 }
 

@@ -7,13 +7,11 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/hhirsch/builder/internal/helpers"
 	"os"
 )
 
 type Encryption struct {
 	environment *Environment
-	logger      *helpers.Logger
 	privateKey  *rsa.PrivateKey
 }
 
@@ -52,7 +50,7 @@ func NewEncryption(environment *Environment) (*Encryption, error) {
 		return nil, fmt.Errorf("unknown key format")
 	}
 
-	return &Encryption{environment: environment, logger: logger, privateKey: rsaPrivateKey}, nil
+	return &Encryption{environment: environment, privateKey: rsaPrivateKey}, nil
 }
 
 func NewEncryptionPkcs1(environment *Environment) *Encryption {
@@ -71,7 +69,7 @@ func NewEncryptionPkcs1(environment *Environment) *Encryption {
 		environment.GetLogger().Fatalf("failed to parse PKCS#1 private key: %v", error)
 	}
 
-	return &Encryption{environment: environment, logger: environment.GetLogger(), privateKey: rsaPrivateKey}
+	return &Encryption{environment: environment, privateKey: rsaPrivateKey}
 }
 
 func NewEncryptionPkcs8(environment *Environment) *Encryption {
@@ -95,7 +93,7 @@ func NewEncryptionPkcs8(environment *Environment) *Encryption {
 		environment.GetLogger().Fatalf("not an RSA private key in file %s.", environment.GetKeyPath())
 	}
 
-	return &Encryption{environment: environment, logger: environment.GetLogger(), privateKey: rsaPrivKey}
+	return &Encryption{environment: environment, privateKey: rsaPrivKey}
 }
 
 func (encryption *Encryption) Encrypt(plainValue string) (encryptedValue string, err error) {
@@ -103,7 +101,6 @@ func (encryption *Encryption) Encrypt(plainValue string) (encryptedValue string,
 	var encryptedValueByteSlices []byte
 	encryptedValueByteSlices, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, &publicKey, []byte(plainValue), nil)
 	if err != nil {
-		encryption.logger.Errorf("Encryption failed: %v", err)
 		return "", err
 	}
 	return string(encryptedValueByteSlices), nil
@@ -112,7 +109,6 @@ func (encryption *Encryption) Encrypt(plainValue string) (encryptedValue string,
 func (encryption *Encryption) Decrypt(encryptedValue string) (decryptedValue string, err error) {
 	plainValue, err := rsa.DecryptOAEP(sha256.New(), rand.Reader, encryption.privateKey, []byte(encryptedValue), nil)
 	if err != nil {
-		encryption.logger.Errorf("Decryption failed: %v", err)
 		return "", err
 	}
 	return string(plainValue), nil

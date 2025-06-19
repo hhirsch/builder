@@ -3,15 +3,20 @@ package controllers
 import (
 	_ "embed"
 	"fmt"
-	"github.com/hhirsch/builder/internal/interpreter"
+	"github.com/hhirsch/builder/internal/environment"
+	"github.com/hhirsch/builder/internal/interpreterV2"
+	"github.com/hhirsch/builder/internal/lexer"
 	"github.com/hhirsch/builder/internal/models"
+	"github.com/hhirsch/builder/internal/parser"
+	"io"
+	"log/slog"
+	"os"
 )
 
 type ScriptAction struct {
-	environment *models.Environment
-	model       *models.BuilderModel
-	controller  *Controller
-	fileName    string
+	model      *models.BuilderModel
+	controller *Controller
+	fileName   string
 	BaseAction
 }
 
@@ -28,28 +33,55 @@ func NewScriptAction(controller *Controller, fileName string) *ScriptAction {
 			brief:       "Run a specific script.",
 			help:        scriptMarkdown,
 		},
-		environment: controller.GetEnvironment(),
-		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
-		controller:  controller,
-		fileName:    fileName,
+		model:    models.NewBuilderModel(environment.GetProjectPath()),
+		fileName: fileName,
 	}
 }
 
 func (scriptAction *ScriptAction) Execute() (string, error) {
-	err := scriptAction.RequireAmountOfParameters(1)
-	if err != nil {
-		return "", err
+	error := scriptAction.RequireAmountOfParameters(1)
+	if error != nil {
+		return "", error
 	}
 	buffer := "Builder started\n"
-	interpreterObject, err := interpreter.NewInterpreter(scriptAction.environment)
-	if err != nil {
-		return "", fmt.Errorf("new interpreter: %w", err)
+	slog.Info("Builder started")
+	interpreterObject, error := interpreterV2.NewInterpreter()
+	if error != nil {
+		return "", fmt.Errorf("interpreter: %w", error)
 	}
 	interpreter := *interpreterObject
-	err = interpreter.Run(scriptAction.fileName)
-	if err != nil {
-		return "", fmt.Errorf("interpreter run: %w", err)
+	file, error := os.Open(scriptAction.fileName)
+	if error != nil {
+		return "", fmt.Errorf("interpreter: %w", error)
 	}
+	defer file.Close()
+
+	data, error := io.ReadAll(file)
+	if error != nil {
+		return "", error
+	}
+	slog.Info("File loaded")
+	lexer, error := lexer.NewLexer(string(data))
+	if error != nil {
+		return "", error
+	}
+	slog.Info("Parsing...")
+	parser, error := parser.NewParser(lexer)
+	if error != nil {
+		return "", error
+	}
+	slog.Info("Running...")
+	interpreter.Run(parser.GetSyntaxTree())
+	if len(*parser.GetErrors()) > 0 {
+		fmt.Println("Error parsing file: ")
+	}
+	for _, error := range *parser.GetErrors() {
+		fmt.Println(error)
+	}
+	/*	if error != nil {
+		return "", fmt.Errorf("interpreter run: %w", err)
+	}*/
+	slog.Info("Interpreter has finnished.")
 	return buffer, nil
 }
 

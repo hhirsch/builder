@@ -1,0 +1,18 @@
+function helloBuilder $message...
+print Your message: $message
+done
+
+function purge $packageName
+step 1
+print test
+//$return = execute dpkg –remove $packageName
+done
+
+function returnTest $test
+print test
+print $test
+step test
+step test2
+//return
+step test3
+step test4

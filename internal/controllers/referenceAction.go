@@ -3,6 +3,7 @@ package controllers
 import (
 	_ "embed"
 	"fmt"
+	"github.com/hhirsch/builder/internal/environment"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/valyala/fasttemplate"
@@ -10,10 +11,9 @@ import (
 )
 
 type ReferenceAction struct {
-	environment *models.Environment
-	logger      *helpers.Logger
-	model       *models.BuilderModel
-	controller  *Controller
+	logger     *helpers.Logger
+	model      *models.BuilderModel
+	controller *Controller
 	BaseAction
 }
 
@@ -30,11 +30,9 @@ func NewReferenceAction(controller *Controller) *ReferenceAction {
 	}
 
 	return &ReferenceAction{
-		BaseAction:  baseAction,
-		environment: controller.GetEnvironment(),
-		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
-		controller:  controller,
+		BaseAction: baseAction,
+		model:      models.NewBuilderModel(environment.GetProjectPath()),
+		controller: controller,
 	}
 
 }
@@ -74,8 +72,4 @@ func (referenceAction *ReferenceAction) Execute() (string, error) {
 	}
 	fmt.Print("\n  Set the environment variable CLICOLOR to 1 to enable colors.\n")
 	return "", nil
-}
-
-func (referenceAction *ReferenceAction) GetDescription() string {
-	return "Create builder directories in " + referenceAction.environment.GetProjectPath() + "."
 }

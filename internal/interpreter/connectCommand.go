@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"errors"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/melbahja/goph"
 	"os/user"
@@ -52,10 +51,6 @@ func (connectCommand *ConnectCommand) Execute(tokens []string) (string, error) {
 	sshClient, err := goph.New("root", domain, auth)
 	if err != nil {
 		return "", err
-	}
-	connectCommand.interpreter.Client = sshClient
-	if connectCommand.interpreter.Client == nil {
-		return "", errors.New("client nil right after being set")
 	}
 	connectCommand.interpreter.System = NewServer(sshClient)
 	connectCommand.logger.Info("Connected to " + tokens[1])

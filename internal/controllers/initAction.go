@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"github.com/hhirsch/builder/internal/environment"
 	"github.com/hhirsch/builder/internal/models"
 )
 
@@ -16,13 +17,12 @@ type InitAction struct {
 func NewInitAction(controller *Controller) *InitAction {
 	initAction := &InitAction{
 		BaseAction: BaseAction{
-			controller:  controller,
-			name:        "init",
-			description: "Initialize builder in the current directory.",
-			brief:       "Initialize builder in the current directory.",
-			help:        initMarkdown,
+			controller: controller,
+			name:       "init",
+			brief:      "Initialize builder in the current directory.",
+			help:       initMarkdown,
 		},
-		model: models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
+		model: models.NewBuilderModel(environment.GetProjectPath()),
 	}
 
 	return initAction
@@ -37,8 +37,4 @@ func (initAction *InitAction) Execute() (string, error) {
 		return "", err
 	}
 	return "Initializing\n", nil
-}
-
-func (initAction *InitAction) GetDescription() string {
-	return "Create builder directories in " + initAction.environment.GetProjectPath() + "."
 }

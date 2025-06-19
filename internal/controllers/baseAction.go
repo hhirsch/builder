@@ -16,7 +16,7 @@ type BaseAction struct {
 
 func (baseAction *BaseAction) ParameterValidationFailed(requiredAmountOfParameters int, errorMessage string) bool {
 	if !baseAction.HasEnoughParameters(requiredAmountOfParameters) {
-		baseAction.environment.GetLogger().Fatal(errorMessage)
+		panic(errorMessage)
 	}
 	return false
 }

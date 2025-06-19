@@ -21,7 +21,11 @@ func (variable *Variable) SetString(content string) {
 	variable.stringContent = content
 }
 
-func (variable *Variable) GetString() (string, error) {
+func (variable *Variable) GetString() string {
+	return variable.stringContent
+}
+
+func (variable *Variable) GetStringOrError() (string, error) {
 	return variable.stringContent, nil
 }
 

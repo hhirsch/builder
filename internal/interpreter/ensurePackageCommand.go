@@ -51,11 +51,11 @@ func (ensurePackageCommand *EnsurePackageCommand) Execute(tokens []string) (stri
 }
 
 func (ensurePackageCommand *EnsurePackageCommand) Undo() {
-	ensurePackageCommand.environment.GetLogger().Info("Undoing ensurePackage.")
+	ensurePackageCommand.environment.GetLogger().Info("ensurePackage has no implementation for undo")
 }
 
 func (ensurePackageCommand *EnsurePackageCommand) GetDescription(tokens []string) string {
-	return "Create a system service from a binary"
+	return "Make sure the package is installed."
 }
 
 func (ensurePackageCommand *EnsurePackageCommand) GetHelp() string {

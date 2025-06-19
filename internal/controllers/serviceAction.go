@@ -27,9 +27,7 @@ func NewServiceAction(controller *Controller) *ServiceAction {
 			brief:       "Setup and monitor services.",
 			help:        serviceMarkdown,
 		},
-		environment: controller.GetEnvironment(),
-		logger:      controller.GetEnvironment().GetLogger(),
-		controller:  controller,
+		controller: controller,
 	}
 
 }
@@ -50,14 +48,6 @@ func (serviceAction *ServiceAction) runServiceScript(serviceName string, fileNam
 	}
 }
 
-func (serviceAction *ServiceAction) install(serviceName string) {
-	serviceAction.runServiceScript(serviceName, "install.bld")
-}
-
-func (serviceAction *ServiceAction) uninstall(serviceName string) {
-	serviceAction.runServiceScript(serviceName, "uninstall.bld")
-}
-
 func (serviceAction *ServiceAction) Execute() (string, error) {
 	err := serviceAction.RequireAmountOfParameters(1)
 	if err != nil {
@@ -66,10 +56,11 @@ func (serviceAction *ServiceAction) Execute() (string, error) {
 	var modifier = serviceAction.controller.Arguments[0]
 	var serviceName = serviceAction.controller.Arguments[1]
 	if modifier == "install" {
-		serviceAction.install(serviceName)
+
+		serviceAction.runServiceScript(serviceName, "install.bld")
 	}
 	if modifier == "uninstall" {
-		serviceAction.uninstall(serviceName)
+		serviceAction.runServiceScript(serviceName, "uninstall.bld")
 	}
 	return "", nil
 }

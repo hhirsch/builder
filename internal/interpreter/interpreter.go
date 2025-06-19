@@ -2,15 +2,18 @@ package interpreter
 
 import (
 	"bufio"
+	_ "embed"
 	"errors"
 	"fmt"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
-	"github.com/melbahja/goph"
 	"os"
 	"slices"
 	"strings"
 )
+
+//go:embed functions.bld
+var standardFunctions string
 
 type Interpreter struct {
 	logger              *helpers.Logger
@@ -20,7 +23,6 @@ type Interpreter struct {
 	Variables           map[string]Variable
 	checkedRequirements []string
 	includes            []string
-	Client              *goph.Client
 	System              System
 	Aliases             map[string]string
 	ReadingBufferActive bool
@@ -59,6 +61,15 @@ func NewInterpreter(environment *models.Environment) (*Interpreter, error) {
 	interpreter.AddCommand(NewIncludeCommand(interpreter, environment))
 	interpreter.AddCommand(NewAliasCommand(interpreter, environment))
 	interpreter.AddCommand(NewEnsurePackageCommand(logger, interpreter.System))
+	interpreter.AddCommand(NewExecuteCommand(interpreter.System))
+	// scanner := bufio.NewScanner(strings.NewReader(standardFunctions))
+	// for scanner.Scan() {
+	// 	interpreter.handleLine(scanner.Text())
+	// }
+
+	// if err := scanner.Err(); err != nil {
+	// 	return nil, fmt.Errorf("loading standard library: %w", err)
+	// }
 	return interpreter, nil
 }
 
@@ -75,7 +86,7 @@ func (interpreter *Interpreter) Run(fileName string) (err error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		err = interpreter.handleLine(line)
+		_, err = interpreter.handleLine(line)
 		if err != nil {
 			return fmt.Errorf("handling line: %w", err)
 		}
@@ -95,7 +106,7 @@ func (interpreter *Interpreter) Run(fileName string) (err error) {
 
 func (interpreter *Interpreter) HandleStringSlices(input []string) error {
 	for _, line := range input {
-		err := interpreter.handleLine(line)
+		_, err := interpreter.handleLine(line)
 		if err != nil {
 			return err
 		}
@@ -103,14 +114,15 @@ func (interpreter *Interpreter) HandleStringSlices(input []string) error {
 	return nil
 }
 
-func (interpreter *Interpreter) handleLine(input string) error {
+func (interpreter *Interpreter) handleLine(input string) (string, error) {
+	interpreter.logger.Debugf("Handling line: %v", input)
 	if strings.TrimSpace(input) == "" {
 		interpreter.logger.Debugf("Skipped empty line in builder file.")
-		return nil
+		return "", nil
 	}
 	tokens := strings.Fields(input)
 	if strings.HasPrefix(tokens[0], "//") {
-		return nil
+		return "", nil
 	}
 
 	if interpreter.ReadingBufferActive {
@@ -119,38 +131,31 @@ func (interpreter *Interpreter) handleLine(input string) error {
 			interpreter.FunctionPool[interpreter.BufferName] = interpreter.ReadingBuffer
 			interpreter.ReadingBuffer = ""
 			interpreter.AddCommand(interpreter.customCommand)
-			return nil
+			return "", nil
 		}
 		interpreter.ReadingBuffer += strings.Join(tokens, " ") + "\n"
 		interpreter.customCommand.AppendToBuffer(strings.Join(tokens, " "))
-		return nil
+		return "", nil
 	}
 
 	if tokens[0] == "function" {
 		if len(tokens) < 2 {
-			return errors.New("function needs 2 parameters")
+			return "", errors.New("function needs 2 parameters")
 		}
 		interpreter.ReadingBufferActive = true
 		interpreter.BufferName = tokens[1]
 		interpreter.customCommand = NewCustomCommand(interpreter, tokens)
-		return nil
+		return "", nil
 	}
 
 	if strings.HasPrefix(tokens[0], "$") && tokens[1] == "=" {
 		return interpreter.handleVariableLine(tokens)
 	}
-	_, err := interpreter.handleCommandLine(tokens)
-	return err
+	return interpreter.handleCommandLine(tokens)
 }
 
 func (interpreter *Interpreter) HasConnection() bool {
 	return interpreter.System != nil
-}
-
-func (interpreter *Interpreter) requireConnection() {
-	if !interpreter.HasConnection() { // if the client is not initialized we don't have a connection
-		interpreter.logger.Fatal("Setup a host before using a command that requires a connection.")
-	}
 }
 
 func (interpreter *Interpreter) handleCommandLine(tokens []string) (string, error) {
@@ -163,8 +168,8 @@ func (interpreter *Interpreter) handleCommandLine(tokens []string) (string, erro
 
 	if foundCommand, isFoundCommand := interpreter.commands[commandName]; isFoundCommand {
 		command = foundCommand
-		if command.RequiresConnection() {
-			interpreter.requireConnection()
+		if command.RequiresConnection() && !interpreter.HasConnection() {
+			return "", fmt.Errorf("%s requires connection", commandName)
 		}
 	}
 
@@ -186,15 +191,15 @@ func (interpreter *Interpreter) handleCommandLine(tokens []string) (string, erro
 	return output, nil
 }
 
-func (interpreter *Interpreter) handleVariableLine(tokens []string) error {
+func (interpreter *Interpreter) handleVariableLine(tokens []string) (string, error) {
 	variableName := strings.TrimPrefix(tokens[0], "$")
 	result, error := interpreter.handleCommandLine(tokens[2:])
 	if error != nil {
-		return error
+		return "", error
 	}
 
 	interpreter.Variables[variableName] = *NewVariable(result)
-	return nil
+	return result, nil
 }
 
 func (interpreter *Interpreter) GetReferencePage() string {

@@ -6,12 +6,12 @@ import (
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/models"
 	"github.com/valyala/fasttemplate"
+	"os"
 	"strings"
 )
 
 type HelpAction struct {
-	environment *models.Environment
-	controller  *Controller
+	controller *Controller
 	BaseAction
 }
 
@@ -31,9 +31,8 @@ func NewHelpAction(controller *Controller) *HelpAction {
 	}
 
 	return &HelpAction{
-		BaseAction:  baseAction,
-		environment: controller.GetEnvironment(),
-		controller:  controller,
+		BaseAction: baseAction,
+		controller: controller,
 	}
 
 }
@@ -51,7 +50,7 @@ func (helpAction *HelpAction) Execute() (string, error) {
 	var markdownRenderer = models.NewMarkdownRenderer()
 	buffer := helpers.GetBannerText()
 	if helpAction.HasEnoughParameters(1) {
-		var actionName = helpAction.controller.Arguments[0]
+		var actionName = os.Args[2]
 		if helpAction.environment.IsColorEnabled() {
 			markdownRenderer.EnableColor()
 		}
@@ -59,14 +58,14 @@ func (helpAction *HelpAction) Execute() (string, error) {
 		template := fasttemplate.New(helpHeader+action.GetHelp(), "{{", "}}")
 		markdownContent := template.ExecuteString(map[string]interface{}{
 			"actionName": actionName,
-			"binaryName": helpAction.environment.GetArguments()[0],
+			"binaryName": os.Args[0],
 			"brief":      action.GetBrief(),
 		})
 		markdownRenderer.Render(markdownContent)
 		return "", nil
 	}
 
-	buffer += fmt.Sprintf("  %s <command> [<arguments>]\n\n", helpAction.environment.GetArguments()[0])
+	buffer += fmt.Sprintf("  %s <command> [<arguments>]\n\n", os.Args[0])
 	for _, action := range helpAction.controller.GetActions() {
 		buffer += fmt.Sprintf("  %s\t%+v\n", helpAction.rightPadString(action.GetName(), 10), action.GetBrief())
 	}

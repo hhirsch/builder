@@ -25,7 +25,6 @@ func NewCommandAction(controller *Controller, commandPath string) *CommandAction
 			description: "Execute command.",
 			help:        commandMarkdown,
 		},
-		environment: controller.GetEnvironment(),
 	}
 }
 

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/hhirsch/builder/internal/environment"
 	"github.com/hhirsch/builder/internal/helpers"
 	"github.com/hhirsch/builder/internal/interpreter"
 	"github.com/hhirsch/builder/internal/models"
@@ -23,10 +24,8 @@ func NewRegistryAction(controller *Controller) *RegistryAction {
 			description: "Setup and monitor services.",
 			help:        "View and edit registry.",
 		},
-		environment: controller.GetEnvironment(),
-		logger:      controller.GetEnvironment().GetLogger(),
-		model:       models.NewBuilderModel(controller.GetEnvironment().GetProjectPath()),
-		controller:  controller,
+		model:      models.NewBuilderModel(environment.GetProjectPath()),
+		controller: controller,
 	}
 
 }
