@@ -2,11 +2,10 @@ package parser
 
 import (
 	"encoding/json"
-	"testing"
-
 	"github.com/google/go-cmp/cmp"
 	"github.com/hhirsch/builder/internal/ast"
 	"github.com/hhirsch/builder/internal/lexer"
+	"testing"
 )
 
 func getStringFromTree(nodes []*ast.Node) string {

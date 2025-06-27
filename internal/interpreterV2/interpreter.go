@@ -1,51 +1,49 @@
 package interpreterV2
 
 import (
-	"fmt"
 	"github.com/hhirsch/builder/internal/ast"
 	"github.com/hhirsch/builder/internal/command"
 	"github.com/hhirsch/builder/internal/token"
+	"github.com/hhirsch/builder/internal/variable"
 	"log/slog"
 )
 
 type Interpreter struct {
-	commands command.Commands
+	commands  command.Commands
+	variables variable.VariablePool
+	function  Function
+	statement Statement
 }
 
 func NewInterpreter() (*Interpreter, error) {
-	interpreter := &Interpreter{commands: *command.NewCommands()}
+	commands := *command.NewCommands()
+	interpreter := &Interpreter{
+		commands:  commands,
+		function:  *NewFunction(&commands),
+		statement: *NewStatement(&commands),
+	}
 	interpreter.commands.AddCommand(command.NewPrintCommand())
 	return interpreter, nil
 }
 
+func (interpreter *Interpreter) convertVariablesToLiterals(node *ast.Node) *ast.Node {
+	return nil
+}
+
 func (interpreter *Interpreter) Run(rootNode *ast.Node) error {
-	slog.Debug("Interpreter is running.")
-	var params []string
+	slog.Info("Interpreter is running.")
 	for _, node := range rootNode.Children {
 		slog.Debug("Processing child nodes.")
 		switch node.Type {
 		case token.STATEMENT:
-			var error error
-			var currentCommand *command.Command
-			currentCommand, error = interpreter.commands.GetCommand(node.Value)
-			if error != nil {
-				return fmt.Errorf("Loading command: %w", error)
-			}
-
-			params = append(params, node.Value)
-			for _, param := range node.Children {
-				slog.Debug("Processing parameter node.")
-				params = append(params, param.Value)
-			}
-
-			(*currentCommand).Execute(params)
+			interpreter.statement.Execute(node)
 		case token.FUNCTION:
-			slog.Debug("Adding function.")
+			interpreter.function.Add(node)
 		case token.EOF:
 			slog.Debug("Encountered EOF. Stopping interpreter.")
 			return nil
 		default:
-			slog.Debug("Interpreter encountered unknown node.", slog.String("node type", string(node.Type)))
+			slog.Error("Interpreter encountered unknown node.", slog.String("node type", string(node.Type)))
 		}
 
 	}

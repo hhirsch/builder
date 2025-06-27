@@ -2,6 +2,7 @@ package command
 
 import (
 	format "fmt"
+	"github.com/hhirsch/builder/internal/ast"
 	"strings"
 )
 
@@ -28,7 +29,7 @@ func (printCommand *PrintCommand) getStringFromTokens(tokens []string) string {
 	return parameters
 }
 
-func (printCommand *PrintCommand) Execute(tokens []string) (string, error) {
-	format.Println(printCommand.getStringFromTokens(tokens))
+func (printCommand *PrintCommand) Execute(parameters []*ast.Node) (string, error) {
+	format.Println(printCommand.GetStringFromParameters(parameters))
 	return "", nil // this is a token sink and has no return value
 }

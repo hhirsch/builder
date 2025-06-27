@@ -6,21 +6,20 @@ import (
 )
 
 func SetupLoggingForTesting() {
-	slog.Info("Setting up logging for testing.")
 	opts := &slog.HandlerOptions{
-		AddSource: true,
+		//AddSource: true,
 		//Level:     slog.LevelInfo,
 		Level: slog.LevelDebug,
 	}
 	logger := slog.New(slog.NewTextHandler(os.Stderr, opts))
 	slog.SetDefault(logger)
+	slog.Info("Logging is set up for testing.")
 }
 
 func SetupLoggingForProduction(fileName string) {
-	slog.Info("Setting up logging for production.")
 	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
-		slog.Error("error opening file using logging for testing", slog.String("errorMessage", err.Error()))
+		slog.Error("error opening file falling back to logging for testing", slog.String("errorMessage", err.Error()))
 		SetupLoggingForTesting()
 		return
 	}
@@ -31,4 +30,5 @@ func SetupLoggingForProduction(fileName string) {
 	}
 	logger := slog.New(slog.NewJSONHandler(file, opts))
 	slog.SetDefault(logger)
+	slog.Info("Logging is set up for production.")
 }

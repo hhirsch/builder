@@ -19,10 +19,9 @@ func (commands *Commands) AddCommand(command Command) {
 }
 
 func (commands *Commands) GetCommand(commandName string) (*Command, error) {
-	command, exists := commands.commands[commandName]
-
-	if !exists {
-		return nil, fmt.Errorf("No such command: %v", commandName)
+	if command, exists := commands.commands[commandName]; exists {
+		return &command, nil
 	}
-	return &command, nil
+	return nil, fmt.Errorf("No such command: %v", commandName)
+
 }

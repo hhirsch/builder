@@ -1,6 +1,8 @@
 package command
 
-import ()
+import (
+	"github.com/hhirsch/builder/internal/ast"
+)
 
 type BaseCommand struct {
 	commandName        string
@@ -29,4 +31,16 @@ func (baseCommand *BaseCommand) GetName() string {
 
 func (baseCommand *BaseCommand) RequiresConnection() bool {
 	return baseCommand.requiresConnection
+}
+
+func (baseCommand *BaseCommand) GetStringFromParameters(parameters []*ast.Node) string {
+	var parameterString string
+	var parameterLength = len(parameters)
+	for index, node := range parameters {
+		parameterString += node.Value
+		if parameterLength != index+1 {
+			parameterString += " "
+		}
+	}
+	return parameterString
 }
