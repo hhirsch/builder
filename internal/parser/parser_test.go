@@ -1,24 +1,11 @@
 package parser
 
 import (
-	"encoding/json"
-	"github.com/google/go-cmp/cmp"
 	"github.com/hhirsch/builder/internal/ast"
 	"github.com/hhirsch/builder/internal/lexer"
+	"github.com/hhirsch/builder/internal/testUtils"
 	"testing"
 )
-
-func getStringFromTree(nodes []*ast.Node) string {
-	syntaxTreeJson, _ := json.Marshal(nodes)
-	return string(syntaxTreeJson)
-}
-
-func throwSyntaxTreeDoesNotMatchError(test *testing.T, tree *ast.Node, referenceTree *ast.Node) {
-	if !cmp.Equal(tree, referenceTree) {
-		test.Logf("Syntax tree:\n%s \n\ndoes not match reference:\n\n%s.", getStringFromTree(tree.Children), getStringFromTree(referenceTree.Children))
-		test.Errorf("Syntax tree does not match reference.")
-	}
-}
 
 func TestParserWithEmptyFileCreatesEmptyAst(test *testing.T) {
 	referenceTree := ast.NewRoot(ast.NewEndOfFile())
@@ -30,7 +17,7 @@ func TestParserWithEmptyFileCreatesEmptyAst(test *testing.T) {
 	if len(parser.errors) > 0 {
 		test.Errorf("Parser should not have any errors.")
 	}
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
 
 func TestSingleStatement(test *testing.T) {
@@ -39,8 +26,7 @@ func TestSingleStatement(test *testing.T) {
 	lexer, _ := lexer.NewLexer(input)
 	parser, _ := NewParser(lexer)
 	syntaxTree := parser.GetSyntaxTree()
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
-
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
 
 func TestParserCreatesAst(test *testing.T) {
@@ -64,7 +50,7 @@ print This is a test
 	lexer, _ := lexer.NewLexer(input)
 	parser, _ := NewParser(lexer)
 	syntaxTree := parser.GetSyntaxTree()
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
 
 func TestParserCreatesAstVariables(test *testing.T) {
@@ -81,7 +67,7 @@ func TestParserCreatesAstVariables(test *testing.T) {
 	parser, _ := NewParser(lexer)
 	syntaxTree := parser.GetSyntaxTree()
 
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
 
 func TestParserSteps(test *testing.T) {
@@ -99,7 +85,7 @@ step Testing 3`
 	parser, _ := NewParser(lexer)
 	syntaxTree := parser.GetSyntaxTree()
 
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
 
 func TestParserCreatesAstForFunctions(test *testing.T) {
@@ -116,5 +102,5 @@ done`
 	lexer, _ := lexer.NewLexer(input)
 	parser, _ := NewParser(lexer)
 	syntaxTree := parser.GetSyntaxTree()
-	throwSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }
