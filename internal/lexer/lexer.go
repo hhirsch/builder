@@ -115,10 +115,6 @@ func (lexer *Lexer) read(limiterFunction func(byte) bool) string {
 	return token
 }
 
-func anything(character byte) bool {
-	return true
-}
-
 func isLetter(character byte) bool {
 	return 'a' <= character && character <= 'z' || 'A' <= character && character <= 'Z' || character == '_' || character == '-'
 }
