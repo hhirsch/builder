@@ -92,7 +92,7 @@ func TestParserCreatesAstForFunctions(test *testing.T) {
 	referenceTree := ast.NewRoot()
 	referenceTree.Children = append(referenceTree.Children,
 		ast.NewFunction("printString",
-			[]*ast.Node{ast.NewIdentifierVariadic("string..."), ast.NewLineBreak()},
+			[]*ast.Node{ast.NewIdentifierVariadic("string"), ast.NewLineBreak()},
 			[]*ast.Node{ast.NewStatement("print", ast.NewIdentifier("string"), ast.NewLineBreak())}),
 	)
 	referenceTree.Children = append(referenceTree.Children, ast.NewEndOfFile())
@@ -101,6 +101,26 @@ print $string
 done`
 	lexer, _ := lexer.NewLexer(input)
 	parser, _ := NewParser(lexer)
+	syntaxTree := parser.GetSyntaxTree()
+	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
+}
+
+func TestParserCreatesAstForFunctionsWithReturn(test *testing.T) {
+	referenceTree := ast.NewRoot()
+	referenceTree.Children = append(referenceTree.Children,
+		ast.NewFunction("printString",
+			[]*ast.Node{ast.NewIdentifierVariadic("string"), ast.NewLineBreak()},
+			[]*ast.Node{ast.NewReturn(ast.NewIdentifier("string")), ast.NewLineBreak()}),
+	)
+	referenceTree.Children = append(referenceTree.Children, ast.NewEndOfFile())
+	input := `function printString $string...
+return $string
+done`
+	lexer, _ := lexer.NewLexer(input)
+	parser, _ := NewParser(lexer)
+	if len(parser.errors) > 0 {
+		test.Errorf("%v parser errors.", len(parser.errors))
+	}
 	syntaxTree := parser.GetSyntaxTree()
 	testUtils.ThrowSyntaxTreeDoesNotMatchError(test, syntaxTree, referenceTree)
 }

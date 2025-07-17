@@ -12,6 +12,7 @@ var registry *models.Registry = models.NewRegistry(appEnvironment.GetBuilderHome
 var testing bool = true
 
 func runControllerAction() {
+	slog.Info("Running controller action.")
 	controller := controllers.NewBuilderController(appEnvironment)
 	controller.ExecuteAction()
 }

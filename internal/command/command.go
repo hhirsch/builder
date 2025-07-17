@@ -7,6 +7,7 @@ import (
 type Command interface {
 	TestRequirements() bool
 	Execute(parameters []*ast.Node) (string, error)
+	Validate(parameters []*ast.Node) error
 	GetName() string
 	RequiresConnection() bool
 }

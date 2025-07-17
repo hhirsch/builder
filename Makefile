@@ -16,7 +16,9 @@ builder:
 	$(GO) build -o $(PROJECT_PATH)/bin/builder $(BUILD_FLAGS) $(PROJECT_PATH)/cmd/builder
 
 tests:
-	$(GO) test ./internal/interpreter $(BUILD_FLAGS)
+	$(GO) test ./internal/lexer $(BUILD_FLAGS)
+	$(GO) test ./internal/parser $(BUILD_FLAGS)
+	$(GO) test ./internal/interpreterV2 $(BUILD_FLAGS)
 
 clean:
 	rm bin/builder

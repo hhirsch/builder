@@ -71,35 +71,20 @@ func NewIdentifier(value string) *Node {
 	}
 }
 
+func NewReturn(node *Node) *Node {
+	return &Node{
+		Type:      token.RETURN,
+		Value:     "return",
+		RightNode: node,
+	}
+}
+
 func NewIdentifierVariadic(value string) *Node {
 	return &Node{
 		Type:  token.IDENTIFIER_VARIADIC,
 		Value: value,
 	}
 }
-
-/*
-func NewFunctionDefinition(value string) *Node {
-	return &Node{
-		Type:  token.FUNCTION,
-		Value: value,
-	}
-}
-
-func NewFunctionIdentifier(value string) *Node {
-	return &Node{
-		Type:  token.FUNCTION_IDENTIFIER,
-		Value: value,
-	}
-}
-
-func NewFunctionParameters(parameters []*Node) *Node {
-	return &Node{
-		Type:     token.FUNCTION_PARAMETERS,
-		Children: parameters,
-	}
-}
-*/
 
 func NewFunction(value string, parameters []*Node, body []*Node) *Node {
 	return &Node{
@@ -109,15 +94,6 @@ func NewFunction(value string, parameters []*Node, body []*Node) *Node {
 		Children:   body,
 	}
 }
-
-/*
-func NewFunction(name string, nodes ...*Node) *Node {
-	return &Node{
-		Type:     token.FUNCTION,
-		Value:    name,
-		Children: nodes,
-	}
-  }*/
 
 func NewEndOfFile() *Node {
 	return &Node{

@@ -65,22 +65,25 @@ func (scriptAction *ScriptAction) Execute() (string, error) {
 	if error != nil {
 		return "", error
 	}
-	slog.Info("Parsing...")
 	parser, error := parser.NewParser(lexer)
 	if error != nil {
 		return "", error
 	}
-	slog.Info("Running...")
-	interpreter.Run(parser.GetSyntaxTree())
+	syntaxTree := parser.GetSyntaxTree()
 	if len(*parser.GetErrors()) > 0 {
 		fmt.Println("Error parsing file: ")
+		for _, error := range *parser.GetErrors() {
+			fmt.Println(error)
+		}
+		return "", fmt.Errorf("%v parse errors detected: ", len(*parser.GetErrors()))
 	}
-	for _, error := range *parser.GetErrors() {
-		fmt.Println(error)
+
+	slog.Info("Running...")
+
+	error = interpreter.Run(syntaxTree)
+	if error != nil {
+		return "", error
 	}
-	/*	if error != nil {
-		return "", fmt.Errorf("interpreter run: %w", err)
-	}*/
 	slog.Info("Interpreter has finnished.")
 	return buffer, nil
 }

@@ -326,7 +326,7 @@ func TestFunctionDefinition(test *testing.T) {
 	reference := []token.Token{
 		token.Token{Type: token.FUNCTION, Literal: "function"},
 		token.Token{Type: token.LITERAL, Literal: "printString"},
-		token.Token{Type: token.IDENTIFIER_VARIADIC, Literal: "string..."},
+		token.Token{Type: token.IDENTIFIER_VARIADIC, Literal: "string"},
 		token.Token{Type: token.LINE_BREAK, Literal: "\n"},
 		token.Token{Type: token.STATEMENT, Literal: "print"},
 		token.Token{Type: token.IDENTIFIER, Literal: "string"},
@@ -348,24 +348,57 @@ done`
 			test.Errorf("Wrong token literal: %v. Expected: %v.", nextToken.Literal, referenceToken.Literal)
 		}
 	}
-	/*	lexer, _ := NewLexer(input)
+}
 
+func TestReturnStatement(test *testing.T) {
+	reference := []token.Token{
+		token.Token{Type: token.FUNCTION, Literal: "function"},
+		token.Token{Type: token.LITERAL, Literal: "getString"},
+		token.Token{Type: token.IDENTIFIER_VARIADIC, Literal: "string"},
+		token.Token{Type: token.LINE_BREAK, Literal: "\n"},
+		token.Token{Type: token.RETURN, Literal: "return"},
+		token.Token{Type: token.IDENTIFIER, Literal: "string"},
+		token.Token{Type: token.LINE_BREAK, Literal: "\n"},
+		token.Token{Type: token.DONE, Literal: "done"},
+	}
+
+	input := `function getString $string...
+return $string
+done`
+	lexer, _ := NewLexer(input)
+
+	for _, referenceToken := range reference {
 		nextToken := lexer.NextToken()
-		if nextToken.Type != token.FUNCTION {
-			test.Errorf("Wrong token type: %v. Expected type: FUNCTION.", nextToken.Type)
+		if referenceToken.Type != nextToken.Type {
+			test.Errorf("Wrong token type: %v. Expected type: %v. Literal: %v", nextToken.Type, referenceToken.Type, nextToken.Literal)
 		}
-		nextToken = lexer.NextToken()
-		if nextToken.Type != token.LITERAL {
-			test.Errorf("Wrong token type: %v. Expected type: LITERAL.", nextToken.Type)
+		if referenceToken.Literal != nextToken.Literal {
+			test.Errorf("Wrong token literal: %v. Expected: %v.", nextToken.Literal, referenceToken.Literal)
 		}
-		if nextToken.Literal != "printString" {
-			test.Errorf("Wrong token literal: %v. Expected: %v.", nextToken.Literal, "printString")
-		}
-		nextToken = lexer.NextToken()
-		if nextToken.Type != token.IDENTIFIER {
-			test.Errorf("Wrong token type: %v. Expected type: IDENTIFIER.", nextToken.Type)
-		}
-		if nextToken.Literal != "string" {
-			test.Errorf("Wrong token literal: %v. Expected: %v.", nextToken.Literal, "string")
-		} */
+	}
+}
+
+func TestInvalidInputCreatesOneIllegalTokenAndThenEof(test *testing.T) {
+	input := `..uiaeiautrdn iuaetrdiuae`
+	lexer, _ := NewLexer(input)
+	nextToken := lexer.NextToken()
+	if nextToken.Type != token.ILLEGAL {
+		test.Errorf("Wrong token type: %v. Expected Illegal.", nextToken.Type)
+	}
+	nextToken = lexer.NextToken()
+	if nextToken.Type != token.EOF {
+		test.Errorf("Wrong token type: %v. Expected EOF.", nextToken.Type)
+	}
+	nextToken = lexer.NextToken()
+	if nextToken.Type != token.EOF {
+		test.Errorf("Wrong token type: %v. Expected EOF.", nextToken.Type)
+	}
+	nextToken = lexer.NextToken()
+	if nextToken.Type != token.EOF {
+		test.Errorf("Wrong token type: %v. Expected EOF.", nextToken.Type)
+	}
+	nextToken = lexer.NextToken()
+	if nextToken.Type != token.EOF {
+		test.Errorf("Wrong token type: %v. Expected EOF.", nextToken.Type)
+	}
 }

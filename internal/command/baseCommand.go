@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/hhirsch/builder/internal/ast"
+	"github.com/hhirsch/builder/internal/token"
 )
 
 type BaseCommand struct {
@@ -35,11 +36,12 @@ func (baseCommand *BaseCommand) RequiresConnection() bool {
 
 func (baseCommand *BaseCommand) GetStringFromParameters(parameters []*ast.Node) string {
 	var parameterString string
-	var parameterLength = len(parameters)
 	for index, node := range parameters {
-		parameterString += node.Value
-		if parameterLength != index+1 {
-			parameterString += " "
+		if node.Type != token.LINE_BREAK {
+			if index != 0 {
+				parameterString += " "
+			}
+			parameterString += node.Value
 		}
 	}
 	return parameterString

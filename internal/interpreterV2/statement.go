@@ -14,14 +14,12 @@ func NewStatement(commands *command.Commands) *Statement {
 	return &Statement{commands: commands}
 }
 
-func (statement *Statement) Execute(node *ast.Node) error {
+func (statement *Statement) Execute(node *ast.Node) (string, error) {
 	var error error
 	var currentCommand *command.Command
 	currentCommand, error = statement.commands.GetCommand(node.Value)
 	if error != nil {
-		return fmt.Errorf("Loading command: %w", error)
+		return "", fmt.Errorf("Loading command: %w", error)
 	}
-	(*currentCommand).Execute(node.Children)
-
-	return nil
+	return (*currentCommand).Execute(node.Children)
 }

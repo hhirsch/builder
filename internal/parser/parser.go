@@ -34,32 +34,27 @@ func (parser *Parser) GetErrors() *[]string {
 
 func (parser *Parser) GetSyntaxTree() *ast.Node {
 	var children []*ast.Node
-	/*	if parser.currentToken.Type != token.LINE_BREAK {
-		parser.advance()
-	}*/
+	slog.Debug("Parsing.")
 	for parser.currentToken.Type != token.EOF {
-		//		if parser.currentToken.Type != token.LINE_BREAK {
 		statement := parser.parse()
 		children = append(children, statement)
-		//}
 		parser.advance()
 	}
-	//if len(children) == 0 {
 	children = append(children, ast.NewEndOfFile())
-	//}
 	return ast.NewRoot(children...)
 }
 
+func (parser *Parser) addParseError(message string) {
+	parser.errors = append(parser.errors, message, string(parser.currentToken.Type))
+}
+
+// @todo add a register for all functions and a register for all statements in the code
+// before starting the interpreter compare them against each other to make sure all the functions exist
 func (parser *Parser) parse() *ast.Node {
 	switch parser.currentToken.Type {
 	case token.LINE_BREAK:
-		//panic("illegal line break that should have been skipped")
-		//		parser.advance()
 		return ast.NewLineBreak()
-
 	case token.SPACE:
-		//panic("illegal line break that should have been skipped")
-		//		parser.advance()
 		return ast.NewSpace()
 	case token.STATEMENT:
 		slog.Debug("Parsing statement.")
@@ -74,13 +69,19 @@ func (parser *Parser) parse() *ast.Node {
 		slog.Debug("Parsing operation.")
 		return parser.parseOperation()
 	case token.RETURN:
+		slog.Debug("Parsing return statement.")
+		return parser.parseReturn()
 		//return parser.parseReturnStatement()
+	case token.ILLEGAL:
+		parser.errors = append(parser.errors, "Illegal token type %v while parsing statement.", string(parser.currentToken.Type))
+		//		return ast.NewStatement("nil", ast.NewLiteral("nil"))
 	default:
 		//return parser.parseStatement()
 		//panic("Literal result when only statements in the input! Type: " + parser.currentToken.Type)
 		return ast.NewLiteral(parser.currentToken.Literal)
 		//return parser.parseExpressionStatement()
 	}
+	parser.errors = append(parser.errors, "Illegal token type %v while parsing statement.", string(parser.currentToken.Type))
 	return ast.NewStatement("nil", ast.NewLiteral("nil"))
 }
 
@@ -109,6 +110,23 @@ func (parser *Parser) parseStatement() *ast.Node {
 
 	//literals = append(literals, ast.NewLineBreak())
 	return ast.NewStatement(statementName, literals...)
+}
+
+func (parser *Parser) parseReturn() *ast.Node {
+	for parser.currentToken.Type != token.LINE_BREAK && parser.currentToken.Type != token.EOF {
+		parser.advance() // skipping the return statement itself
+		switch parser.currentToken.Type {
+		case token.LITERAL:
+			return ast.NewReturn(ast.NewLiteral(parser.currentToken.Literal))
+		case token.IDENTIFIER:
+			return ast.NewReturn(ast.NewIdentifier(parser.currentToken.Literal))
+		case token.ILLEGAL:
+			parser.errors = append(parser.errors, "Illegal token type %v while parsing statement.", string(parser.currentToken.Type))
+		default:
+			parser.errors = append(parser.errors, "Unexpected token type %v while parsing statement.", string(parser.currentToken.Type))
+		}
+	}
+	return ast.NewReturn(ast.NewIllegal(parser.currentToken.Literal))
 }
 
 func (parser *Parser) parseFunction() *ast.Node {
@@ -148,6 +166,17 @@ func (parser *Parser) parseFunction() *ast.Node {
 			functionBody = append(functionBody, ast.NewSpace())
 		case token.STATEMENT:
 			functionBody = append(functionBody, parser.parseStatement())
+		case token.RETURN:
+			parser.advance()
+			switch parser.currentToken.Type {
+			case token.LITERAL:
+				functionBody = append(functionBody, ast.NewReturn(ast.NewLiteral(parser.currentToken.Literal)))
+			case token.IDENTIFIER:
+				functionBody = append(functionBody, ast.NewReturn(ast.NewIdentifier(parser.currentToken.Literal)))
+			default:
+				parser.errors = append(parser.errors, "Illegal token type %v while parsing return statement.", string(parser.currentToken.Type))
+			}
+
 		case token.DONE:
 			parser.errors = append(parser.errors, "Illegal token type %v while parsing statement.", string(parser.currentToken.Type))
 		case token.ILLEGAL:

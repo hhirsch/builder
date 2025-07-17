@@ -67,6 +67,7 @@ func (controller *Controller) ExecuteAction() {
 
 	var actionName = os.Args[1]
 	if action, exists := controller.actionsMap[actionName]; exists {
+		slog.Info("Builder called with recognized command: " + actionName + ".")
 		_, err := action.Execute()
 		if err != nil {
 			slog.Error("Executing action.", slog.String("error message", err.Error()))
@@ -75,7 +76,7 @@ func (controller *Controller) ExecuteAction() {
 		}
 		return
 	}
-	slog.Info("Builder called with unrecognized command. " + actionName + ".")
+	slog.Info("Builder called with unrecognized command: " + actionName + ".")
 	controller.ShowHelp()
 }
 

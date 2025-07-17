@@ -11,7 +11,7 @@ type Lexer struct {
 	input          string
 	isAtFirstToken bool
 	line           uint32
-	column         uint32
+	column         uint16
 }
 
 func NewLexer(input string) (*Lexer, error) {
@@ -29,6 +29,10 @@ func NewLexer(input string) (*Lexer, error) {
 	return lexer, nil
 }
 
+func (lexer *Lexer) GetPosition() (line uint32, column uint16) {
+	return lexer.line, lexer.column
+}
+
 func (lexer *Lexer) newLine() {
 	lexer.line++
 	lexer.column = 1
@@ -36,13 +40,6 @@ func (lexer *Lexer) newLine() {
 
 func (lexer *Lexer) NextToken() *token.Token {
 	var nextToken *token.Token
-	/*	for lexer.character == '\n' && lexer.isAtFirstToken {
-			lexer.nextCharacter()
-		}
-		for lexer.character == ' ' || lexer.character == '\t' {
-			lexer.nextCharacter()
-		}*/
-
 	for lexer.character == token.WHITE_SPACE {
 		lexer.nextCharacter()
 		lexer.column++
@@ -75,7 +72,7 @@ func (lexer *Lexer) NextToken() *token.Token {
 		lexer.nextCharacter()
 		followUpDots := lexer.read(isDot)
 		if len(followUpDots) == 3 {
-			nextToken = token.NewToken(token.IDENTIFIER_VARIADIC, identifier+followUpDots)
+			nextToken = token.NewToken(token.IDENTIFIER_VARIADIC, identifier)
 		} else if len(followUpDots) == 0 {
 			nextToken = token.NewToken(token.IDENTIFIER, identifier)
 		} else {
@@ -84,7 +81,6 @@ func (lexer *Lexer) NextToken() *token.Token {
 	case 0:
 		nextToken = token.NewToken(token.EOF, "")
 	default:
-		//		if lexer.position == 0 || lexer.input[lexer.position-1] == token.NEW_LINE || lexer.input[lexer.position-1] == '\r' {
 		if lexer.isAtFirstToken && isLetter(lexer.character) {
 			literal := lexer.read(isLetter)
 			nextToken = token.NewToken(token.GetStatement(literal), literal)
@@ -96,7 +92,8 @@ func (lexer *Lexer) NextToken() *token.Token {
 			literal := lexer.read(isDigit)
 			nextToken = token.NewToken(token.LITERAL, literal)
 		} else {
-			nextToken = token.NewToken(token.ILLEGAL, lexer.read(isLetter))
+			lexer.moveToEnd()
+			nextToken = token.NewToken(token.ILLEGAL, string(lexer.character))
 		}
 	}
 	lexer.nextCharacter()
@@ -116,6 +113,10 @@ func (lexer *Lexer) read(limiterFunction func(byte) bool) string {
 	 */
 	lexer.position--
 	return token
+}
+
+func anything(character byte) bool {
+	return true
 }
 
 func isLetter(character byte) bool {
@@ -141,4 +142,9 @@ func (lexer *Lexer) nextCharacter() {
 	} else {
 		lexer.character = lexer.input[lexer.position]
 	}
+}
+
+func (lexer *Lexer) moveToEnd() {
+	lexer.position = len(lexer.input) - 1
+	lexer.character = 0
 }

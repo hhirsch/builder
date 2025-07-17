@@ -54,7 +54,7 @@ func (customCommand *CustomCommand) Execute(tokens []string) (string, error) {
 				return "", nil
 			}
 		} else {
-			customCommand.logger.Debugf("Token is not return: %s", tokens[0], " ")
+			customCommand.logger.Debugf("Token is not return: %s", tokens[0])
 		}
 		_, err := customCommand.interpreter.handleLine(strings.Join(processedTokens, " "))
 		if err != nil {

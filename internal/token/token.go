@@ -68,7 +68,7 @@ func NewToken(tokenType Type, literal string) *Token {
 }
 
 func GetStatement(literal string) Type {
-	if keyword, ok := keywords[literal]; ok {
+	if keyword, exists := keywords[literal]; exists {
 		return keyword
 	}
 	return STATEMENT
