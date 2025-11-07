@@ -7,7 +7,7 @@ Copyright (C) 2025  Henry Hirsch
 This program is licensed under the GNU General Public License v3. 
 See <http://www.gnu.org/licenses/gpl-3.0.html> for details.
 ## Features
-- Touring incomplete Domain Specific Language inspired by Basic.
+- Turing incomplete Domain Specific Language inspired by Basic.
 - commands to 
   - install packages
   - upload files
